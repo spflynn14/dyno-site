@@ -1,0 +1,120 @@
+{% extends 'team.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/team_settings.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="third_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        <div id="team_settings_column_one">
+            <div id="team_name_div">
+                <h5 style="display: inline-block; font-weight: bold">Team Name: &nbsp&nbsp</h5>
+                <input type="text" id="team_name_input" maxlength="60" style="display: inline-block" />
+            </div>
+            <br><br>
+            <div id="email_div">
+                <h5 style="display: inline-block; font-weight: bold">Email: &nbsp&nbsp</h5>
+                <input type="email" id="email_input" style="display: inline-block" />
+            </div>
+            <br>
+            <div id="logo_div">
+                <h5 style="display: inline-block; font-weight: bold">Assign Team Logo: &nbsp&nbsp</h5>
+                <input type="file" id="logo_input" style="display: inline-block"/>
+                <p style="font-size: small">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp(sorry, not implemented yet)</p>
+            </div>
+            <br>
+            <div id="save_changes_div">
+                <button type="submit" id="team_settings_save_changes">Save Changes</button>
+                <br><br><p id="team_settings_message" style="color: blue"></p>
+            </div>
+        </div>
+
+        <div id="team_settings_column_two">
+            <div id="team_settings_player_display_filters_area">
+                Checking boxes below will hide a player with corresponding tag in the Team Organization and Cap Situation By Year tabs:<br><br>
+                <input class='display_filter_checkbox' type="checkbox" value="IR" {% if 'IR' in filtered_tags %}checked{% endif %} /> IR<br>
+                <input class='display_filter_checkbox' type="checkbox" value="Trade" {% if 'Trade' in filtered_tags %}checked{% endif %} /> Trade<br>
+                <input class='display_filter_checkbox' type="checkbox" value="Release" {% if 'Release' in filtered_tags %}checked{% endif %} /> Release<br>
+            </div>
+            <br><br>
+            <div id="team_settings_role_descriptions_area">
+                <h5 style="text-decoration: underline">Role Descriptions</h5><br>
+                <table>
+                    <tbody>
+                        {% for x in role_list %}
+                            <tr>
+                                <td style="font-size: small; padding: 4px 4px; border: 1px dotted #cdcdcd">{{ x.role }}</td>
+                                <td style="font-size: small; padding: 4px 4px; border: 1px dotted #cdcdcd">{{ x.description }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="team_settings_column_three">
+            <div id="change_user_password_div">
+                <button type="button" id="go_to_change_password_button" style="float: right">Click Here to change username and/or password</button>
+            </div>
+            <br><br>
+            <div id="account_balance_div">
+                {% if current_balance > 0 %}
+                    Current Balance: &nbsp&nbsp<span style="color: green;">${{ current_balance }}</span><br>
+                {% elif current_balance < 0 %}
+                    Current Balance: &nbsp&nbsp<span style="color: red;">${{ current_balance }}</span><br>
+                {% else %}
+                    Current Balance: &nbsp&nbsp<span>${{ current_balance }}</span><br>
+                {% endif %}
+
+                <span style="font-size: x-small">(includes 2016 league fees)</span><br><br>
+                <p style="font-size: smaller" id="show_hide_account_details">(Show/Hide Details)</p><br>
+
+                <div id="account_balance_details_div">
+                    {% if yr1_balance == 0 %}
+                        2015 League Year: &nbsp&nbsp<span style="color: green;">Paid!</span><br>
+                    {% else %}
+                        2015 League Year: &nbsp&nbsp<span style="color: red">Unpaid (${{ yr1_balance }})</span><br>
+                    {% endif %}
+
+                    {% if yr2_balance == 0 %}
+                        2016 League Year: &nbsp&nbsp<span style="color: green;">Paid!</span><br><br>
+                    {% else %}
+                        2016 League Year: &nbsp&nbsp<span style="color: red">Unpaid (${{ yr2_balance }})</span><br><br>
+                    {% endif %}
+
+                    <p style="font-size: x-small">(if any of the above information is incorrect,<br>please contact me immediately)</p><br>
+
+                    <p style="font-size: small;">Bonuses:</p>
+
+                    {% if yr1_bonuses.0 == '1' %}
+                        <p style="font-size: small">2015 Extra 3rd Round Rookie Pick</p>
+                    {% endif %}
+                    {% if yr1_bonuses.2 == '1' %}
+                        <p style="font-size: small">2015 "Waiver Extension"</p>
+                    {% endif %}
+                    {% if yr2_bonuses.0 == '1' %}
+                        <p style="font-size: small">2016 Extra 3rd Round Rookie Pick</p>
+                    {% endif %}
+                    {% if yr2_bonuses.2 == '1' %}
+                        <p style="font-size: small">2016 "Waiver Extension"</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="vw_1">
+        <p>{{ team_name }}</p>
+    </div>
+
+    <div id="vw_2">
+        <p>{{ user_email }}</p>
+    </div>
+{% endblock %}

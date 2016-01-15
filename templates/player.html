@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="{% static 'js/player.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="tab_area" id="second_tab_area">
+
+    </div>
+
+    <div class="tab_area" id="third_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        {% csrf_token %}
+        <div id="player_search_area">
+            Search:<br>
+            <input type="text" name="search_text" id="search_text">
+            <br><br>
+            <h6>Click on player below to load info</h6>
+            <select id="player_select_listbox" name="player_selected" size="25">
+                {% for x in player_list %}
+                    <option {% if x == player_selected %}selected{% endif %}>{{ x }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="player_display_area">
+            <div class='display_div' id="line_1">
+                <div id="name_text"></div>
+                <div id="pos_text"></div>
+                <i class="glyphicon glyphicon-user" id='user_icon' style="display: inline-block; float: left; width: 3%"></i><p id="team_text"></p>
+            </div>
+            <div class='display_div' id="line_2"></div>
+            <div class='display_div' id="line_11">
+                <div class='hidden_divs' style="text-align: right; font-weight: bold; width: 30%; display: inline-block">Contract Type: &nbsp&nbsp&nbsp</div>
+                <div id="contract_type_text" style="display: inline-block; width: 25%"></div>
+                <div class='hidden_divs' style="text-align: right; font-weight: bold; display: inline-block">Notes: &nbsp&nbsp&nbsp</div>
+                <div id="notes_text" style="display: inline-block"></div>
+            </div>
+            <div class='display_div' id="line_3">
+                <div style="width: 20.6%; display: inline-block"></div>
+                <div class='hidden_divs' style="width: 20%; font-weight: bold; display: inline-block; text-align: center">Total Cost</div>
+                <div class='hidden_divs' style="width: 20%; font-weight: bold; display: inline-block; text-align: center">Salary</div>
+                <div class='hidden_divs' style="width: 20%; font-weight: bold; display: inline-block; text-align: center">Signing Bonus</div>
+            </div>
+            <div class='display_div' id="line_4">
+                <div class='hidden_headers' id="yr1_header" style="width: 15%; text-align: right;">2015</div>
+                <div style="width: 5%; display: inline-block"></div>
+                <div class='line_text' id="yr1_total_text"></div>
+                <div class='line_text' id="yr1_salary_text"></div>
+                <div class='line_text' id="yr1_sb_text"></div>
+            </div>
+            <div class='display_div' id="line_5">
+                <div class='hidden_headers' id="yr2_header" style="width: 15%; text-align: right;">2016</div>
+                <div style="width: 5%; display: inline-block"></div>
+                <div class='line_text' id="yr2_total_text"></div>
+                <div class='line_text' id="yr2_salary_text"></div>
+                <div class='line_text' id="yr2_sb_text"></div>
+            </div>
+            <div class='display_div' id="line_6">
+                <div class='hidden_headers' id="yr3_header" style="width: 15%; text-align: right;">2017</div>
+                <div style="width: 5%; display: inline-block"></div>
+                <div class='line_text' id="yr3_total_text"></div>
+                <div class='line_text' id="yr3_salary_text"></div>
+                <div class='line_text' id="yr3_sb_text"></div>
+            </div>
+            <div class='display_div' id="line_7">
+                <div class='hidden_headers' id="yr4_header" style="width: 15%; text-align: right;">2018</div>
+                <div style="width: 5%; display: inline-block"></div>
+                <div class='line_text' id="yr4_total_text"></div>
+                <div class='line_text' id="yr4_salary_text"></div>
+                <div class='line_text' id="yr4_sb_text"></div>
+            </div>
+            <div class='display_div' id="line_8">
+                <div class='hidden_headers' id="yr5_header" style="width: 15%; text-align: right;">2019</div>
+                <div style="width: 5%; display: inline-block"></div>
+                <div class='line_text' id="yr5_total_text"></div>
+                <div class='line_text' id="yr5_salary_text"></div>
+                <div class='line_text' id="yr5_sb_text"></div>
+            </div>
+            <div class='display_div' id="line_9"></div>
+            <div class='display_div' id="line_10">
+                <div class='hidden_headers' id="all_header" style="width: 15%; text-align: right;">Totals</div>
+                <div style="width: 5%; display: inline-block"></div>
+                <div class='line_text' id="all_total_text"></div>
+                <div class='line_text' id="all_salary_text"></div>
+                <div class='line_text' id="all_sb_text"></div>
+            </div>
+        </div>
+
+        <div id="player_interaction_area">
+            <div class='tab_area' id="player_mini_tab_area">
+                <div class="mini_tab_button_player" id="player_cut_eval_button" style="font-size: smaller">Cap Implications If Player Is Cut</div>
+                <div class="mini_tab_button_player" id="player_restructure_eval_button" style="font-size: smaller">Cap Implications If Contract Restructured</div>
+            </div>
+            <div id="message_area" style="text-align: center"></div>
+            <div id="player_interaction_display_area">
+                <div id='player_cut_area' style="height: 40%">
+                    <table style="table-layout: fixed; width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class='player_interaction_cells' style="text-align: center; width: 25%;"></th>
+                                <th class='player_interaction_cells' style="text-align: center; width: 25%;">Total Cost</th>
+                                <th class='player_interaction_cells' style="text-align: center; width: 25%;">Guaranteed</th>
+                                <th class='player_interaction_cells' style="text-align: center; width: 25%;">Cap Savings</th>
+                            </tr>
+                        </thead>
+                        <tbody id="player_interaction_1">
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id='player_restructure_area' style="height: 40%">
+                    <p style="font-size: smaller; text-align: center">Use the sliders for large changes. Use the spinners for small changes. There will likely be small rounding errors in some of the numbers. Ignore those.</p>
+                    <table style="table-layout: fixed; width: 100%;">
+                        <tbody id="player_interaction_3">
+                            <tr>
+                                <td class='player_interaction_cells_restructure' style="width: 15%"></td>
+                                <td class='player_interaction_cells_restructure' style="width: 40%"></td>
+                                <td class='player_interaction_cells_restructure' style="width: 15%"></td>
+                                <td class='player_interaction_cells_restructure' style="text-decoration: underline; font-weight: bold; width: 15%;">Salary</td>
+                                <td class='player_interaction_cells_restructure' style="text-decoration: underline; font-weight: bold; width: 15%;">Total Cost</td>
+                            </tr>
+
+                            <!-- ROW 1 -->
+                            <tr>
+                                <td class='player_interaction_cells_restructure' style="font-weight: bold; width: 15%;">2015</td>
+                                <td class='player_interaction_cells_restructure' style="width: 40%">
+                                    <div id="slider_1" style="margin: auto"></div>
+                                </td>
+                                <td class='player_interaction_cells_restructure freeze_button_area' style="width: 15%">
+                                    <div style="margin: auto">
+                                        <button id='freeze_button_1' type="button">Freeze</button>
+                                    </div>
+                                </td>
+                                <td class='player_interaction_cells_restructure' style="width: 15%">
+                                    <input id="spinner_1" name='value' style="width: 35px; height:50%" />
+                                </td>
+                                <td class='player_interaction_cells_restructure' id='cap_hit_1' style="width: 15%">Cap Hit</td>
+                            </tr>
+
+                            <!-- ROW 2 -->
+                            <tr>
+                                <td class='player_interaction_cells_restructure' style="font-weight: bold; width: 15%;">2016</td>
+                                <td class='player_interaction_cells_restructure' style="width: 40%">
+                                    <div id="slider_2" style="margin: auto"></div>
+                                </td>
+                                <td class='player_interaction_cells_restructure freeze_button_area' style="width: 15%">
+                                    <div style="margin: auto">
+                                        <button id='freeze_button_2' type="button">Freeze</button>
+                                    </div>
+                                </td>
+                                <td class='player_interaction_cells_restructure' style="width: 15%">
+                                    <input id="spinner_2" name='value' style="width: 35px; height:50%" />
+                                </td>
+                                <td class='player_interaction_cells_restructure' id='cap_hit_2' style="width: 15%">Cap Hit</td>
+                            </tr>
+
+                            <!-- ROW 3 -->
+                            <tr>
+                                <td class='player_interaction_cells_restructure' style="font-weight: bold; width: 15%;">2017</td>
+                                <td class='player_interaction_cells_restructure' style="width: 40%">
+                                    <div id="slider_3" style="margin: auto"></div>
+                                </td>
+                                <td class='player_interaction_cells_restructure freeze_button_area' style="width: 15%">
+                                    <div style="margin: auto">
+                                        <button id='freeze_button_3' type="button">Freeze</button>
+                                    </div>
+                                </td>
+                                <td class='player_interaction_cells_restructure' style="width: 15%">
+                                    <input id="spinner_3" name='value' style="width: 35px; height:50%" />
+                                </td>
+                                <td class='player_interaction_cells_restructure' id='cap_hit_3' style="width: 15%">Cap Hit</td>
+                            </tr>
+
+                            <!-- ROW 4 -->
+                            <tr>
+                                <td class='player_interaction_cells_restructure' style="font-weight: bold; width: 15%;">2018</td>
+                                <td class='player_interaction_cells_restructure' style="width: 40%">
+                                    <div id="slider_4" style="margin: auto"></div>
+                                </td>
+                                <td class='player_interaction_cells_restructure freeze_button_area' style="width: 15%">
+                                    <div style="margin: auto">
+                                        <button id='freeze_button_4' type="button">Freeze</button>
+                                    </div>
+                                </td>
+                                <td class='player_interaction_cells_restructure' style="width: 15%">
+                                    <input id="spinner_4" name='value' style="width: 35px; height:50%" />
+                                </td>
+                                <td class='player_interaction_cells_restructure' id='cap_hit_4' style="width: 15%">Cap Hit</td>
+                            </tr>
+
+                            <!-- ROW 5 -->
+                            <tr>
+                                <td class='player_interaction_cells_restructure' style="font-weight: bold; width: 15%;">2019</td>
+                                <td class='player_interaction_cells_restructure' style="width: 40%">
+                                    <div id="slider_5" style="margin: auto"></div>
+                                </td>
+                                <td class='player_interaction_cells_restructure freeze_button_area' style="width: 15%">
+                                    <div style="margin: auto">
+                                        <button id='freeze_button_5' type="button">Freeze</button>
+                                    </div>
+                                </td>
+                                <td class='player_interaction_cells_restructure' style="width: 15%">
+                                    <input id="spinner_5" name='value' style="width: 35px; height:50%" />
+                                </td>
+                                <td class='player_interaction_cells_restructure' id='cap_hit_5' style="width: 15%">Cap Hit</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <table style="table-layout: fixed; width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class='player_interaction_cells' style="text-align: center; width: 33%;">Total</th>
+                                <th class='player_interaction_cells' style="text-align: center; width: 33%;">Salary</th>
+                                <th class='player_interaction_cells' style="text-align: center; width: 33%;">Signing Bonus</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class='player_interaction_cells' id="restructure_total">$999.99</td>
+                                <td class='player_interaction_cells' id="restructure_salary">$999.99</td>
+                                <td class='player_interaction_cells' id="restructure_sb">$999.99</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="height: 10%"></div>
+                <div style="height: 30%">
+                    <table style="table-layout: fixed; width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class='player_interaction_cells' style="text-align: center; width: 25%;"></th>
+                                <th class='player_interaction_cells' style="text-align: center; width: 25%;">Total Players Costs</th>
+                                <th class='player_interaction_cells' style="text-align: center; width: 25%;">Cap Penalties</th>
+                                <th class='player_interaction_cells' style="text-align: center; width: 25%;">Cap Space</th>
+                            </tr>
+                        </thead>
+                        <tbody id="player_interaction_2">
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <div>
+                    **All of the above only takes effect at the beginning of league year 2016, March 1. Until then, old cut and restructure rules are in place.**
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

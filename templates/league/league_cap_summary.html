@@ -1,0 +1,41 @@
+{% extends 'league.html' %}
+
+{% block content %}
+    <div class="tab_area" id="third_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        <div class="cap_summary_datagrid">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="100px"></th>
+                        <th width="100px" style="text-align: center">Total Salary</th>
+                        <th width="100px" style="text-align: center">Current Cap Penalty</th>
+                        <th width="100px" style="text-align: center">Cap Space</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a,b,c,d in summary_data %}
+                        {% if forloop.counter0|divisibleby:2 %}
+                            <tr>
+                                <td>{{ a }}</td>
+                                <td style="text-align: center">${{ b }}</td>
+                                <td style="text-align: center">${{ c }}</td>
+                                <td style="text-align: center">${{ d }}</td>
+                            </tr>
+                        {% else %}
+                            <tr class="cap_summary_data_aux">
+                                <td>{{ a }}</td>
+                                <td style="text-align: center">${{ b }}</td>
+                                <td style="text-align: center">${{ c }}</td>
+                                <td style="text-align: center">${{ d }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

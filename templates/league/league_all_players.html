@@ -1,0 +1,111 @@
+{% extends 'league.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/league_all_players.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="tab_area" id="third_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        {% csrf_token %}
+        <div class="all_players_datagrid">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Position</th>
+                        <th width="120px">Name</th>
+                        <th>Team</th>
+                        <th style="text-align: center">Contract Type</th>
+                        <th style="text-align: center">Total Value</th>
+                        <th style="text-align: center">Signing Bonus</th>
+                        <th style="text-align: center">Salary</th>
+                        <th style="text-align: center">2015 Salary/<br>Signing Bonus</th>
+                        <th style="text-align: center">2016 Salary/<br>Signing Bonus</th>
+                        <th style="text-align: center">2017 Salary/<br>Signing Bonus</th>
+                        <th style="text-align: center">2018 Salary/<br>Signing Bonus</th>
+                        <th style="text-align: center">2019 Salary/<br>Signing Bonus</th>
+                        <th width="180px">Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for x in table_contents %}
+                        {% if forloop.counter0|divisibleby:2 %}
+                            <tr>
+                                <td>{{ x.position }}</td>
+                                <td>
+                                    <div class="name_link">{{ x.name }}</div>
+                                </td>
+                                <td>{{ x.team }}</td>
+                                <td align="center">{{ x.contract_type }}</td>
+                                <td align="center">${{ x.total_value }}</td>
+                                <td align="center">${{ x.signing_bonus }}</td>
+                                <td align="center">${{ x.salary }}</td>
+                                <td align="center">${{ x.yr1_salary }} &nbsp(${{ x.yr1_sb }})</td>
+                                {% if x.yr2_salary == None %}
+                                    <td></td>
+                                {% else %}
+                                    <td align="center">${{ x.yr2_salary }} &nbsp(${{ x.yr2_sb }})</td>
+                                {% endif %}
+                                {% if x.yr3_salary == None %}
+                                    <td></td>
+                                {% else %}
+                                    <td align="center">${{ x.yr3_salary }} &nbsp(${{ x.yr3_sb }})</td>
+                                {% endif %}
+                                {% if x.yr4_salary == None %}
+                                    <td></td>
+                                {% else %}
+                                    <td align="center">${{ x.yr4_salary }} &nbsp(${{ x.yr4_sb }})</td>
+                                {% endif %}
+                                {% if x.yr5_salary == None %}
+                                    <td></td>
+                                {% else %}
+                                    <td align="center">${{ x.yr5_salary }} &nbsp(${{ x.yr5_sb }})</td>
+                                {% endif %}
+                                <td>{{ x.notes }}</td>
+                            </tr>
+                        {% else %}
+                            <tr class="all_player_data_aux">
+                                <td>{{ x.position }}</td>
+                                <td>
+                                    <div class="name_link">{{ x.name }}</div>
+                                </td>
+                                <td>{{ x.team }}</td>
+                                <td align="center">{{ x.contract_type }}</td>
+                                <td align="center">${{ x.total_value }}</td>
+                                <td align="center">${{ x.signing_bonus }}</td>
+                                <td align="center">${{ x.salary }}</td>
+                                <td align="center">${{ x.yr1_salary }} &nbsp(${{ x.yr1_sb }})</td>
+                                {% if x.yr2_salary == None %}
+                                    <td></td>
+                                {% else %}
+                                    <td align="center">${{ x.yr2_salary }} &nbsp(${{ x.yr2_sb }})</td>
+                                {% endif %}
+                                {% if x.yr3_salary == None %}
+                                    <td></td>
+                                {% else %}
+                                    <td align="center">${{ x.yr3_salary }} &nbsp(${{ x.yr3_sb }})</td>
+                                {% endif %}
+                                {% if x.yr4_salary == None %}
+                                    <td></td>
+                                {% else %}
+                                    <td align="center">${{ x.yr4_salary }} &nbsp(${{ x.yr4_sb }})</td>
+                                {% endif %}
+                                {% if x.yr5_salary == None %}
+                                    <td></td>
+                                {% else %}
+                                    <td align="center">${{ x.yr5_salary }} &nbsp(${{ x.yr5_sb }})</td>
+                                {% endif %}
+                                <td>{{ x.notes }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

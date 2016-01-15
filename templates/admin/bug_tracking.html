@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+    <div class="tab_area" id="second_tab_area">
+
+    </div>
+
+    <div class="tab_area" id="third_tab_area">
+        <a href="/new_bug" class="third_tab_button_team" style="width: 25%; border: 2px solid #2d99d4">Click Here To Submit Bug Report</a>
+    </div>
+
+    <div id="display_area">
+        <div class='bug_tracking_table'>
+            <table>
+                <thead>
+                    <tr style="height: 50px; text-decoration: underline">
+                        <th style="width: 4%">ID</th>
+                        <th style="width: 8%">title</th>
+                        <th style="width: 26%">report</th>
+                        <th style="width: 8%">category</th>
+                        <th style="width: 8%">status</th>
+                        <th style="width: 8%">priority</th>
+                        <th style="width: 8%">date/time</th>
+                        <th style="width: 30%">comments</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for x in bug_list %}
+                        <tr style="height: 100px">
+                            <td id="bug_tracking_container">
+                                <div>{{ x.id }}</div>
+                            </td>
+                            <td id="bug_tracking_container">
+                                <div>{{ x.title }}</div>
+                            </td>
+                            <td id="bug_tracking_container">
+                                <div>{{ x.report }}</div>
+                            </td>
+                            <td id="bug_tracking_container">
+                                <div>{{ x.category }}</div>
+                            </td>
+                            <td id="bug_tracking_container">
+                                <div>{{ x.status }}</div>
+                            </td>
+                            <td id="bug_tracking_container">
+                                {% if x.priority == 1 %}
+                                    <div style="color: red">Urgent</div>
+                                {% elif x.priority == 2 %}
+                                    <div style="color: #ab020c">High</div>
+                                {% elif x.priority == 3 %}
+                                    <div style="color: #0000ff">Medium</div>
+                                {% elif x.priority == 4 %}
+                                    <div style="color: #00ff00">Low</div>
+                                {% endif %}
+                            </td>
+                            <td id="bug_tracking_container">
+                                <div>{{ x.date }}</div>
+                            </td>
+                            <td id="bug_tracking_container">
+                                <div>{{ x.comments }}</div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

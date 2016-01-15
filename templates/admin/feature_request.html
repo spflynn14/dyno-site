@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+    <div class="tab_area" id="second_tab_area">
+
+    </div>
+
+    <div class="tab_area" id="third_tab_area">
+    </div>
+
+    <div id="display_area">
+        <form action="/process_feature_request" method="post">
+            {% csrf_token %}
+            <h5>To request a new feature, describe the feature you would like in the box below and click Submit. Thank you.</h5><br>
+            <textarea name="feature_request" style="width: 50%; height: 400px"></textarea><br>
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+{% endblock %}

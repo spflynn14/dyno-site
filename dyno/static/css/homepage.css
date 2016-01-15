@@ -1,0 +1,64 @@
+#quick_links {
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    text-align: right;
+    background: #a5d4e8;
+}
+
+#center_area {
+    padding: 4% 10% 2% 10%;
+}
+
+#message_area, #login_form {
+    display: inline-block;
+    height: 40%
+}
+
+#message_area {
+    font-size: larger;
+    vertical-align: top;
+    width: 30%;
+    padding-left: 50px;
+    padding-top: 50px;
+    /*border: 2px solid red;*/
+}
+
+#main_center_area {
+    padding: 10px 10px 10px 10px;
+    height: 540px;
+    border-radius: 40px;
+    border-style: double;
+    border-width: 4px;
+    border-color: #7AA3B8;
+}
+
+#login_form {
+    width: 70%;
+    float: right;
+    padding-left: 52%;
+}
+
+#links_left {
+    width: 40%;
+    height: 60%;
+    padding-left: 20px;
+    padding-top: 20px;
+}
+
+#league_link, #teams_link {
+    font-family: 'Helvetica Neue';
+    font-size: 1.6em;
+}
+
+#league_link {
+
+}
+
+#teams_link {
+    padding-right: 20px;
+}
+
+#teams_combo {
+    font-size: 1.2em;
+}

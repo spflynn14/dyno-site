@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/new_bug.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="tab_area" id="second_tab_area">
+
+    </div>
+
+    <div class="tab_area" id="third_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        {% csrf_token %}
+        <div id="new_bug_report_area">
+            <h4>New Bug Submission</h4>
+            <br>
+            <h6>Detailed bug reporting is extremely helpful. Please provide information about what you were trying to do, how it failed, and the steps necessary to repeat the error. Include as much detail as possible. Thank you.</h6>
+            <br>
+            <div id="new_bug_report_subarea">
+                <h5>Report:</h5>
+                <textarea id="report_text"></textarea>
+            </div>
+        </div>
+
+        <div id="new_bug_auto_info_area">
+            Date: &nbsp&nbsp&nbsp&nbsp<input type="text" id="date_text" disabled/><br><br>
+            OS: &nbsp&nbsp&nbsp&nbsp<textarea style="width: 100%;" disabled>{{ os }}</textarea><br><br>
+            Browser: &nbsp&nbsp&nbsp&nbsp<textarea style="width: 100%; height: 15%" disabled>{{ browser }}</textarea><br><br>
+            Resolution: &nbsp&nbsp&nbsp&nbsp<input type="text" id="res_text" disabled/><br><br>
+            Other Envirn: &nbsp&nbsp&nbsp&nbsp<textarea style="width: 100%; height: 40%" disabled>{{ environ }}</textarea><br><br>
+        </div>
+
+        <button type="submit">Submit</button>
+
+    </div>
+{% endblock %}

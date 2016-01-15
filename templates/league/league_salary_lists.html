@@ -1,0 +1,252 @@
+{% extends 'league.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/league_salary_lists.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="third_tab_area">
+        <h5>***Note: The salary list for each position is maintained throughout the year, and the salaries listed on it are only changed once a new contract is signed. The salary list only lists the average salary for the life of the contract. The salary list is used solely for contract calculations, and is not to be used as a reference for player contracts in any other context.</h5>
+        <h6>***This salary list contains only players that are making above the league minimum of $1.00</h6>
+    </div>
+
+    <div id="display_area">
+        <div class="salary_lists_pos_header" style="padding-top: 1.5%">
+            <table>
+                <tr>
+                    <td style="font-size: 1.5em; padding-left: 0px">QB</td>
+                    <td style="font-size: 1.5em; padding-left: 185px">RB</td>
+                    <td style="font-size: 1.5em; padding-left: 185px">WR</td>
+                    <td style="font-size: 1.5em; padding-left: 180px">TE</td>
+                    <td style="font-size: 1.5em; padding-left: 185px">D/ST</td>
+                    <td style="font-size: 1.5em; padding-left: 170px">K</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="salary_lists_table_area"></div>
+            <table>
+                <tr>
+                    <td>
+                        <div class="salary_lists_datagrid">
+                            <table id="qb_list">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th width="105px">Name</th>
+                                        <th width="60px" style="text-align: center">Yearly Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td align="center">${{ qb_zero_salary|floatformat:"2" }}</td>
+                                    </tr>
+                                    {% for x in qb_contents %}
+                                        {% if forloop.counter0|divisibleby:2 %}
+                                            <tr class="salary_lists_data_aux">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td class="name_link">{{ x.name }}</td>
+                                                <td align="center">${{ x.yearly_cost }}</td>
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td class="name_link">{{ x.name }}</td>
+                                                <td align="center">${{ x.yearly_cost }}</td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                    <td>&nbsp&nbsp</td>
+                    <td>
+                        <div class="salary_lists_datagrid">
+                            <table id="rb_list">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th width="105px">Name</th>
+                                        <th width="60px" style="text-align: center">Yearly Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td align="center">${{ rb_zero_salary|floatformat:"2" }}</td>
+                                    </tr>
+                                    {% for x in rb_contents %}
+                                        {% if forloop.counter0|divisibleby:2 %}
+                                            <tr class="salary_lists_data_aux">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td class="name_link">{{ x.name }}</td>
+                                                <td align="center">${{ x.yearly_cost }}</td>
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td class="name_link">{{ x.name }}</td>
+                                                <td align="center">${{ x.yearly_cost }}</td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                    <td>&nbsp&nbsp</td>
+                    <td>
+                        <div class="salary_lists_datagrid">
+                            <table id="wr_list">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th width="105px">Name</th>
+                                        <th width="60px" style="text-align: center">Yearly Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td align="center">${{ wr_zero_salary|floatformat:"2" }}</td>
+                                    </tr>
+                                    {% for x in wr_contents %}
+                                        {% if forloop.counter0|divisibleby:2 %}
+                                            <tr class="salary_lists_data_aux">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td class="name_link">{{ x.name }}</td>
+                                                <td align="center">${{ x.yearly_cost }}</td>
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td class="name_link">{{ x.name }}</td>
+                                                <td align="center">${{ x.yearly_cost }}</td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                    <td>&nbsp&nbsp</td>
+                    <td>
+                        <div class="salary_lists_datagrid">
+                            <table id="te_list">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th width="105px">Name</th>
+                                        <th width="60px" style="text-align: center">Yearly Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td align="center">${{ te_zero_salary|floatformat:"2" }}</td>
+                                    </tr>
+                                    {% for x in te_contents %}
+                                        {% if forloop.counter0|divisibleby:2 %}
+                                            <tr class="salary_lists_data_aux">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td class="name_link">{{ x.name }}</td>
+                                                <td align="center">${{ x.yearly_cost }}</td>
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td class="name_link">{{ x.name }}</td>
+                                                <td align="center">${{ x.yearly_cost }}</td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                    <td>&nbsp&nbsp</td>
+                    <td>
+                        <div class="salary_lists_datagrid">
+                            <table id="def_list">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th width="105px">Name</th>
+                                        <th width="60px" style="text-align: center">Yearly Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td align="center">${{ def_zero_salary|floatformat:"2" }}</td>
+                                    </tr>
+                                    {% for x in def_contents %}
+                                        {% if forloop.counter0|divisibleby:2 %}
+                                            <tr class="salary_lists_data_aux">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td class="name_link">{{ x.name }}</td>
+                                                <td align="center">${{ x.yearly_cost }}</td>
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td class="name_link">{{ x.name }}</td>
+                                                <td align="center">${{ x.yearly_cost }}</td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                    <td>&nbsp&nbsp</td>
+                    <td>
+                        <div class="salary_lists_datagrid">
+                            <table id="k_list">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th width="105px">Name</th>
+                                        <th width="60px" style="text-align: center">Yearly Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>0</td>
+                                        <td></td>
+                                        <td align="center">${{ k_zero_salary|floatformat:"2" }}</td>
+                                    </tr>
+                                    {% for x in k_contents %}
+                                        {% if forloop.counter0|divisibleby:2 %}
+                                            <tr class="salary_lists_data_aux">
+                                                <td>{{ forloop.counter }}</td>
+                                                <td class="name_link">{{ x.name }}</td>
+                                                <td align="center">${{ x.yearly_cost }}</td>
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td class="name_link">{{ x.name }}</td>
+                                                <td align="center">${{ x.yearly_cost }}</td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends 'team.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/team_release_players.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="third_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        <div id="team_release_table_area">
+            <h5>Select players to cut by marking checkbox - **these number only effective in 2016 league year; old cut rules apply until then**</h5>
+            <div class="team_release_datagrid">
+                <table style="table-layout: fixed">
+                    <thead>
+                        <tr>
+                            <th width="4%" ></th>
+                            <th width="6%" style="text-align: center">Pos</th>
+                            <th width="17%">Name</th>
+                            <th width="8%" style="text-align: center">Contract Type</th>
+                            <th width="13%" style="text-align: center">2015 Salary<br><span style="color: #00e100">Signing Bonus</span></th>
+                            <th width="13%" style="text-align: center">2016 Salary<br><span style="color: #00e100">Signing Bonus</span></th>
+                            <th width="13%" style="text-align: center">2017 Salary<br><span style="color: #00e100">Signing Bonus</span></th>
+                            <th width="13%" style="text-align: center">2018 Salary<br><span style="color: #00e100">Signing Bonus</span></th>
+                            <th width="13%" style="text-align: center">2019 Salary<br><span style="color: #00e100">Signing Bonus</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="team_release_body">
+                        {% for x in player_list %}
+                        <tr>
+                            <td>
+                                <div style="text-align: center">
+                                    <input type="checkbox" class="release_checkbox" />
+                                </div>
+                            </td>
+                            <td style="text-align: center">{{ x.pos }}</td>
+                            <td>{{ x.name }}</td>
+                            <td style="text-align: center">{{ x.contract_type }}</td>
+                            <td class='team_release_yr1_cell' style="text-align: center">${{ x.yr1_salary }}<br><span style="color: green">${{ x.yr1_sb }}</span></td>
+                            {% if x.yr2_salary != 0 %}
+                                <td class='team_release_yr2_cell'  style="text-align: center">${{ x.yr2_salary }}<br><span style="color: green">${{ x.yr2_sb }}</span></td>
+                            {% endif %}
+                            {% if x.yr3_salary != 0 %}
+                                <td class='team_release_yr3_cell'  style="text-align: center">${{ x.yr3_salary }}<br><span style="color: green">${{ x.yr3_sb }}</span></td>
+                            {% endif %}
+                            {% if x.yr4_salary != 0 %}
+                                <td class='team_release_yr4_cell'  style="text-align: center">${{ x.yr4_salary }}<br><span style="color: green">${{ x.yr4_sb }}</span></td>
+                            {% endif %}
+                            {% if x.yr5_salary != 0 %}
+                                <td class='team_release_yr5_cell'  style="text-align: center">${{ x.yr5_salary }}<br><span style="color: green">${{ x.yr5_sb }}</span></td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="team_release_right_area">
+            <div id="team_release_button_area">
+
+            </div>
+
+            <div id="team_release_right_table_1_area">
+                <h4 style="text-align: center; color: #2d99d4">Total For All Players Checked</h4>
+                <table style="table-layout: fixed; width: 100%;">
+                    <thead>
+                        <tr>
+                            <th class='team_release_right_cells' style="text-align: center; width: 25%;"></th>
+                            <th class='team_release_right_cells' style="text-align: center; width: 25%;">Total Cost</th>
+                            <th class='team_release_right_cells' style="text-align: center; width: 25%;">Cap Penalty</th>
+                            <th class='team_release_right_cells' style="text-align: center; width: 25%;">Cap Savings</th>
+                        </tr>
+                    </thead>
+                    <tbody id="team_release_right_table_1">
+                        <tr>
+                            <td class='team_release_right_cells' style="font-weight: bold">2015</td>
+                            <td class='team_release_right_cells' id='trr1_1-1'></td>
+                            <td class='team_release_right_cells' id='trr1_1-2' style="color: red"></td>
+                            <td class='team_release_right_cells' id='trr1_1-3' style="color: green"></td>
+                        </tr>
+                        <tr>
+                            <td class='team_release_right_cells' style="font-weight: bold">2016</td>
+                            <td class='team_release_right_cells' id='trr1_2-1'></td>
+                            <td class='team_release_right_cells' id='trr1_2-2' style="color: red"></td>
+                            <td class='team_release_right_cells' id='trr1_2-3' style="color: green"></td>
+                        </tr>
+                        <tr>
+                            <td class='team_release_right_cells' style="font-weight: bold">2017</td>
+                            <td class='team_release_right_cells' id='trr1_3-1'></td>
+                            <td class='team_release_right_cells' id='trr1_3-2' style="color: red"></td>
+                            <td class='team_release_right_cells' id='trr1_3-3' style="color: green"></td>
+                        </tr>
+                        <tr>
+                            <td class='team_release_right_cells' style="font-weight: bold">2018</td>
+                            <td class='team_release_right_cells' id='trr1_4-1'></td>
+                            <td class='team_release_right_cells' id='trr1_4-2' style="color: red"></td>
+                            <td class='team_release_right_cells' id='trr1_4-3' style="color: green"></td>
+                        </tr>
+                        <tr>
+                            <td class='team_release_right_cells' style="font-weight: bold">2019</td>
+                            <td class='team_release_right_cells' id='trr1_5-1'></td>
+                            <td class='team_release_right_cells' id='trr1_5-2' style="color: red"></td>
+                            <td class='team_release_right_cells' id='trr1_5-3' style="color: green"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="team_release_right_table_2_area">
+                <h4 style="text-align: center; color: #2d99d4">Salary Cap</h4>
+                <p style="text-align: center; color: #2d99d4">(if checked players released)</p>
+                <table style="table-layout: fixed; width: 100%;">
+                    <thead>
+                        <tr>
+                            <th class='team_release_right_cells' style="text-align: center; width: 25%;"></th>
+                            <th class='team_release_right_cells' style="text-align: center; width: 25%;">Total Player Costs</th>
+                            <th class='team_release_right_cells' style="text-align: center; width: 25%;">Cap Penalties</th>
+                            <th class='team_release_right_cells' style="text-align: center; width: 25%;">Cap Space</th>
+                        </tr>
+                    </thead>
+                    <tbody id="team_release_right_table_2">
+                        <tr>
+                            <td class='team_release_right_cells' style="font-weight: bold">2015</td>
+                            <td class='team_release_right_cells' id='trr2_1-1'></td>
+                            <td class='team_release_right_cells' id='trr2_1-2' style="color: red"></td>
+                            <td class='team_release_right_cells' id='trr2_1-3' style="color: green"></td>
+                        </tr>
+                        <tr>
+                            <td class='team_release_right_cells' style="font-weight: bold">2016</td>
+                            <td class='team_release_right_cells' id='trr2_2-1'></td>
+                            <td class='team_release_right_cells' id='trr2_2-2' style="color: red"></td>
+                            <td class='team_release_right_cells' id='trr2_2-3' style="color: green"></td>
+                        </tr>
+                        <tr>
+                            <td class='team_release_right_cells' style="font-weight: bold">2017</td>
+                            <td class='team_release_right_cells' id='trr2_3-1'></td>
+                            <td class='team_release_right_cells' id='trr2_3-2' style="color: red"></td>
+                            <td class='team_release_right_cells' id='trr2_3-3' style="color: green"></td>
+                        </tr>
+                        <tr>
+                            <td class='team_release_right_cells' style="font-weight: bold">2018</td>
+                            <td class='team_release_right_cells' id='trr2_4-1'></td>
+                            <td class='team_release_right_cells' id='trr2_4-2' style="color: red"></td>
+                            <td class='team_release_right_cells' id='trr2_4-3' style="color: green"></td>
+                        </tr>
+                        <tr>
+                            <td class='team_release_right_cells' style="font-weight: bold">2019</td>
+                            <td class='team_release_right_cells' id='trr2_5-1'></td>
+                            <td class='team_release_right_cells' id='trr2_5-2' style="color: red"></td>
+                            <td class='team_release_right_cells' id='trr2_5-3' style="color: green"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="vw_1">
+        <table>
+            <tr>
+                <td id="vw_1-1">{{ team_info.yr1_cap_pen }}</td>
+                <td id="vw_1-2">{{ team_info.yr2_cap_pen }}</td>
+                <td id="vw_1-3">{{ team_info.yr3_cap_pen }}</td>
+                <td id="vw_1-4">{{ team_info.yr4_cap_pen }}</td>
+                <td id="vw_1-5">{{ team_info.yr5_cap_pen }}</td>
+            </tr>
+        </table>
+    </div>
+{% endblock %}

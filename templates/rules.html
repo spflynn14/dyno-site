@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="tab_area" id="second_tab_area">
+
+    </div>
+
+    <div class="tab_area" id="third_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        <div style="padding-left: 10px; padding-right: 10px; height: 95%; width: 100%; overflow-y: scroll">
+            {{ rules_text|safe }}
+        </div>
+    </div>
+{% endblock %}

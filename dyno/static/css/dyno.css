@@ -1,0 +1,1019 @@
+.nav_bar {
+    height: 50px;
+    background-color: #2d99d4;
+}
+
+.nav_button {
+    float: right;
+    color: #ffffff;
+    padding-top: 13px;
+}
+
+.name_link {
+    color: black;
+}
+
+.name_link:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#login_link, #logout_link {
+    padding-left: 5%;
+    padding-right: 30px;
+}
+
+.dropdown {
+    background-color: #2d99d4;
+    padding-top: 14px;
+}
+
+#center_area {
+    padding: 1% 5% 2% 5%;
+}
+
+.tab_area {
+    height: 6%;
+    padding: 0px 4% 0px 4%;
+}
+
+#main_center_area {
+    padding: 10px 10px 10px 10px;
+    height: 800px;
+    border-radius: 40px;
+    border-style: double;
+    border-width: 4px;
+    border-color: #2d99d4;
+}
+
+#display_area {
+    height: 82%;
+    /*border: 1px solid green;*/
+}
+
+.tab_button, .second_tab_button_league, .second_tab_button_team, .third_tab_button_team, .mini_tab_button_player {
+    height: 90%;
+    vertical-align: middle;
+    color: black;
+    background-color: white;
+    padding-top: 0.55%;
+    border-radius: 5px;
+    border: 2px solid #cccccc;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1.15em;
+}
+
+.tab_button {
+    width: 12%;
+}
+
+.second_tab_button_league {
+    width: 19.4%;
+}
+
+.second_tab_button_team {
+    width: 19.4%;
+}
+
+.third_tab_button_team {
+    width: 19.4%;
+}
+
+.third_tab_button_team:hover {
+    text-decoration: underline;
+    cursor: pointer;
+    color: #2c609b;
+}
+
+#login_center_area {
+    padding: 10% 40% 20% 40%;
+}
+
+#user_password_page_div {
+    padding: 5% 40% 20% 40%;
+}
+
+#welcome_message {
+    padding-left: 150px;
+    padding-top: 100px;
+}
+
+#rules_text {
+    width: 100%;
+    height: 95%;
+}
+
+/* ALL PLAYERS DATAGRID */
+
+.all_players_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+}
+.all_players_datagrid {
+    height: 100%;
+    padding-top: 1%;
+    font: normal 0.75em/150% Arial, Helvetica, sans-serif;
+    background: #fff;
+    overflow-y: scroll;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.all_players_datagrid table td, .all_players_datagrid table th {
+    padding: 4px 4px;
+}
+.all_players_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-size: 1.15em;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.all_players_datagrid table thead th:first-child {
+    border: none;
+}
+.all_players_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 1em;
+    font-weight: normal;
+}
+.all_players_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.all_players_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+.all_player_data_aux {
+    background-color: #dcdcdc;
+}
+
+/* SALARY LISTS DATAGRID */
+
+.salary_lists_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+}
+.salary_lists_datagrid {
+    height: 650px;
+    padding-top: 1%;
+    font: normal 0.75em/150% Arial, Helvetica, sans-serif;
+    background: #fff;
+    overflow-y: scroll;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+.salary_lists_datagrid table td, .salary_lists_datagrid table th {
+    padding: 4px 4px;
+}
+.salary_lists_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-size: 1.15em;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.salary_lists_datagrid table thead th:first-child {
+    border: none;
+}
+.salary_lists_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 1em;
+    font-weight: normal;
+}
+
+.salary_lists_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.salary_lists_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.salary_lists_data_aux {
+    background-color: #dcdcdc;
+}
+
+/* CAP SUMMARY DATAGRID */
+
+.cap_summary_datagrid table {
+    border-collapse: collapse;
+}
+.cap_summary_datagrid {
+    height: 100%;
+    padding-top: 1%;
+    padding-left: 30%;
+    font: normal 0.75em/150% Arial, Helvetica, sans-serif;
+    background: #fff;
+    overflow: hidden;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+.cap_summary_datagrid table td, .cap_summary_datagrid table th {
+    padding: 4px 4px;
+}
+.cap_summary_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-size: 1.15em;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.cap_summary_datagrid table thead th:first-child {
+    border: none;
+}
+.cap_summary_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 1em;
+    font-weight: normal;
+}
+.cap_summary_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.cap_summary_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+.cap_summary_data_aux {
+    background-color: #dcdcdc;
+}
+
+
+
+
+
+
+
+/* PLAYER PAGE */
+
+#player_search_area {
+    /*border: 1px solid red;*/
+    display: inline-block;
+    height: 100%;
+    width: 15%;
+    float: left;
+}
+
+#player_display_area {
+    /*border: 1px solid blue;*/
+    display: inline-block;
+    height: 100%;
+    width: 50%;
+    float: left;
+}
+
+#player_interaction_area {
+    /*border: 1px solid green;*/
+    display: inline-block;
+    height: 100%;
+    width: 35%;
+}
+
+#player_select_listbox {
+    min-width: 80%;
+    max-width: 100%;
+}
+
+#search_text {
+    max-width: 100%;
+}
+
+.display_div {
+    /*border: 1px dotted green;*/
+    width: 100%;
+    height: 6%;
+}
+
+#line_2 {
+    height: 6%;
+}
+
+#line_9 {
+    height: 6%;
+}
+
+#line_11 {
+    height: 10%;
+}
+
+#name_text {
+    display: inline-block;
+    font-weight: bold;
+    font-size: 1.25em;
+    color: #0000ff;
+    width: 45%;
+    float: left;
+    padding-left: 5%;
+    /*border: 1px solid red;*/
+}
+
+#pos_text {
+    display: inline-block;
+    text-decoration: underline;
+    font-weight: bold;
+    width: 25%;
+    float: left;
+    /*border: 1px solid red;*/
+}
+
+#team_text {
+    display: inline-block;
+    width: 15%;
+    font-weight: bold;
+    float: left;
+    /*border: 1px solid red;*/
+}
+
+.hidden_divs, .hidden_headers, .line_text {
+    /*border: 1px solid red;*/
+}
+
+.hidden_headers {
+    font-weight: bold;
+    display: inline-block;
+}
+
+.line_text {
+    display: inline-block;
+    width: 20%;
+    text-align: center;
+}
+
+#player_mini_tab_area {
+    width: 100%;
+    height: 8%;
+    text-align: center;
+    /*border: 1px solid red;*/
+}
+
+.mini_tab_button_player {
+    width: 33%;
+    padding: 2px 2px 2px 2px;
+}
+
+.mini_tab_button_player:hover {
+    text-decoration: underline;
+    cursor: pointer;
+    color: #2c609b;
+}
+
+#player_interaction_display_area {
+    width: 100%;
+    height: 95%;
+    padding-top: 3%;
+    /*border: 1px solid blue;*/
+}
+
+.player_interaction_cells {
+    height: 25px;
+    width: 20%;
+    text-align: center;
+    font-size: smaller;
+    /*border: 1px solid red;*/
+}
+
+.player_interaction_cells_restructure {
+    height: 25px;
+    text-align: center;
+    font-size: smaller;
+    /*border: 1px solid red;*/
+}
+
+/* END PLAYER PAGE */
+
+
+
+
+
+
+
+
+
+/* TEAM ORGANIZATION DATAGRID */
+
+.team_organization_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+.team_organization_datagrid {
+    width: 100%;
+    font: normal 0.75em/150% Arial, Helvetica, sans-serif;
+    background: #fff;
+    overflow-y: scroll;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.team_organization_datagrid table td, .team_organization_datagrid table th {
+    padding: 4px 4px;
+}
+.team_organization_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-size: 1.15em;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.team_organization_datagrid table thead th:first-child {
+    border: none;
+}
+.team_organization_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 1em;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+.team_organization_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.team_organization_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+.team_organization_data_aux {
+    background-color: #dcdcdc;
+}
+
+/* END TEAM ORG DATA GRID */
+
+#team_selection_dropdown {
+    width: 20%;
+    float: right;
+    height: 90%;
+    vertical-align: middle;
+    color: black;
+    background-color: white;
+    padding-top: 0.55%;
+    border-radius: 5px;
+    border: 2px solid #cccccc;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1.15em;
+}
+
+#organize_page_header {
+    height: 8%;
+    width: 100%;
+}
+
+#team_header_nickname, #team_header_name {
+    display: inline-block;
+    text-decoration: underline;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#team_header_nickname {
+    width: 50%;
+    float: left;
+    text-align: right;
+    border-top: 1px solid #b4b4b4;
+    border-bottom: 1px solid #b4b4b4;
+    border-left: 1px solid #b4b4b4;
+}
+
+#team_header_name {
+    width: 50%;
+    text-align: left;
+    border-top: 1px solid #b4b4b4;
+    border-bottom: 1px solid #b4b4b4;
+    border-right: 1px solid #b4b4b4;
+}
+
+#save_role_changes_button {
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+#flex_players_selection_area {
+    width: 100%;
+    height: auto;
+    float: left;
+}
+
+#organization_left_area {
+    height: 90%;
+    float: left;
+    width: 15%;
+    display: inline-block;
+}
+
+#organization_form_area {
+    height: 90%;
+    float: left;
+    width: 70%;
+    display: inline-block;
+}
+
+#organization_form {
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+    float: left;
+}
+
+#organization_first_column {
+    display: inline-block;
+    float: left;
+    height: 100%;
+    width: 45%;
+}
+
+#organization_middle_gap {
+    display: inline-block;
+    float: left;
+    height: 100%;
+    width: 1%;
+}
+
+#organization_second_column {
+    display: inline-block;
+    float: left;
+    height: 100%;
+    width: 45%;
+}
+
+.right_interaction_area {
+    width: 15%;
+    height: 90%;
+    display: inline-block;
+    float: right;
+}
+
+#organization_starters_area {
+    height: 60%;
+    width: 100%;
+}
+
+#organization_def_and_kickers_area {
+    height: 40%;
+    width: 100%;
+}
+
+#organization_bench_area {
+    height: 60%;
+    width: 100%;
+}
+
+#organization_developmental_area {
+    height: 40%;
+    width: 100%;
+}
+
+#view_selection_area {
+    float: right;
+    height: 70px;
+    width: 90%;
+}
+
+#total_cost_div {
+    border: 1px solid #b4b4b4;
+    height: 25%;
+    width: 100%;
+    text-align: center;
+}
+
+#cap_penalty_div {
+    border: 1px solid #b4b4b4;
+    height: 25%;
+    width: 100%;
+    text-align: center;
+}
+
+#cap_space_div {
+    border: 1px solid #b4b4b4;
+    height: 25%;
+    width: 100%;
+    text-align: center;
+}
+
+#team_info_display {
+    width: 95%;
+    height: 60%;
+    padding-left: 20px;
+}
+
+#by_pos_view {
+    height: 90%;
+    width: 100%;
+    float: left;
+}
+
+#by_pos_main_area {
+    height: 100%;
+    width: 85%;
+    float: left;
+    display: inline-block;
+}
+
+
+
+/* TEAM BY POS DATAGRID */
+
+.team_by_pos_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+.team_by_pos_datagrid {
+    width: 100%;
+    font: normal 0.75em/150% Arial, Helvetica, sans-serif;
+    background: #fff;
+    overflow-y: scroll;
+    display: inline-block;
+}
+
+.team_by_pos_datagrid table td, .team_by_pos_datagrid table th {
+    padding: 4px 4px;
+}
+.team_by_pos_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-size: 1.15em;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.team_by_pos_datagrid table thead th:first-child {
+    border: none;
+}
+.team_by_pos_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 1em;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+.team_by_pos_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.team_by_pos_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+.team_by_pos_data_aux {
+    background-color: #dcdcdc;
+}
+
+/* END TEAM BY POS DATA GRID */
+
+#by_pos_first_column, #by_pos_second_column, #by_pos_third_column, #by_pos_fourth_column {
+    display: inline-block;
+    float: left;
+    height: 100%;
+    width: 23.5%;
+}
+
+.by_pos_column_gap {
+    display: inline-block;
+    float: left;
+    height: 100%;
+    width: 2%;
+}
+
+
+/* TEAM SETTINGS */
+
+#team_settings_column_one {
+    display: inline-block;
+    height: 100%;
+    width: 33%;
+    float: left;
+}
+
+#team_settings_column_two {
+    display: inline-block;
+    height: 100%;
+    width: 33%;
+    float: left;
+}
+
+#team_settings_column_three {
+    display: inline-block;
+    height: 100%;
+    width: 33%;
+    float: left;
+}
+
+#team_name_div {
+    border: 1px solid #dcdcdc;
+    padding: 20px 20px 20px 20px;
+    width: auto;
+    display: inline-block;
+}
+
+#change_user_password_div {
+    width: 100%;
+    height: 10%;
+    float: right;
+}
+
+#logo_div {
+    border: 1px solid #dcdcdc;
+    padding: 20px 20px 20px 20px;
+    width: auto;
+}
+
+#email_div {
+    border: 1px solid #dcdcdc;
+    padding: 20px 20px 20px 20px;
+    width: auto;
+}
+
+#save_changes_div {
+    width: auto;
+    height: 10%;
+}
+
+#account_balance_div {
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 60%;
+    height: auto;
+    max-height: 60%;
+    overflow-y: auto;
+    float: right;
+    border: 1px solid #dcdcdc;
+}
+
+#show_hide_account_details:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#team_settings_player_display_filters_area {
+    height: auto;
+    width: 75%;
+    padding: 10px 10px 10px 10px;
+    margin-left: 25%;
+    border: 1px solid #dcdcdc;
+}
+
+#team_settings_role_descriptions_area {
+    height: auto;
+    max-height: 65%;
+    overflow-y: auto;
+    width: 75%;
+    padding: 10px 10px 10px 10px;
+    margin-left: 25%;
+    border: 1px solid #dcdcdc;
+}
+
+/* END: TEAM SETTINGS */
+
+
+/* TEAM CAP SITUATION DATAGRID */
+
+.team_cap_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+.team_cap_datagrid {
+    width: 100%;
+    padding-top: 10px;
+    font: normal 0.75em/150% Arial, Helvetica, sans-serif;
+    background: #fff;
+    overflow-y: scroll;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.team_cap_datagrid table td, .team_cap_datagrid table th {
+    padding: 4px 4px;
+}
+.team_cap_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-size: 1.15em;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.team_cap_datagrid table thead th:first-child {
+    border: none;
+}
+.team_cap_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 1em;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+.team_cap_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.team_cap_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+.team_cap_data_aux {
+    background-color: #dcdcdc;
+}
+
+/* END TEAM ORG DATA GRID */
+
+#team_info_div {
+    width: 100%;
+    height: 10%;
+    padding-bottom: 20px;
+    text-align: center;
+}
+
+#total_cost_cap_sit_div {
+    height: 100%;
+    width: 15%;
+    display: inline-block;
+    text-align: center;
+}
+
+#cap_penalty_cap_sit_div {
+    height: 100%;
+    width: 15%;
+    display: inline-block;
+    text-align: center;
+}
+
+#cap_space_cap_sit_div {
+    height: 100%;
+    width: 15%;
+    display: inline-block;
+    text-align: center;
+}
+
+
+
+/* TEAM - RELEASE PLAYERS */
+
+#team_release_table_area {
+    float: left;
+    display: inline-block;
+    width: 70%;
+    height: 100%;
+    /*border: 1px solid green;*/
+}
+
+#team_release_right_area {
+    display: inline-block;
+    width: 30%;
+    height: 100%;
+    /*border: 1px solid blue;*/
+}
+
+#team_release_button_area {
+    width: 100%;
+    height: 10%;
+    /*border: 1px dotted blue;*/
+}
+
+#team_release_right_table_1_area {
+    width: 100%;
+    height: 40%;
+    /*border: 1px dotted blue;*/
+}
+
+#team_release_right_table_2_area {
+    width: 100%;
+    height: 50%;
+    /*border: 1px dotted red;*/
+}
+
+.team_release_right_cells {
+    height: 30px;
+    width: 25%;
+    text-align: center;
+    font-size: small;
+    /*border: 1px solid red;*/
+}
+
+/* datagrid */
+
+.team_release_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.team_release_datagrid {
+    width: 100%;
+    height: 94%;
+    font: normal 0.75em/150% Arial, Helvetica, sans-serif;
+    background: #fff;
+    overflow-y: scroll;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.team_release_datagrid table td, .team_release_datagrid table th {
+    padding: 4px 4px;
+}
+.team_release_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-size: 1.15em;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.team_release_datagrid table thead th:first-child {
+    border: none;
+}
+.team_release_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 1em;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+.team_release_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.team_release_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+.team_release_data_aux {
+    background-color: #dcdcdc;
+}
+
+/* END: TEAM - RELEASE PLAYERS */
+
+
+
+/* BUG TRACKING */
+
+.bug_tracking_table {
+    width: 100%;
+    height: 94%;
+    overflow-y: scroll;
+}
+
+.bug_tracking_table table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.bug_tracking_table td {
+    font-size: small;
+    border: 1px solid #dcdcdc;
+    padding: 4px 4px;
+}
+
+#bug_tracking_container {
+    height: 50px;
+}
+
+#bug_tracking_container > div {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.bug_tracking_table th {
+    border: 1px solid #dcdcdc;
+    padding: 4px 4px;
+}
+
+/* END: BUG TRACKING */
+
+/* NEW BUG */
+
+#new_bug_report_area {
+    height: 95%;
+    width: 50%;
+    float: left;
+    display: inline-block;
+    padding-right: 20px;
+}
+
+#new_bug_report_subarea {
+    height: 70%;
+    width: 100%;
+}
+
+#report_text {
+    width: 100%;
+    height: 100%;
+    padding: 10px 10px 10px 10px;
+}
+
+#new_bug_auto_info_area {
+    height: 82%;
+    width: 50%;
+    display: inline-block;
+    padding-left: 100px;
+}
+
+/* END: NEW BUG */

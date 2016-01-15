@@ -1,0 +1,156 @@
+{% extends 'team.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/team_cap_situation.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="third_tab_area">
+        <div class="third_tab_button_team" id="yr1_cap_situation">2015</div>
+        <div class="third_tab_button_team" id="yr2_cap_situation">2016</div>
+        <div class="third_tab_button_team" id="yr3_cap_situation">2017</div>
+        <div class="third_tab_button_team" id="yr4_cap_situation">2018</div>
+        <div class="third_tab_button_team" id="yr5_cap_situation">2019</div>
+    </div>
+
+    <div id="display_area" style="padding: 3% 15% 0px 14%">
+        <div id="team_info_div">
+            <div id="total_cost_cap_sit_div">
+                <h6 style="font-weight: bold">Total Player Cost</h6>
+                <p style="font-size: small" id="total_cost_text"></p>
+            </div>
+            <div id="cap_penalty_cap_sit_div">
+                <h6 style="font-weight: bold">Cap Penalty</h6>
+                <p style="font-size: small; color: red" id="cap_penalty_text"></p>
+            </div>
+            <div id="cap_space_cap_sit_div">
+                <h6 style="font-weight: bold">Cap Space Available</h6>
+                <p style="font-size: small; color: green;" id="cap_space_text"></p>
+            </div>
+
+        </div>
+        <div class="team_cap_datagrid" style="height: 88%;">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="9%" >Role</th>
+                        <th width="7%" style="text-align: center">Pos</th>
+                        <th width="18%">Name</th>
+                        <th width="12%" style="text-align: center">Contract Type</th>
+                        <th width="10%" style="text-align: center">Cap Hit</th>
+                        <th width="10%" style="text-align: center">Salary</th>
+                        <th width="10%" style="text-align: center">Signing Bonus</th>
+                        <th width="24%">Notes</th>
+                    </tr>
+                </thead>
+                <tbody id="team_cap_body">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="vw_1">
+        {% for x in team_json %}
+            <table>
+                <tr>
+                    <td id="vw_1-1">{{ x.yr1_role }}</td>
+                    <td id="vw_1-2">{{ x.yr2_role }}</td>
+                    <td id="vw_1-3">{{ x.yr3_role }}</td>
+                    <td id="vw_1-4">{{ x.yr4_role }}</td>
+                    <td id="vw_1-5">{{ x.yr5_role }}</td>
+                    <td id="vw_1-6">{{ x.pos }}</td>
+                    <td id="vw_1-7">{{ x.name }}</td>
+                    <td id="vw_1-8">{{ x.contract_type }}</td>
+                    <td id="vw_1-9">{{ x.yr1_salary }}</td>
+                    <td id="vw_1-10">{{ x.yr2_salary }}</td>
+                    <td id="vw_1-11">{{ x.yr3_salary }}</td>
+                    <td id="vw_1-12">{{ x.yr4_salary }}</td>
+                    <td id="vw_1-13">{{ x.yr5_salary }}</td>
+                    <td id="vw_1-14">{{ x.yr1_sb }}</td>
+                    <td id="vw_1-15">{{ x.yr2_sb }}</td>
+                    <td id="vw_1-16">{{ x.yr3_sb }}</td>
+                    <td id="vw_1-17">{{ x.yr4_sb }}</td>
+                    <td id="vw_1-18">{{ x.yr5_sb }}</td>
+                    <td id="vw_1-19">{{ x.notes }}</td>
+                    <td id="vw_1-20">
+                        {% for x in x.avail_roles_yr1 %}
+                            <p>{{ x }}</p>
+                    {% endfor %}
+                    </td>
+                    <td id="vw_1-21">
+                        {% for x in x.avail_roles_yr2 %}
+                            <p>{{ x }}</p>
+                    {% endfor %}
+                    </td>
+                    <td id="vw_1-22">
+                        {% for x in x.avail_roles_yr3 %}
+                            <p>{{ x }}</p>
+                    {% endfor %}
+                    </td>
+                    <td id="vw_1-23">
+                        {% for x in x.avail_roles_yr4 %}
+                            <p>{{ x }}</p>
+                    {% endfor %}
+                    </td>
+                    <td id="vw_1-24">
+                        {% for x in x.avail_roles_yr5 %}
+                            <p>{{ x }}</p>
+                    {% endfor %}
+                    </td>
+                </tr>
+            </table>
+        {% endfor %}
+    </div>
+
+    <div id="vw_2">
+        {% for x in avail_roles %}
+            <table>
+                <tr id="vw_2_tr">
+                    <td id="vw_2-1">{{ x.role }}</td>
+                    <td id="vw_2-2">{{ x.unique_role }}</td>
+                    <td id="vw_2-3">{{ x.applies_to_QB }}</td>
+                    <td id="vw_2-4">{{ x.applies_to_RB }}</td>
+                    <td id="vw_2-5">{{ x.applies_to_WR }}</td>
+                    <td id="vw_2-6">{{ x.applies_to_TE }}</td>
+                    <td id="vw_2-7">{{ x.applies_to_DEF }}</td>
+                    <td id="vw_2-8">{{ x.applies_to_K }}</td>
+                </tr>
+            </table>
+        {% endfor %}
+    </div>
+
+    <div id="vw_3">
+        <p>{{ cap_pen_yr1 }}</p>
+    </div>
+
+    <div id="vw_4">
+        <p>{{ cap_pen_yr2 }}</p>
+    </div>
+
+    <div id="vw_5">
+        <p>{{ cap_pen_yr3 }}</p>
+    </div>
+
+    <div id="vw_6">
+        <p>{{ cap_pen_yr4 }}</p>
+    </div>
+
+    <div id="vw_7">
+        <p>{{ cap_pen_yr5 }}</p>
+    </div>
+
+    <div id="vw_8">
+        <table>
+            <tr>
+                {% for x in filtered_tags %}
+                    <td id="vw_8-1">{{ x }}</td>
+                {% endfor %}
+            </tr>
+        </table>
+    </div>
+
+{% endblock %}

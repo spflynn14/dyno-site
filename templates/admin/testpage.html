@@ -1,0 +1,21 @@
+<html>
+<head>
+</head>
+<body>
+    <h1>Leave a Suggestion Here</h1>
+        <div class="message"></div>
+        <div>
+            <form action="" method="post">{% csrf_token %}
+                {{ form.as_p }}
+                <input type="submit" value="Submit Feedback" />
+            </form>
+        </div>
+</body>
+</html>
+
+<script>$('#form').submit(function(e){
+    $.post('/url/', $(this).serialize(), function(data){
+       $('.message').html(data.message);
+    });
+    e.preventDefault();
+});</script>

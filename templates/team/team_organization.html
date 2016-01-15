@@ -1,0 +1,391 @@
+{% extends 'team.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/team_organization.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+
+    <div class="tab_area" id="third_tab_area">
+        <div class="dropdown" id="team_selection_dropdown" style="background-color: rgba(255, 0, 0, 0.12)">
+            <a href="#" class="dropdown-toggle_team" data-toggle="dropdown" style="color: black">Select Team To View <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+                {% for x in team_list %}
+                    <li><a href="team_org_change_team_{{ forloop.counter }}">{{ x }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div id="display_area">
+        <div id="organize_page_header">
+            <h4 id='team_header_nickname'>{{ nickname }}</h4>
+            <h4 id='team_header_name'>&nbsp({{ team_selected }})</h4>
+        </div>
+
+        <div id="organization_left_area">
+            <div id="flex_players_selection_area">
+                <h6 style="font-size: x-small">Select starting flex spots</h6>
+                <select id="flex_1_select">
+
+                </select>
+                <p style="line-height: 6px"></p>
+                <select id="flex_2_select">
+
+                </select>
+            </div>
+            <br><br><br><br><br><br><br>
+            <p style="font-size: smaller">Role descriptions and<br>filters can be found<br>on the Team Settings tab</p>
+        </div>
+
+        <div id="organization_form_area">
+            <div id="organization_first_column">
+
+                <!-- STARTERS AREA -->
+
+                <div id="organization_starters_area">
+                    <h5 style="text-decoration: underline; font-weight: bold">Starters</h5>
+                    <div class="team_organization_datagrid" style="height: 85%">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="18%" >Role</th>
+                                    <th width="7%" style="text-align: center">Pos</th>
+                                    <th width="33%">Name</th>
+                                    <th width="12%" style="text-align: center">Total Value</th>
+                                    <th width="7%" style="text-align: center">Yrs Left</th>
+                                    <th width="12%" style="text-align: center">Avg Yrly $$</th>
+                                    <th width="12%" style="text-align: center">2015 Cap $$</th>
+                                </tr>
+                            </thead>
+                            <tbody id="starters_body">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- DEFENSE AND KICKERS AREA -->
+
+                <div id="organization_def_and_kickers_area">
+                    <h5 style="text-decoration: underline; font-weight: bold">Defenses and Kickers</h5>
+                    <div class="team_organization_datagrid" style="height: 75%">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="18%" >Role</th>
+                                    <th width="7%" style="text-align: center">Pos</th>
+                                    <th width="33%">Name</th>
+                                    <th width="12%" style="text-align: center">Total Value</th>
+                                    <th width="7%" style="text-align: center">Yrs Left</th>
+                                    <th width="12%" style="text-align: center">Avg Yrly $$</th>
+                                    <th width="12%" style="text-align: center">2015 Cap $$</th>
+                                </tr>
+                            </thead>
+                            <tbody id="def_k_body">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="organization_middle_gap"></div>
+
+            <div id="organization_second_column">
+
+                <!-- BENCH AREA -->
+
+                <div id="organization_bench_area">
+                    <h5 style="text-decoration: underline; font-weight: bold">Bench</h5>
+                    <div class="team_organization_datagrid" style="height: 85%">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="18%" >Role</th>
+                                    <th width="7%" style="text-align: center">Pos</th>
+                                    <th width="33%">Name</th>
+                                    <th width="12%" style="text-align: center">Total Value</th>
+                                    <th width="7%" style="text-align: center">Yrs Left</th>
+                                    <th width="12%" style="text-align: center">Avg Yrly $$</th>
+                                    <th width="12%" style="text-align: center">2015 Cap $$</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bench_body">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- DEVELOPMENTAL AREA -->
+
+                <div id="organization_developmental_area">
+                    <h5 style="text-decoration: underline; font-weight: bold">Developmental</h5>
+                    <div class="team_organization_datagrid" style="height: 75%">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="18%" >Role</th>
+                                    <th width="7%" style="text-align: center">Pos</th>
+                                    <th width="33%">Name</th>
+                                    <th width="12%" style="text-align: center">Total Value</th>
+                                    <th width="7%" style="text-align: center">Yrs Left</th>
+                                    <th width="12%" style="text-align: center">Avg Yrly $$</th>
+                                    <th width="12%" style="text-align: center">2015 Cap $$</th>
+                                </tr>
+                            </thead>
+                            <tbody  id="dev_body">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right_interaction_area" id="organization_interaction_area">
+            <div id="view_selection_area">
+                <div style="width: 100%">
+                    <h5 style="text-align: right; width: 100%;">Select View<br></h5>
+                </div>
+                <div>
+                    <select style="float: right" class="organization_view_select">
+                        <option {% if team_view == 'Default' %}selected{% endif %}>Default</option>
+                        <option {% if team_view == 'By Position' %}selected{% endif %}>By Position</option>
+                    </select>
+                </div>
+            </div>
+            <br><br><br><br><br><br><br><br>
+            <div id="team_info_display">
+                <div id="total_cost_div">
+                    <h5 style="font-weight: bold; text-decoration: underline">Total Player Cost</h5>
+                    <h4 style="padding-top: 10px;">${{ total_cost|floatformat:2 }}</h4>
+                </div>
+                <br>
+                <div id="cap_penalty_div">
+                    <h5 style="font-weight: bold; text-decoration: underline">Cap Penalty</h5>
+                    <h4 style="padding-top: 10px; color: red;">${{ cap_penalty|floatformat:2 }}</h4>
+                </div>
+                <br>
+                <div id="cap_space_div">
+                    <h5 style="font-weight: bold; text-decoration: underline">Cap Space Available</h5>
+                    <h4 style="padding-top: 10px; color: green;">${{ cap_space|floatformat:2 }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="vw_1">
+        {% for x in player_list %}
+            <table>
+                <tr id="vw_1_tr">
+                    <td id="vw_1-1">{{ x.name }}</td>
+                    <td id="vw_1-2">{{ x.pos }}</td>
+                    <td id="vw_1-3">{{ x.role }}</td>
+                    <td id="vw_1-4">{{ x.total_value }}</td>
+                    <td id="vw_1-5">{{ x.yrs_left }}</td>
+                    <td id="vw_1-6">{{ x.avg_yearly }}</td>
+                    <td id="vw_1-7">{{ x.cap_hit }}</td>
+                    <td id="vw_1-8">
+                        {% for x in x.avail_roles %}
+                            <p>{{ x }}</p>
+                    {% endfor %}
+                    </td>
+                </tr>
+            </table>
+        {% endfor %}
+    </div>
+
+    <div id="vw_2">
+        <p>{{ current_user }}</p>
+    </div>
+
+    <div id="vw_3">
+        {% for x in avail_roles %}
+            <table>
+                <tr id="vw_3_tr">
+                    <td id="vw_3-1">{{ x.role }}</td>
+                    <td id="vw_3-2">{{ x.unique_role }}</td>
+                    <td id="vw_3-3">{{ x.applies_to_QB }}</td>
+                    <td id="vw_3-4">{{ x.applies_to_RB }}</td>
+                    <td id="vw_3-5">{{ x.applies_to_WR }}</td>
+                    <td id="vw_3-6">{{ x.applies_to_TE }}</td>
+                    <td id="vw_3-7">{{ x.applies_to_DEF }}</td>
+                    <td id="vw_3-8">{{ x.applies_to_K }}</td>
+                </tr>
+            </table>
+        {% endfor %}
+    </div>
+
+    <div id="vw_4">
+        <p>{{ flex_1 }}</p>
+    </div>
+
+    <div id="vw_5">
+        <p>{{ flex_2 }}</p>
+    </div>
+
+    <div id="vw_6">
+        <p>{{ user_team_index }}</p>
+    </div>
+
+    <div id="vw_7">
+        <table>
+            <tr>
+                {% for x in filtered_tags %}
+                    <td id="vw_7-1">{{ x }}</td>
+                {% endfor %}
+            </tr>
+        </table>
+    </div>
+
+    <div id="by_pos_view">
+        <div id="by_pos_main_area">
+            <div id="by_pos_first_column">
+
+                <!-- QB AREA -->
+
+                <div id="organization_starters_area">
+                    <h5 style="text-decoration: underline; font-weight: bold; text-align: center">QB</h5>
+                    <div class="team_by_pos_datagrid">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="27%" >Role</th>
+                                    <th width="43%">Name</th>
+                                    <th width="12%" style="text-align: center">Yrs</th>
+                                    <th width="18%" style="text-align: center">Avg $$</th>
+                                </tr>
+                            </thead>
+                            <tbody id="QB_body">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="by_pos_column_gap"></div>
+
+            <div id="by_pos_second_column">
+
+                <!-- RB AREA -->
+
+                <div id="organization_starters_area">
+                    <h5 style="text-decoration: underline; font-weight: bold; text-align: center">RB</h5>
+                    <div class="team_by_pos_datagrid">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="27%" >Role</th>
+                                    <th width="43%">Name</th>
+                                    <th width="12%" style="text-align: center">Yrs</th>
+                                    <th width="18%" style="text-align: center">Avg $$</th>
+                                </tr>
+                            </thead>
+                            <tbody id="RB_body">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="by_pos_column_gap"></div>
+
+            <div id="by_pos_third_column">
+
+                <!-- WR AREA -->
+
+                <div id="organization_starters_area">
+                    <h5 style="text-decoration: underline; font-weight: bold; text-align: center">WR</h5>
+                    <div class="team_by_pos_datagrid">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="27%" >Role</th>
+                                    <th width="43%">Name</th>
+                                    <th width="12%" style="text-align: center">Yrs</th>
+                                    <th width="18%" style="text-align: center">Avg $$</th>
+                                </tr>
+                            </thead>
+                            <tbody id="WR_body">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="by_pos_column_gap"></div>
+
+            <div id="by_pos_fourth_column">
+
+                <!-- TE AREA -->
+
+                <div id="organization_starters_area">
+                    <h5 style="text-decoration: underline; font-weight: bold; text-align: center">TE</h5>
+                    <div class="team_by_pos_datagrid">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="27%" >Role</th>
+                                    <th width="43%">Name</th>
+                                    <th width="12%" style="text-align: center">Yrs</th>
+                                    <th width="18%" style="text-align: center">Avg $$</th>
+                                </tr>
+                            </thead>
+                            <tbody id="TE_body">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class='right_interaction_area' id="by_pos_interaction_area">
+            <div id="view_selection_area">
+                <div style="width: 100%">
+                    <h5 style="text-align: right; width: 100%;">Select View<br></h5>
+                </div>
+                <div>
+                    <select style="float: right" class="organization_view_select">
+                        <option {% if team_view == 'Default' %}selected{% endif %}>Default</option>
+                        <option {% if team_view == 'By Position' %}selected{% endif %}>By Position</option>
+                    </select>
+                </div>
+            </div>
+            <br><br><br><br><br><br><br><br>
+            <div id="team_info_display">
+                <div id="total_cost_div">
+                    <h5 style="font-weight: bold; text-decoration: underline">Total Player Cost</h5>
+                    <h4 style="padding-top: 10px;">${{ total_cost|floatformat:2 }}</h4>
+                </div>
+                <br>
+                <div id="cap_penalty_div">
+                    <h5 style="font-weight: bold; text-decoration: underline">Cap Penalty</h5>
+                    <h4 style="padding-top: 10px; color: red;">${{ cap_penalty|floatformat:2 }}</h4>
+                </div>
+                <br>
+                <div id="cap_space_div">
+                    <h5 style="font-weight: bold; text-decoration: underline">Cap Space Available</h5>
+                    <h4 style="padding-top: 10px; color: green;">${{ cap_space|floatformat:2 }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+
