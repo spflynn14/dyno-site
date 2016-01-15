@@ -271,8 +271,10 @@ def teamorganizationpage(request):
     if working_local == True:
         con = sql3.connect('db.sqlite3')
     else:
-        con = sql3.connect('/home/spflynn/dyno-site/dyno_website/db.sqlite3')
+        con = sql3.connect('/home/spflynn/dyno-site/db.sqlite3')
     cur = con.cursor()
+
+    print(con, cur)
 
     cur.execute('SELECT text_variable FROM dyno_variable WHERE name=?', ['team selected'])
     a = cur.fetchone()
@@ -483,7 +485,7 @@ def teamcapsituationpage(request):
     if working_local == True:
         con = sql3.connect('db.sqlite3')
     else:
-        con = sql3.connect('/home/spflynn/dyno-site/dyno_website/db.sqlite3')
+        con = sql3.connect('/home/spflynn/dyno-site/db.sqlite3')
     cur = con.cursor()
 
     a = Team.objects.get(user=request.user)
@@ -903,7 +905,7 @@ def testview(request):
     if working_local == True:
         con = sql3.connect('db.sqlite3')
     else:
-        con = sql3.connect('/home/spflynn/dyno-site/dyno_website/db.sqlite3')
+        con = sql3.connect('/home/spflynn/dyno-site/db.sqlite3')
     cur = con.cursor()
 
     cur.execute('SELECT name, yr1_role, position, total_value FROM dyno_player WHERE team=?', ['Flynn'])
