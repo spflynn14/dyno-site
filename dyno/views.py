@@ -274,8 +274,6 @@ def teamorganizationpage(request):
         con = sql3.connect('/home/spflynn/dyno-site/db.sqlite3')
     cur = con.cursor()
 
-    print(con, cur)
-
     cur.execute('SELECT text_variable FROM dyno_variable WHERE name=?', ['team selected'])
     a = cur.fetchone()
     team_selected = a[0]

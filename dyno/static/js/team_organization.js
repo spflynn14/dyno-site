@@ -16,6 +16,9 @@ $(document).ready(function() {
     });
     $('#vw_7').remove();
 
+    console.log(filtered_tags);
+
+
     //get master list {player, role, pos}
     var $master = [];
     $('#vw_1').find('tr').each(function() {

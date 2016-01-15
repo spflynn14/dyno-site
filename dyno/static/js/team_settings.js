@@ -17,6 +17,28 @@ $(document).ready(function() {
     $('#team_name_input').val($team_name);
     $('#email_input').val($user_email);
 
+
+    function save_filters () {
+        console.log('triggered');
+        var filters_text = '';
+        $.each(filters_list, function(index, value) {
+            var t = value.toString();
+            filters_text = filters_text + t + ',';
+        });
+
+        $.ajax({
+            url : '/save_team_settings_player_filters',
+            type: "POST",
+            data: {csrfmiddlewaretoken:document.getElementsByName('csrfmiddlewaretoken')[0].value, 'tags_to_filter' : filters_text},
+            dataType: 'json',
+            success: function(data){
+                //do nothing
+            }
+        });
+    }
+
+
+
     $('#go_to_change_password_button').click(function() {
         window.location.href = '/user_change_password';
     });
@@ -62,23 +84,6 @@ $(document).ready(function() {
         } else {
             filters_list.push($(this).val());
         }
+        save_filters();
     });
-
-    window.onbeforeunload = unload_var;
-    function unload_var() {
-        var filters_text = ''
-        $.each(filters_list, function(index, value) {
-            var t = value.toString();
-            filters_text = filters_text + t + ',';
-        });
-        $.ajax({
-            url : '/save_team_settings_player_filters',
-            type: "POST",
-            data: {csrfmiddlewaretoken:document.getElementsByName('csrfmiddlewaretoken')[0].value, 'tags_to_filter' : filters_text},
-            dataType: 'json',
-            success: function(data){
-                //do nothing
-            }
-        });
-    }
 });
