@@ -7,6 +7,8 @@ from django.template import RequestContext, loader
 from .models import *
 from .forms import *
 
+working_local = True
+
 def homepage(request):
     return render(request, 'base.html', {})
 
@@ -266,7 +268,10 @@ def teamorganizationpage(request):
 
         return avail_roles
 
-    con = sql3.connect('db.sqlite3')
+    if working_local == True:
+        con = sql3.connect('db.sqlite3')
+    else:
+        con = sql3.connect('/dyno_website/db.sqlite3')
     cur = con.cursor()
 
     cur.execute('SELECT text_variable FROM dyno_variable WHERE name=?', ['team selected'])
@@ -475,7 +480,10 @@ def teamcapsituationpage(request):
 
         return avail_roles
 
-    con = sql3.connect('db.sqlite3')
+    if working_local == True:
+        con = sql3.connect('db.sqlite3')
+    else:
+        con = sql3.connect('/dyno_website/db.sqlite3')
     cur = con.cursor()
 
     a = Team.objects.get(user=request.user)
@@ -886,173 +894,16 @@ def resetavailableroles(request):
                                          unique_role=y[8])
     return HttpResponseRedirect('/')
 
-def saverolechanges(request):
-    o = open('debug.txt', 'w')
-    for x in request.POST:
-        o.write(x)
-        o.write('\n')
-    o.close()
-    starters_list = ['','','','','','','','']
-    starters_names = ['','','','','','','','']
-    def_k_list = []
-    def_k_names = []
-    bench_list = []
-    bench_names = []
-    dev_list = []
-    dev_names = []
-
-    k = []
-
-    for x in request.POST.keys():
-        k.append(x)
-
-    for x in k:
-        if x.startswith('def_k_name'):
-            def_k_list.append('')
-            def_k_names.append('')
-        elif x.startswith('bench_name'):
-            bench_list.append('')
-            bench_names.append('')
-        elif x.startswith('dev_name'):
-            dev_list.append('')
-            dev_names.append('')
-
-    for x in range(len(starters_list)):
-        try:
-            t_s = 'role_select_starters' + str(x)
-            c_s = request.POST[t_s]
-            starters_list[x] = c_s
-            t1_s = 'starters_name' + str(x)
-            c1_s = request.POST[t1_s]
-            starters_names[x] = c1_s
-        except:
-            pass
-
-    for x in range(len(def_k_list)):
-        try:
-            t_k = 'role_select_def_k' + str(x)
-            c_k = request.POST[t_k]
-            def_k_list[x] = c_k
-            t1_k = 'def_k_name' + str(x)
-            c1_k = request.POST[t1_k]
-            def_k_names[x] = c1_k
-        except:
-            pass
-
-    for x in range(len(bench_list)):
-        try:
-            t_b = 'role_select_bench' + str(x)
-            c_b = request.POST[t_b]
-            bench_list[x] = c_b
-            t1_b = 'bench_name' + str(x)
-            c1_b = request.POST[t1_b]
-            bench_names[x] = c1_b
-        except:
-            pass
-
-    for x in range(len(dev_list)):
-        try:
-            t_d = 'role_select_dev' + str(x)
-            c_d = request.POST[t_d]
-            dev_list[x] = c_d
-            t1_d = 'dev_name' + str(x)
-            c1_d = request.POST[t1_d]
-            dev_names[x] = c1_d
-        except:
-            pass
-
-    #print(starters_list)
-    #print(starters_names)
-    #print(def_k_list)
-    #print(def_k_names)
-    #print(bench_list)
-    #print(bench_names)
-    #print(dev_list)
-    #print(dev_names)
-
-    #todo: these team_selected will need to be changed to whichever team is loaded
-    team_selected = 'Flynn'
-    
-    con = sql3.connect('db.sqlite3')
-    cur = con.cursor()
-    
-    cur.execute('SELECT name FROM dyno_player WHERE team=?', [team_selected])
-    a = cur.fetchall()
-    
-    for x in range(len(a)):
-        for y in range(len(starters_names)):
-            if starters_names[y] == a[x][0]:
-                cur.execute('SELECT yr1_role FROM dyno_player WHERE name=?', [a[x][0]])
-                b = cur.fetchone()
-                if b[0] == starters_list[y]:
-                    pass
-                else:
-                    p = Player.objects.get(name=a[x][0])
-                    p.yr1_role = starters_list[y]
-                    #print('starters - ',starters_names[y], a[x][0], p, p.yr1_role, starters_list[y])
-                    p.save()
-        for y in range(len(def_k_names)):
-            if def_k_names[y] == a[x][0]:
-                cur.execute('SELECT yr1_role FROM dyno_player WHERE name=?', [a[x][0]])
-                b = cur.fetchone()
-                if b[0] == def_k_list[y]:
-                    pass
-                else:
-                    p = Player.objects.get(name=a[x][0])
-                    p.yr1_role = def_k_list[y]
-                    #print('def_k - ',def_k_names[y], a[x][0], p, p.yr1_role, def_k_list[y])
-                    p.save()
-        for y in range(len(bench_names)):
-            if bench_names[y] == a[x][0]:
-                cur.execute('SELECT yr1_role FROM dyno_player WHERE name=?', [a[x][0]])
-                b = cur.fetchone()
-                if b[0] == bench_list[y]:
-                    pass
-                else:
-                    p = Player.objects.get(name=a[x][0])
-                    p.yr1_role = bench_list[y]
-                    #print('bench - ',bench_names[y], a[x][0], p, p.yr1_role, bench_list[y])
-                    p.save()
-        for y in range(len(dev_names)):
-            if dev_names[y] == a[x][0]:
-                cur.execute('SELECT yr1_role FROM dyno_player WHERE name=?', [a[x][0]])
-                b = cur.fetchone()
-                if b[0] == dev_list[y]:
-                    pass
-                else:
-                    p = Player.objects.get(name=a[x][0])
-                    p.yr1_role = dev_list[y]
-                    #print('dev - ',dev_names[y], a[x][0], p, p.yr1_role, dev_list[y])
-                    p.save()
-                    
-    cur.close()
-    con.close()
-
-    return HttpResponseRedirect('/team/organization')
-
-def saveflexspot1(request):
-    c = request.POST['flex_1_select']
-    team_selected = 'Flynn'
-    p = Team.objects.get(internal_name=team_selected)
-    p.flex_1 = c
-    p.save()
-    return HttpResponseRedirect('/team/organization')
-
-def saveflexspot2(request):
-    c = request.POST['flex_2_select']
-    team_selected = 'Flynn'
-    p = Team.objects.get(internal_name=team_selected)
-    p.flex_2 = c
-    p.save()
-    return HttpResponseRedirect('/team/organization')
-
 def testview(request):
     b = Player.objects.order_by('name')
     test_list = []
     for x in b:
         test_list.append(x.name)
 
-    con = sql3.connect('db.sqlite3')
+    if working_local == True:
+        con = sql3.connect('db.sqlite3')
+    else:
+        con = sql3.connect('/dyno_website/db.sqlite3')
     cur = con.cursor()
 
     cur.execute('SELECT name, yr1_role, position, total_value FROM dyno_player WHERE team=?', ['Flynn'])
