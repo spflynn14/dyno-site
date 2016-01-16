@@ -16,8 +16,6 @@ $(document).ready(function() {
     });
     $('#vw_7').remove();
 
-    console.log(filtered_tags);
-
 
     //get master list {player, role, pos}
     var $master = [];
@@ -488,7 +486,7 @@ $(document).ready(function() {
     function populate_WR_table_aux (data) {
         if ($.inArray(data.role, filtered_tags) == -1) {
             $('<tr>').appendTo('#WR_body');
-            var $role_select = $('<select>').addClass('role_selects').attr('style', 'width:100%;height: 100%').appendTo('#WR_body');
+            var $role_select = $('<select>').addClass('role_selects').attr('style', 'width:100%;height: 100%;').appendTo('#WR_body');
             $.each(data.avail_roles, function (index, value) {
                 if (value == data.role) {
                     $role_select.append($('<option>')

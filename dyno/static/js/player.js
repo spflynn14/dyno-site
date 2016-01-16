@@ -242,7 +242,6 @@ $(document).ready(function() {
     });
 
     function fill_bottom_table_restructure (data) {
-        console.log(data);
         //fill bottom table
         $('#player_interaction_2').empty();
 
@@ -359,21 +358,29 @@ $(document).ready(function() {
         $('#slider_1').fadeTo('fast', 0.35);
         $('#spinner_1').spinner('disable', true);
 
-        $('#slider_2').slider('disable', true);
-        $('#slider_2').fadeTo('fast', 0.35);
-        $('#spinner_2').spinner('disable', true);
+        if ($avail_sliders >= 2) {
+            $('#slider_2').slider('disable', true);
+            $('#slider_2').fadeTo('fast', 0.35);
+            $('#spinner_2').spinner('disable', true);
+        }
 
-        $('#slider_3').slider('disable', true);
-        $('#slider_3').fadeTo('fast', 0.35);
-        $('#spinner_3').spinner('disable', true);
+        if ($avail_sliders >= 3) {
+            $('#slider_3').slider('disable', true);
+            $('#slider_3').fadeTo('fast', 0.35);
+            $('#spinner_3').spinner('disable', true);
+        }
 
-        $('#slider_4').slider('disable', true);
-        $('#slider_4').fadeTo('fast', 0.35);
-        $('#spinner_4').spinner('disable', true);
+        if ($avail_sliders >= 4) {
+            $('#slider_4').slider('disable', true);
+            $('#slider_4').fadeTo('fast', 0.35);
+            $('#spinner_4').spinner('disable', true);
+        }
 
-        $('#slider_5').slider('disable', true);
-        $('#slider_5').fadeTo('fast', 0.35);
-        $('#spinner_5').spinner('disable', true);
+        if ($avail_sliders == 5) {
+            $('#slider_5').slider('disable', true);
+            $('#slider_5').fadeTo('fast', 0.35);
+            $('#spinner_5').spinner('disable', true);
+        }
 
         $num_sliders_disabled = $avail_sliders;
     }
@@ -429,6 +436,7 @@ $(document).ready(function() {
         }
 
         if ($('#slider_1').slider('option','disabled')) {
+            console.log('count 1');
             disabled_pool = disabled_pool + Number($('#spinner_1').val());
         } else {
             if (slider_source != 1) {
@@ -436,6 +444,7 @@ $(document).ready(function() {
             }
         }
         if ($('#slider_2').slider('option','disabled')) {
+            console.log('count 2');
             disabled_pool = disabled_pool + Number($('#spinner_2').val());
         } else {
             if (slider_source != 2) {
@@ -443,6 +452,7 @@ $(document).ready(function() {
             }
         }
         if ($('#slider_3').slider('option','disabled')) {
+            console.log('count 3');
             disabled_pool = disabled_pool + Number($('#spinner_3').val());
         } else {
             if (slider_source != 3) {
@@ -450,6 +460,7 @@ $(document).ready(function() {
             }
         }
         if ($('#slider_4').slider('option','disabled')) {
+            console.log('count 4');
             disabled_pool = disabled_pool + Number($('#spinner_4').val());
         } else {
             if (slider_source != 4) {
@@ -457,6 +468,7 @@ $(document).ready(function() {
             }
         }
         if ($('#slider_5').slider('option','disabled')) {
+            console.log('count 5');
             disabled_pool = disabled_pool + Number($('#spinner_5').val());
         } else {
             if (slider_source != 5) {
@@ -464,16 +476,56 @@ $(document).ready(function() {
             }
         }
 
+        var max_salary = $sal - disabled_pool - (enabled_sliders - 1);
+        if (current_slider_value > max_salary) {
+            current_slider_value = max_salary;
+            if (slider_source == 1) {
+                $('#slider_1').slider('value', current_slider_value*20);
+                $('#spinner_1').val(((current_slider_value)).toFixed(2));
+            } else if (slider_source == 2) {
+                $('#slider_2').slider('value', current_slider_value*20);
+                $('#spinner_2').val(((current_slider_value)).toFixed(2));
+            }
+             else if (slider_source == 3) {
+                $('#slider_3').slider('value', current_slider_value*20);
+                $('#spinner_3').val(((current_slider_value)).toFixed(2));
+            }
+             else if (slider_source == 4) {
+                $('#slider_4').slider('value', current_slider_value*20);
+                $('#spinner_4').val(((current_slider_value)).toFixed(2));
+            }
+             else if (slider_source == 5) {
+                $('#slider_5').slider('value', current_slider_value*20);
+                $('#spinner_5').val(((current_slider_value)).toFixed(2));
+            }
+        }
+
         //console.log('before = ', total_avail_pool);
         var total_avail_pool = $sal - current_slider_value - disabled_pool;
 
         var per_year = Math.round(((total_avail_pool / (enabled_sliders-1)) * 100)) / 100;
+        if (per_year < 1) {
+            per_year = 1
+        }
         var last_year = Math.round((total_avail_pool - (per_year * (enabled_sliders - 2))) * 100) / 100;
 
-        //console.log(per_year);
-        //console.log(last_year);
-        //console.log(total_avail_pool);
-        //console.log(current_slider_value);
+
+        console.log('per_year = ',per_year);
+        console.log('last_year = ',last_year);
+        console.log('total_avail_pool = ',total_avail_pool);
+        console.log('disabled_pool = ',disabled_pool);
+        console.log('enabled_slider_list = ',enabled_slider_list);
+        console.log('current_slider_value = ',current_slider_value);
+        console.log('max_salary = ',max_salary);
+        console.log('spinner_1 = ',$('#spinner_1').val());
+        console.log('spinner_2 = ',$('#spinner_2').val());
+        console.log('spinner_3 = ',$('#spinner_3').val());
+        console.log('spinner_4 = ',$('#spinner_4').val());
+        console.log('spinner_5 = ',$('#spinner_5').val());
+        console.log('**********');
+
+
+
 
         $.each(enabled_slider_list, function(index, x) {
             if (index == enabled_slider_list.length-1) {
@@ -532,7 +584,6 @@ $(document).ready(function() {
             },
             dataType: 'json',
             success: function (data) {
-                console.log(data);
 
                 $total = Number(data.total_cost);
                 $sb = Number(data.total_guar);
