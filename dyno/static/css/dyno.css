@@ -1016,3 +1016,28 @@
 }
 
 /* END: NEW BUG */
+
+
+
+/* FEATURE LIST */
+
+#feature_list_area {
+    display: inline-block;
+    width: 50%;
+    height: 100%;
+    float: left;
+    padding-left: 10px;
+    padding-right: 10px;
+    overflow-y: auto;
+}
+
+#changelog_area {
+    display: inline-block;
+    width: 50%;
+    height: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+    overflow-y: auto;
+}
+
+/* END: FEATURE LIST */

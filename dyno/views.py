@@ -1,9 +1,10 @@
-import os, sys, platform
+import os
 from decimal import *
 from django.shortcuts import render, redirect, render_to_response
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.template import RequestContext, loader
+from django_user_agents.utils import get_user_agent
 from .models import *
 from .forms import *
 
@@ -496,34 +497,37 @@ def teamcapsituationpage(request):
     f_t = a.filtered_tags
     filtered_tags = f_t.strip().split(',')[:-1]
 
-    b = Player.objects.filter(team=team)
-    team_json = []
 
-    for x in b:
-        avail_ro_1 = avail_roles(con, cur, team, x.position, x.name, 1)
-        avail_ro_2 = avail_roles(con, cur, team, x.position, x.name, 2)
-        avail_ro_3 = avail_roles(con, cur, team, x.position, x.name, 3)
-        avail_ro_4 = avail_roles(con, cur, team, x.position, x.name, 4)
-        avail_ro_5 = avail_roles(con, cur, team, x.position, x.name, 5)
-        team_json.append({'yr1_role': x.yr1_role,
-                         'yr2_role' : x.yr2_role,
-                         'yr3_role' : x.yr3_role,
-                         'yr4_role' : x.yr4_role,
-                         'yr5_role' : x.yr5_role,
-                          'pos' : x.position,
-                          'name' : x.name,
-                          'contract_type' : x.contract_type,
-                          'yr1_salary' : x.yr1_salary,
-                          'yr2_salary' : x.yr2_salary,
-                          'yr3_salary' : x.yr3_salary,
-                          'yr4_salary' : x.yr4_salary,
-                          'yr5_salary' : x.yr5_salary,
-                          'yr1_sb' : x.yr1_sb,
-                          'yr2_sb' : x.yr2_sb,
-                          'yr3_sb' : x.yr3_sb,
-                          'yr4_sb' : x.yr4_sb,
-                          'yr5_sb' : x.yr5_sb,
-                          'notes' : x.notes,
+    cur.execute('SELECT * FROM dyno_player WHERE team=?', [team])
+    b1 = cur.fetchall()
+
+    team_json1 = []
+
+    for x in b1:
+        avail_ro_1 = avail_roles(con, cur, team, x[1], x[2], 1)
+        avail_ro_2 = avail_roles(con, cur, team, x[1], x[2], 2)
+        avail_ro_3 = avail_roles(con, cur, team, x[1], x[2], 3)
+        avail_ro_4 = avail_roles(con, cur, team, x[1], x[2], 4)
+        avail_ro_5 = avail_roles(con, cur, team, x[1], x[2], 5)
+        team_json1.append({'yr1_role': x[19],
+                         'yr2_role' : x[20],
+                         'yr3_role' : x[21],
+                         'yr4_role' : x[22],
+                         'yr5_role' : x[23],
+                          'pos' : x[1],
+                          'name' : x[2],
+                          'contract_type' : x[4],
+                          'yr1_salary' : x[8],
+                          'yr2_salary' : x[9],
+                          'yr3_salary' : x[10],
+                          'yr4_salary' : x[11],
+                          'yr5_salary' : x[12],
+                          'yr1_sb' : x[13],
+                          'yr2_sb' : x[14],
+                          'yr3_sb' : x[15],
+                          'yr4_sb' : x[16],
+                          'yr5_sb' : x[17],
+                          'notes' : x[18],
                           'avail_roles_yr1' : avail_ro_1,
                           'avail_roles_yr2' : avail_ro_2,
                           'avail_roles_yr3' : avail_ro_3,
@@ -547,7 +551,7 @@ def teamcapsituationpage(request):
     cur.close()
     con.close()
 
-    return render(request, 'team/team_cap_situation.html', {'team_json' : team_json,
+    return render(request, 'team/team_cap_situation.html', {'team_json' : team_json1,
                                                             'avail_roles' : avail_roles_all,
                                                             'cap_pen_yr1' : cap_pen_yr1,
                                                             'cap_pen_yr2' : cap_pen_yr2,
@@ -953,7 +957,7 @@ def bugtrackingpage(request):
 
 def newbugpage(request):
     e = os.environ
-    o = platform.platform()
+    o = request.user_agent.os
     b = request.META['HTTP_USER_AGENT']
     return render(request, 'admin/new_bug.html', {'environ' : e,
                                                   'os' : o,
@@ -963,3 +967,13 @@ def featurerequestpage(request):
 
 
     return render(request, 'admin/feature_request.html', {})
+
+def featurelistchangelogpage(request):
+    a = Message.objects.get(name='Features List')
+    features_list = a.content
+
+    b = Message.objects.get(name='Changelog')
+    changelog = b.content
+
+    return render(request, 'admin/feature_list.html', {'features_list' : features_list,
+                                                       'changelog' : changelog})

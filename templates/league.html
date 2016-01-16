@@ -6,6 +6,7 @@
     <head>
         <meta charset="UTF-8">
         <title>Dynasty League</title>
+        <link rel="icon" href="{% static 'favicon.ico' %}">
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
@@ -32,8 +33,12 @@
                         <li><a href="/admin">Admin</a></li>
                         <li><a href="/batch">Batch</a></li>
                         <li><a href="/settings">Settings</a></li>
+                        <li class="divider"></li>
                     {% else %}
                     {% endif %}
+                    <li><a href="/team/team_settings">Team Settings</a></li>
+                    <li class="divider"></li>
+                    <li><a href="/feature_list">Feature List & Changelog</a></li>
                     <li class="divider"></li>
                     <li><a href="/bug_tracking">Bug Tracking</a></li>
                     <li><a href="/feature_request">Feature Request</a></li>

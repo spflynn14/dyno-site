@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+    <div class="tab_area" id="second_tab_area">
+
+    </div>
+
+    <div class="tab_area" id="third_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        <div id="feature_list_area">
+            {{ features_list|safe }}
+        </div>
+
+        <div id="changelog_area">
+            {{ changelog|safe }}
+        </div>
+    </div>
+{% endblock %}

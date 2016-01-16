@@ -54,4 +54,5 @@ urlpatterns = [
     url(r'^feature_request$', views.featurerequestpage, name='request new feature'),
     url(r'^process_feature_request$', processing.process_feature_request, name='process feature request'),
     url(r'^save_team_settings_player_filters$', processing.save_team_settings_player_filters, name='save player filter info when leaving team settings'),
+    url(r'^feature_list$', views.featurelistchangelogpage, name='feature list and changelog'),
 ]
