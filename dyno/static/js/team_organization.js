@@ -9,6 +9,8 @@ $(document).ready(function() {
     $('#vw_2').remove();
     var $user_team_index = $('#vw_6').find('p').text();
     $('#vw_6').remove();
+    var $user_team = $('#vw_8').find('p').text();
+    $('#vw_8').remove();
 
     var filtered_tags = [];
     $('#vw_7').find('td').each(function() {
@@ -179,6 +181,10 @@ $(document).ready(function() {
                         .text(value));
                 }
             });
+            if ($team != $user_team) {
+                $role_select.prop('disabled', true);
+                $role_select.empty();
+            }
             $('<td>').attr('align','center').text(data.pos).appendTo('#starters_body');
             $('<td>').addClass('name_link').text(data.name).appendTo('#starters_body');
             $('<td>').attr('align','center').text('$' + data.total_value.toFixed(2)).appendTo('#starters_body');
@@ -206,6 +212,10 @@ $(document).ready(function() {
                         .text(value));
                 }
             });
+            if ($team != $user_team) {
+                $role_select.prop('disabled', true);
+                $role_select.empty();
+            }
             $('<td>').attr('align','center').addClass('team_organization_data_aux').text(data.pos).appendTo('#starters_body');
             $('<td>').addClass('name_link').addClass('team_organization_data_aux').text(data.name).appendTo('#starters_body');
             $('<td>').attr('align','center').addClass('team_organization_data_aux').text('$' + data.total_value.toFixed(2)).appendTo('#starters_body');
@@ -239,6 +249,10 @@ $(document).ready(function() {
                         .text(value));
                 }
             });
+            if ($team != $user_team) {
+                $role_select.prop('disabled', true);
+                $role_select.empty();
+            }
             $('<td>').attr('align', 'center').text(data.pos).appendTo('#def_k_body');
             $('<td>').addClass('name_link').text(data.name).appendTo('#def_k_body');
             $('<td>').attr('align', 'center').text('$' + data.total_value.toFixed(2)).appendTo('#def_k_body');
@@ -264,6 +278,10 @@ $(document).ready(function() {
                         .text(value));
                 }
             });
+            if ($team != $user_team) {
+                $role_select.prop('disabled', true);
+                $role_select.empty();
+            }
             $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text(data.pos).appendTo('#def_k_body');
             $('<td>').addClass('name_link').addClass('team_organization_data_aux').text(data.name).appendTo('#def_k_body');
             $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.total_value.toFixed(2)).appendTo('#def_k_body');
@@ -289,6 +307,10 @@ $(document).ready(function() {
                         .text(value));
                 }
             });
+            if ($team != $user_team) {
+                $role_select.prop('disabled', true);
+                $role_select.empty();
+            }
             $('<td>').attr('align','center').text(data.pos).appendTo('#bench_body');
             $('<td>').addClass('name_link').text(data.name).appendTo('#bench_body');
             $('<td>').attr('align','center').text('$' + data.total_value.toFixed(2)).appendTo('#bench_body');
@@ -314,6 +336,10 @@ $(document).ready(function() {
                         .text(value));
                 }
             });
+            if ($team != $user_team) {
+                $role_select.prop('disabled', true);
+                $role_select.empty();
+            }
             $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text(data.pos).appendTo('#bench_body');
             $('<td>').addClass('name_link').addClass('team_organization_data_aux').text(data.name).appendTo('#bench_body');
             $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.total_value.toFixed(2)).appendTo('#bench_body');
@@ -339,6 +365,10 @@ $(document).ready(function() {
                         .text(value));
                 }
             });
+            if ($team != $user_team) {
+                $role_select.prop('disabled', true);
+                $role_select.empty();
+            }
             $('<td>').attr('align', 'center').text(data.pos).appendTo('#dev_body');
             $('<td>').addClass('name_link').text(data.name).appendTo('#dev_body');
             $('<td>').attr('align', 'center').text('$' + data.total_value.toFixed(2)).appendTo('#dev_body');
@@ -364,6 +394,10 @@ $(document).ready(function() {
                         .text(value));
                 }
             });
+            if ($team != $user_team) {
+                $role_select.prop('disabled', true);
+                $role_select.empty();
+            }
             $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text(data.pos).appendTo('#dev_body');
             $('<td>').addClass('name_link').addClass('team_organization_data_aux').text(data.name).appendTo('#dev_body');
             $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.total_value.toFixed(2)).appendTo('#dev_body');
@@ -389,6 +423,10 @@ $(document).ready(function() {
                         .text(value));
                 }
             });
+            if ($team != $user_team) {
+                $role_select.prop('disabled', true);
+                $role_select.empty();
+            }
             $('<td>').addClass('name_link').text(data.name).appendTo('#QB_body');
             $('<td>').attr('align', 'center').text(data.yrs_left).appendTo('#QB_body');
             $('<td>').attr('align', 'center').text('$' + data.avg_yearly.toFixed(2)).appendTo('#QB_body');
@@ -411,6 +449,10 @@ $(document).ready(function() {
                         .text(value));
                 }
             });
+            if ($team != $user_team) {
+                $role_select.prop('disabled', true);
+                $role_select.empty();
+            }
             $('<td>').addClass('name_link').addClass('team_organization_data_aux').text(data.name).appendTo('#QB_body');
             $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text(data.yrs_left).appendTo('#QB_body');
             $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.avg_yearly.toFixed(2)).appendTo('#QB_body');
@@ -433,6 +475,10 @@ $(document).ready(function() {
                         .text(value));
                 }
             });
+            if ($team != $user_team) {
+                $role_select.prop('disabled', true);
+                $role_select.empty();
+            }
             $('<td>').addClass('name_link').text(data.name).appendTo('#RB_body');
             $('<td>').attr('align', 'center').text(data.yrs_left).appendTo('#RB_body');
             $('<td>').attr('align', 'center').text('$' + data.avg_yearly.toFixed(2)).appendTo('#RB_body');
@@ -455,6 +501,10 @@ $(document).ready(function() {
                         .text(value));
                 }
             });
+            if ($team != $user_team) {
+                $role_select.prop('disabled', true);
+                $role_select.empty();
+            }
             $('<td>').addClass('name_link').addClass('team_organization_data_aux').text(data.name).appendTo('#RB_body');
             $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text(data.yrs_left).appendTo('#RB_body');
             $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.avg_yearly.toFixed(2)).appendTo('#RB_body');
@@ -477,6 +527,10 @@ $(document).ready(function() {
                         .text(value));
                 }
             });
+            if ($team != $user_team) {
+                $role_select.prop('disabled', true);
+                $role_select.empty();
+            }
             $('<td>').addClass('name_link').text(data.name).appendTo('#WR_body');
             $('<td>').attr('align', 'center').text(data.yrs_left).appendTo('#WR_body');
             $('<td>').attr('align', 'center').text('$' + data.avg_yearly.toFixed(2)).appendTo('#WR_body');
@@ -499,6 +553,10 @@ $(document).ready(function() {
                         .text(value));
                 }
             });
+            if ($team != $user_team) {
+                $role_select.prop('disabled', true);
+                $role_select.empty();
+            }
             $('<td>').addClass('name_link').addClass('team_organization_data_aux').text(data.name).appendTo('#WR_body');
             $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text(data.yrs_left).appendTo('#WR_body');
             $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.avg_yearly.toFixed(2)).appendTo('#WR_body');
@@ -521,6 +579,10 @@ $(document).ready(function() {
                         .text(value));
                 }
             });
+            if ($team != $user_team) {
+                $role_select.prop('disabled', true);
+                $role_select.empty();
+            }
             $('<td>').addClass('name_link').text(data.name).appendTo('#TE_body');
             $('<td>').attr('align', 'center').text(data.yrs_left).appendTo('#TE_body');
             $('<td>').attr('align', 'center').text('$' + data.avg_yearly.toFixed(2)).appendTo('#TE_body');
@@ -543,6 +605,10 @@ $(document).ready(function() {
                         .text(value));
                 }
             });
+            if ($team != $user_team) {
+                $role_select.prop('disabled', true);
+                $role_select.empty();
+            }
             $('<td>').addClass('name_link').addClass('team_organization_data_aux').text(data.name).appendTo('#TE_body');
             $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text(data.yrs_left).appendTo('#TE_body');
             $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.avg_yearly.toFixed(2)).appendTo('#TE_body');
