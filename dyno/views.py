@@ -1,11 +1,8 @@
 import os
 from decimal import *
-from django.shortcuts import render, redirect, render_to_response
+from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
-from django.template import RequestContext, loader
-from django_user_agents.utils import get_user_agent
-from .models import *
+from django.http import HttpResponseRedirect, HttpResponse
 from .forms import *
 
 working_local = True
@@ -14,7 +11,6 @@ def homepage(request):
     return render(request, 'base.html', {})
 
 def loginpage(request):
-    print('***login page : ', request.user)
     return render(request, 'login.html', {'failed_login': False})
 
 def loginView(request):
