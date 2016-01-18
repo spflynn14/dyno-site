@@ -25,7 +25,7 @@ SECRET_KEY = '&d6ujl69cgdcrsk=er1z#a166i(0f14s$0s+)&2y-#9*)9kcp4'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'www.dynastyleague.space']
 
 
 # Application definition
@@ -124,3 +124,18 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+
+EMAIL_SUBJECT_PREFIX = "[Dynasty League] "
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST_USER = "dynastyleague.space@gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_PASSWORD = '6n4J7jzPBreP'
+
+DEFAULT_FROM_EMAIL = 'dynastyleague.space@gmail.com'
+SERVER_EMAIL = 'dynastyleague.space@gmail.com'
+
+ADMINS = (
+    ('Sean Flynn', 'spflynn0@gmail.com'),
+)
