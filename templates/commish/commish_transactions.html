@@ -1,0 +1,100 @@
+{% extends 'admin/commish_office.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/commish_transactions.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.tablesorter.js' %}"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+
+    <div class="tab_area" id="second_tab_area">
+        {% if request.path == '/commish/pending_transactions' %}
+            <a href="/commish/pending_transactions" class="second_tab_button_team" style="background-color: #2d99d4; color: white">Pending Transactions</a>
+        {% else %}
+            <a href="/commish/pending_transactions" class="second_tab_button_team">Pending Transactions</a>
+        {% endif %}
+
+        {% if request.path == '/commish/transactions' %}
+            <a href="/commish/transactions" class="second_tab_button_team" style="background-color: #2d99d4; color: white">All Transactions</a>
+        {% else %}
+            <a href="/commish/transactions" class="second_tab_button_team">All Transactions</a>
+        {% endif %}
+    </div>
+
+    <div id="display_area">
+        <div id="commish_trans_date_filters_area">
+            <button type="button" class="commish_trans_date_button" id="filter_24_hours_button" style="margin-left: 60px">24 Hours</button>
+            <button type="button" class="commish_trans_date_button" id="filter_48_hours_button" style="margin-left: 30px">48 Hours</button>
+            <button type="button" class="commish_trans_date_button" id="filter_72_hours_button" style="margin-left: 30px">72 Hours</button>
+            <button type="button" class="commish_trans_date_button" id="filter_week_button" style="margin-left: 30px">Week</button>
+            <button type="button" class="commish_trans_date_button" id="filter_month_button" style="margin-left: 30px">Month</button>
+            <p class="commish_trans_date_button" style="margin-left: 50px">Start Date: <input type="text" size='8' id="datepicker_start"></p>
+            <p class="commish_trans_date_button" style="margin-left: 10px">End Date: <input type="text" size='8' id="datepicker_end"></p>
+        </div>
+        <div class="commish_transactions_datagrid" style="height: 98%;">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="14%">Date</th>
+                        <th width="13%">Player</th>
+                        <th width="7%">Team1</th>
+                        <th width="7%">Team2</th>
+                        <th width="13%">Transaction Type</th>
+                        <th width="5%" style="text-align: center">Var_d1</th>
+                        <th width="5%" style="text-align: center">Var_d2</th>
+                        <th width="5%" style="text-align: center">Var_d3</th>
+                        <th width="5%" style="text-align: center">Var_i1</th>
+                        <th width="5%" style="text-align: center">Var_i2</th>
+                        <th width="7%">Var_t1</th>
+                        <th width="7%">Var_t2</th>
+                        <th width="7%">Var_t3</th>
+                    </tr>
+                </thead>
+                <tbody id="commish_transactions_body">
+
+                </tbody>
+            </table>
+        </div>
+
+        <div id="commish_trans_cat_filters_area">
+            <table style="table-layout: fixed; width: 100%;">
+                {% for x in type_list %}
+                    <tr style="height: 50px">
+                        <td style="width: 20%;"></td>
+                        <td style="width: 70%;">{{ x }}</td>
+                        <td style="width: 10%;"><input type="checkbox" checked/></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <div id="vw_1">
+        {% for x in transactions %}
+            <table>
+                <tr>
+                    <td id="vw_1-1">{{ x.date }}</td>
+                    <td id="vw_1-2">{{ x.player }}</td>
+                    <td id="vw_1-3">{{ x.team1 }}</td>
+                    <td id="vw_1-4">{{ x.team2 }}</td>
+                    <td id="vw_1-5">{{ x.transaction_type }}</td>
+                    <td id="vw_1-6">{{ x.var_d1 }}</td>
+                    <td id="vw_1-7">{{ x.var_d2 }}</td>
+                    <td id="vw_1-8">{{ x.var_d3 }}</td>
+                    <td id="vw_1-9">{{ x.var_i1 }}</td>
+                    <td id="vw_1-10">{{ x.var_i2 }}</td>
+                    <td id="vw_1-11">{{ x.var_t1 }}</td>
+                    <td id="vw_1-12">{{ x.var_t2 }}</td>
+                    <td id="vw_1-13">{{ x.var_t3 }}</td>
+                    <td id="vw_1-14">{{ x.date.isoformat }}</td>
+                </tr>
+            </table>
+        {% endfor %}
+    </div>
+
+{% endblock %}

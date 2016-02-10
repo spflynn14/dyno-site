@@ -1,11 +1,253 @@
 import os
+import sqlite3 as sql3
 from decimal import *
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, HttpResponse
+from django.db.models import Q
 from .forms import *
+from .models import *
 
 working_local = True
+current_league_year = 2015
+year_list = [current_league_year, current_league_year + 1, current_league_year + 2, current_league_year + 3, current_league_year + 4]
+
+
+
+def extension_calc(x,
+                   adp_qb_list, adp_rb_list, adp_wr_list, adp_te_list, adp_def_list, adp_k_list,
+                   salary_listing_qb, salary_listing_rb, salary_listing_wr, salary_listing_te, salary_listing_def, salary_listing_k,
+                   qb_yr1_list, rb_yr1_list, wr_yr1_list, te_yr1_list, def_yr1_list, k_yr1_list,
+                   qb_yr2_list, rb_yr2_list, wr_yr2_list, te_yr2_list, def_yr2_list, k_yr2_list,
+                   ):
+
+    num_years = 1
+    if x.yr2_salary > 0:
+        num_years += 1
+    if x.yr3_salary > 0:
+        num_years += 1
+    if x.yr4_salary > 0:
+        num_years += 1
+    if x.yr5_salary > 0:
+        num_years += 1
+    avg_yearly = float((x.yr1_salary + x.yr1_sb + x.yr2_salary + x.yr2_sb + x.yr3_salary + x.yr3_sb + x.yr4_salary + x.yr4_sb + x.yr5_salary + x.yr5_sb)) / num_years
+
+    player_adp = 999
+    player_perf1 = 999
+    player_perf2 = 999
+    if x.position == 'QB':
+        for y in adp_qb_list:
+            if y.player == x.name:
+                player_adp = y.rank
+        try:
+            adp_cost = salary_listing_qb[player_adp-1]
+        except IndexError:
+            adp_cost = 1
+
+        for y in qb_yr1_list:
+            if y.player == x.name:
+                player_perf1 = y.rank
+        for y in qb_yr2_list:
+            if y.player == x.name:
+                player_perf2 = y.rank
+        try:
+            perf1_cost = salary_listing_qb[player_perf1-1]
+        except:
+            perf1_cost = 1
+        try:
+            perf2_cost = salary_listing_qb[player_perf2-1]
+        except:
+            perf2_cost = 1
+
+        if perf1_cost > perf2_cost:
+            perf_cost = perf1_cost
+        else:
+            perf_cost = perf2_cost
+
+        part_a = (0.25 * adp_cost) + (0.75 * perf_cost)
+        if part_a >= avg_yearly:
+            base_extension = part_a
+        else:
+            base_extension = (0.50 * part_a) + (0.50 * avg_yearly)
+
+    elif x.position == 'RB':
+        for y in adp_rb_list:
+            if y.player == x.name:
+                player_adp = y.rank
+        try:
+            adp_cost = salary_listing_rb[player_adp-1]
+        except IndexError:
+            adp_cost = 1
+
+        for y in rb_yr1_list:
+            if y.player == x.name:
+                player_perf1 = y.rank
+        for y in rb_yr2_list:
+            if y.player == x.name:
+                player_perf2 = y.rank
+        try:
+            perf1_cost = salary_listing_rb[player_perf1-1]
+        except:
+            perf1_cost = 1
+        try:
+            perf2_cost = salary_listing_rb[player_perf2-1]
+        except:
+            perf2_cost = 1
+
+        if perf1_cost > perf2_cost:
+            perf_cost = perf1_cost
+        else:
+            perf_cost = perf2_cost
+
+        part_a = (0.25 * adp_cost) + (0.75 * perf_cost)
+        if part_a >= avg_yearly:
+            base_extension = part_a
+        else:
+            base_extension = (0.50 * part_a) + (0.50 * avg_yearly)
+
+    elif x.position == 'WR':
+        for y in adp_wr_list:
+            if y.player == x.name:
+                player_adp = y.rank
+        try:
+            adp_cost = salary_listing_wr[player_adp-1]
+        except IndexError:
+            adp_cost = 1
+
+        for y in wr_yr1_list:
+            if y.player == x.name:
+                player_perf1 = y.rank
+        for y in wr_yr2_list:
+            if y.player == x.name:
+                player_perf2 = y.rank
+        try:
+            perf1_cost = salary_listing_wr[player_perf1-1]
+        except:
+            perf1_cost = 1
+        try:
+            perf2_cost = salary_listing_wr[player_perf2-1]
+        except:
+            perf2_cost = 1
+
+        if perf1_cost > perf2_cost:
+            perf_cost = perf1_cost
+        else:
+            perf_cost = perf2_cost
+
+        part_a = (0.25 * adp_cost) + (0.75 * perf_cost)
+        if part_a >= avg_yearly:
+            base_extension = part_a
+        else:
+            base_extension = (0.50 * part_a) + (0.50 * avg_yearly)
+
+    elif x.position == 'TE':
+        for y in adp_te_list:
+            if y.player == x.name:
+                player_adp = y.rank
+        try:
+            adp_cost = salary_listing_te[player_adp-1]
+        except IndexError:
+            adp_cost = 1
+
+        for y in te_yr1_list:
+            if y.player == x.name:
+                player_perf1 = y.rank
+        for y in te_yr2_list:
+            if y.player == x.name:
+                player_perf2 = y.rank
+        try:
+            perf1_cost = salary_listing_te[player_perf1-1]
+        except:
+            perf1_cost = 1
+        try:
+            perf2_cost = salary_listing_te[player_perf2-1]
+        except:
+            perf2_cost = 1
+
+        if perf1_cost > perf2_cost:
+            perf_cost = perf1_cost
+        else:
+            perf_cost = perf2_cost
+
+        part_a = (0.25 * adp_cost) + (0.75 * perf_cost)
+        if part_a >= avg_yearly:
+            base_extension = part_a
+        else:
+            base_extension = (0.50 * part_a) + (0.50 * avg_yearly)
+
+    elif x.position == 'DEF':
+        for y in adp_def_list:
+            if y.player == x.name:
+                player_adp = y.rank
+        try:
+            adp_cost = salary_listing_def[player_adp-1]
+        except IndexError:
+            adp_cost = 1
+
+        for y in def_yr1_list:
+            if y.player == x.name:
+                player_perf1 = y.rank
+        for y in def_yr2_list:
+            if y.player == x.name:
+                player_perf2 = y.rank
+        try:
+            perf1_cost = salary_listing_def[player_perf1-1]
+        except:
+            perf1_cost = 1
+        try:
+            perf2_cost = salary_listing_def[player_perf2-1]
+        except:
+            perf2_cost = 1
+
+        if perf1_cost > perf2_cost:
+            perf_cost = perf1_cost
+        else:
+            perf_cost = perf2_cost
+
+        part_a = (0.25 * adp_cost) + (0.75 * perf_cost)
+        if part_a >= avg_yearly:
+            base_extension = part_a
+        else:
+            base_extension = (0.50 * part_a) + (0.50 * avg_yearly)
+
+    elif x.position == 'K':
+        for y in adp_k_list:
+            if y.player == x.name:
+                player_adp = y.rank
+        try:
+            adp_cost = salary_listing_k[player_adp-1]
+        except IndexError:
+            adp_cost = 1
+
+        for y in k_yr1_list:
+            if y.player == x.name:
+                player_perf1 = y.rank
+        for y in k_yr2_list:
+            if y.player == x.name:
+                player_perf2 = y.rank
+        try:
+            perf1_cost = salary_listing_k[player_perf1-1]
+        except:
+            perf1_cost = 1
+        try:
+            perf2_cost = salary_listing_k[player_perf2-1]
+        except:
+            perf2_cost = 1
+
+        if perf1_cost > perf2_cost:
+            perf_cost = perf1_cost
+        else:
+            perf_cost = perf2_cost
+
+        part_a = (0.25 * adp_cost) + (0.75 * perf_cost)
+        if part_a >= avg_yearly:
+            base_extension = part_a
+        else:
+            base_extension = (0.50 * part_a) + (0.50 * avg_yearly)
+
+    return base_extension, avg_yearly, num_years
+
+
 
 def homepage(request):
     return render(request, 'base.html', {})
@@ -21,8 +263,11 @@ def loginView(request):
         if user.is_active:
             login(request, user)
             a = Variable.objects.get(name='team selected')
-            b = Team.objects.get(user=user)
-            team_name = b.internal_name
+            try:
+                b = Team.objects.get(user=user)
+                team_name = b.internal_name
+            except:
+                team_name = ''
 
             a.text_variable = team_name
             a.save()
@@ -56,15 +301,331 @@ def draftpage(request):
     return render(request, 'draft.html', {})
 
 def auctionpage(request):
-    return render(request, 'auction.html', {})
+    a = Player.objects.filter(team='Free Agent').order_by('name')
+    new_auction_player_list = []
+    for x in a:
+        new_auction_player_list.append(x.position + ' - ' + x.name)
+
+    b = Auction.objects.all().order_by('clock_reset')
+
+    c = Team.objects.get(user=request.user)
+    current_team = c.internal_name
+
+    d = Variable.objects.get(name='New Auction Info')
+    d.text_variable = ''
+    d.save()
+
+    return render(request, 'auction.html', {'new_auction_player_list' : new_auction_player_list,
+                                            'auctions' : b,
+                                            'current_team' : current_team})
+
+def auctionbidconfirmationpage(request):
+    a = Variable.objects.get(name='New Auction Info')
+    b = a.text_variable
+
+    bids_list = []
+
+    if '\n' not in b:
+        c = b.strip().split(':')
+        bids_list.append({'player' : c[0],
+                          'bid' : c[1]})
+    else:
+        c = b.strip().split('\n')
+        for x in c:
+            d = x.strip().split(':')
+            bids_list.append({'player' : d[0],
+                              'bid' : d[1]})
+
+    return render(request, 'auction_bid_confirmation.html', {'bids_list' : bids_list})
 
 def leagueallplayerspage(request):
     #todo: change to sql pull to speed up
-    table_contents = Player.objects.order_by('position', '-total_value')
-    return render(request, 'league/league_all_players.html', {'table_contents' : table_contents})
+    a = Team.objects.all()
+    teams = []
+    for x in a:
+        teams.append(x.internal_name)
+
+    b = Player.objects.order_by('position', '-total_value')
+    table_contents = []
+    for x in b:
+        if x.team in teams:
+            table_contents.append(x)
+
+    return render(request, 'league/league_all_players.html', {'table_contents' : table_contents,
+                                                              'year_list' : year_list})
 
 def leagueextensions(request):
-    return render(request, 'league/league_extensions.html', {})
+    a = Player.objects.all()
+    b = ADP.objects.all().order_by('rank')
+    c = Performance_Yr1.objects.all().order_by('rank')
+    d = Performance_Yr2.objects.all().order_by('rank')
+    e = SalaryListing.objects.all().order_by('-yearly_cost')
+
+    salary_listing_qb = []
+    salary_listing_rb = []
+    salary_listing_wr = []
+    salary_listing_te = []
+    salary_listing_def = []
+    salary_listing_k = []
+    for x in e:
+        if x.position == 'QB':
+            salary_listing_qb.append(float(x.yearly_cost))
+        elif x.position == 'RB':
+            salary_listing_rb.append(float(x.yearly_cost))
+        elif x.position == 'WR':
+            salary_listing_wr.append(float(x.yearly_cost))
+        elif x.position == 'TE':
+            salary_listing_te.append(float(x.yearly_cost))
+        elif x.position == 'DEF':
+            salary_listing_def.append(float(x.yearly_cost))
+        elif x.position == 'K':
+            salary_listing_k.append(float(x.yearly_cost))
+    qb_first = salary_listing_qb[0]*1.05
+    salary_listing_qb.insert(0, qb_first)
+    rb_first = salary_listing_rb[0]*1.05
+    salary_listing_rb.insert(0, rb_first)
+    wr_first = salary_listing_wr[0]*1.05
+    salary_listing_wr.insert(0, wr_first)
+    te_first = salary_listing_te[0]*1.05
+    salary_listing_te.insert(0, te_first)
+    def_first = salary_listing_def[0]*1.05
+    salary_listing_def.insert(0, def_first)
+    k_first = salary_listing_k[0]*1.05
+    salary_listing_k.insert(0, k_first)
+
+    adp_qb_list = []
+    adp_rb_list = []
+    adp_wr_list = []
+    adp_te_list = []
+    adp_def_list = []
+    adp_k_list = []
+
+    num_qb = 0
+    num_rb = 0
+    num_wr = 0
+    num_te = 0
+    num_def = 0
+    num_k = 0
+
+    for x in b:
+        if x.position == 'QB':
+            num_qb += 1
+            x.rank = num_qb
+            adp_qb_list.append(x)
+        elif x.position == 'RB':
+            num_rb += 1
+            x.rank = num_rb
+            adp_rb_list.append(x)
+        elif x.position == 'WR':
+            num_wr += 1
+            x.rank = num_wr
+            adp_wr_list.append(x)
+        elif x.position == 'TE':
+            num_te += 1
+            x.rank = num_te
+            adp_te_list.append(x)
+        elif x.position == 'Def':
+            num_def += 1
+            x.rank = num_def
+            adp_def_list.append(x)
+        elif x.position == 'K':
+            num_k += 1
+            x.rank = num_k
+            adp_k_list.append(x)
+
+    qb_yr1_list = []
+    rb_yr1_list = []
+    wr_yr1_list = []
+    te_yr1_list = []
+    def_yr1_list = []
+    k_yr1_list = []
+
+    num_yr1_qb = 0
+    num_yr1_rb = 0
+    num_yr1_wr = 0
+    num_yr1_te = 0
+    num_yr1_def = 0
+    num_yr1_k = 0
+
+    for x in c:
+        if x.position == 'QB':
+            num_yr1_qb += 1
+            x.rank = num_yr1_qb
+            qb_yr1_list.append(x)
+        elif x.position == 'RB':
+            num_yr1_rb += 1
+            x.rank = num_yr1_rb
+            rb_yr1_list.append(x)
+        elif x.position == 'WR':
+            num_yr1_wr += 1
+            x.rank = num_yr1_wr
+            wr_yr1_list.append(x)
+        elif x.position == 'TE':
+            num_yr1_te += 1
+            x.rank = num_yr1_te
+            te_yr1_list.append(x)
+        elif x.position == 'DEF':
+            num_yr1_def += 1
+            x.rank = num_yr1_def
+            def_yr1_list.append(x)
+        elif x.position == 'K':
+            num_yr1_k += 1
+            x.rank = num_yr1_k
+            k_yr1_list.append(x)
+
+    qb_yr2_list = []
+    rb_yr2_list = []
+    wr_yr2_list = []
+    te_yr2_list = []
+    def_yr2_list = []
+    k_yr2_list = []
+
+    num_yr2_qb = 0
+    num_yr2_rb = 0
+    num_yr2_wr = 0
+    num_yr2_te = 0
+    num_yr2_def = 0
+    num_yr2_k = 0
+
+    for x in d:
+        if x.position == 'QB':
+            num_yr2_qb += 1
+            x.rank = num_yr2_qb
+            qb_yr2_list.append(x)
+        elif x.position == 'RB':
+            num_yr2_rb += 1
+            x.rank = num_yr2_rb
+            rb_yr2_list.append(x)
+        elif x.position == 'WR':
+            num_yr2_wr += 1
+            x.rank = num_yr2_wr
+            wr_yr2_list.append(x)
+        elif x.position == 'TE':
+            num_yr2_te += 1
+            x.rank = num_yr2_te
+            te_yr2_list.append(x)
+        elif x.position == 'Def':
+            num_yr2_def += 1
+            x.rank = num_yr2_def
+            def_yr2_list.append(x)
+        elif x.position == 'K':
+            num_yr2_k += 1
+            x.rank = num_yr2_k
+            k_yr2_list.append(x)
+
+    list1 = []
+    for x in a:
+        if x.yr1_salary > 0:
+            base_extension, avg_yearly, num_years = extension_calc(x,
+                                                                   adp_qb_list, adp_rb_list, adp_wr_list, adp_te_list, adp_def_list, adp_k_list,
+                                                                   salary_listing_qb, salary_listing_rb, salary_listing_wr, salary_listing_te, salary_listing_def, salary_listing_k,
+                                                                   qb_yr1_list, rb_yr1_list, wr_yr1_list, te_yr1_list, def_yr1_list, k_yr1_list,
+                                                                   qb_yr2_list, rb_yr2_list, wr_yr2_list, te_yr2_list, def_yr2_list, k_yr2_list,
+                                                                   )
+
+            if x.position == 'QB':
+                if base_extension > salary_listing_qb[8]:
+                    max_years = 4
+                elif base_extension > salary_listing_qb[15]:
+                    max_years = 3
+                else:
+                    max_years = 2
+            elif x.position == 'RB':
+                if base_extension > salary_listing_rb[15]:
+                    max_years = 4
+                elif base_extension > salary_listing_rb[30]:
+                    max_years = 3
+                else:
+                    max_years = 2
+            elif x.position == 'WR':
+                if base_extension > salary_listing_wr[20]:
+                    max_years = 4
+                elif base_extension > salary_listing_wr[40]:
+                    max_years = 3
+                else:
+                    max_years = 2
+            elif x.position == 'TE':
+                if base_extension > salary_listing_te[8]:
+                    max_years = 4
+                elif base_extension > salary_listing_te[15]:
+                    max_years = 3
+                else:
+                    max_years = 2
+            else:
+                max_years = 4
+
+            if num_years + max_years > 5:
+                max_years = 5 - num_years
+
+            if num_years > 1:
+                if (avg_yearly * 1.2) > base_extension:
+                    base_extension = avg_yearly * 1.2
+
+            if max_years > 0:
+                yr1_extension = base_extension * 1.1
+            else:
+                yr1_extension = '-'
+            if max_years > 1:
+                yr2_extension = base_extension
+            else:
+                yr2_extension = '-'
+            if max_years > 2:
+                yr3_extension = base_extension * 0.95
+            else:
+                yr3_extension = '-'
+            if max_years > 3:
+                yr4_extension = base_extension * 0.90
+            else:
+                yr4_extension = '-'
+
+            try:
+                if yr1_extension < 1:
+                    yr1_extension = 1
+            except:
+                pass
+            try:
+                if yr2_extension < 1:
+                    yr2_extension = 1
+            except:
+                pass
+            try:
+                if yr3_extension < 1:
+                    yr3_extension = 1
+            except:
+                pass
+            try:
+                if yr4_extension < 1:
+                    yr4_extension = 1
+            except:
+                pass
+
+
+            list1.append({'pos' : x.position,
+                          'player' : x.name,
+                          'team' : x.team,
+                          'avg_yearly_cost' : avg_yearly,
+                          'years_left' : num_years,
+                          'base_extension_value' : base_extension,
+                          'max_extension_length' : max_years,
+                          '1yr_extension' : yr1_extension,
+                          '2yr_extension' : yr2_extension,
+                          '3yr_extension' : yr3_extension,
+                          '4yr_extension' : yr4_extension,
+                          })
+
+
+    e = Team.objects.get(user=request.user)
+    user_team = e.internal_name
+
+    f = Variable.objects.get(name='Extensions Switch')
+    ext_switch = f.int_variable
+
+    g = Transaction.objects.filter(transaction_type='Extension Submitted').filter(var_t1='Pending')
+
+    return render(request, 'league/league_extensions.html', {'player_list' : list1,
+                                                             'user_team' : user_team,
+                                                             'ext_switch' : ext_switch,
+                                                             'submitted_extensions_list' : g})
 
 def leaguesalarylists(request):
     #todo: change to sql pull to speed up
@@ -99,19 +660,166 @@ def leaguesalarylists(request):
                                                                'k_contents' : k_contents,
                                                                'k_zero_salary' : k_first,})
 
+def leagueadp(request):
+    a = ADP.objects.all().order_by('rank')
+    qb_list = []
+    rb_list = []
+    wr_list = []
+    te_list = []
+    def_list = []
+    k_list = []
+
+    num_qb = 0
+    num_rb = 0
+    num_wr = 0
+    num_te = 0
+    num_def = 0
+    num_k = 0
+
+    for x in a:
+        if x.position == 'QB':
+            num_qb += 1
+            x.rank = num_qb
+            qb_list.append(x)
+        elif x.position == 'RB':
+            num_rb += 1
+            x.rank = num_rb
+            rb_list.append(x)
+        elif x.position == 'WR':
+            num_wr += 1
+            x.rank = num_wr
+            wr_list.append(x)
+        elif x.position == 'TE':
+            num_te += 1
+            x.rank = num_te
+            te_list.append(x)
+        elif x.position == 'Def':
+            num_def += 1
+            x.rank = num_def
+            def_list.append(x)
+        elif x.position == 'K':
+            num_k += 1
+            x.rank = num_k
+            k_list.append(x)
+
+    return render(request, 'league/league_adp.html', {'qb_list' : qb_list,
+                                                      'rb_list' : rb_list,
+                                                      'wr_list' : wr_list,
+                                                      'te_list' : te_list,
+                                                      'def_list' : def_list,
+                                                      'k_list' : k_list})
+
+def performancepage(request):
+    a = Performance_Yr1.objects.all().order_by('rank')
+    qb_yr1_list = []
+    rb_yr1_list = []
+    wr_yr1_list = []
+    te_yr1_list = []
+    def_yr1_list = []
+    k_yr1_list = []
+
+    num_yr1_qb = 0
+    num_yr1_rb = 0
+    num_yr1_wr = 0
+    num_yr1_te = 0
+    num_yr1_def = 0
+    num_yr1_k = 0
+
+    for x in a:
+        if x.position == 'QB':
+            num_yr1_qb += 1
+            x.rank = num_yr1_qb
+            qb_yr1_list.append(x)
+        elif x.position == 'RB':
+            num_yr1_rb += 1
+            x.rank = num_yr1_rb
+            rb_yr1_list.append(x)
+        elif x.position == 'WR':
+            num_yr1_wr += 1
+            x.rank = num_yr1_wr
+            wr_yr1_list.append(x)
+        elif x.position == 'TE':
+            num_yr1_te += 1
+            x.rank = num_yr1_te
+            te_yr1_list.append(x)
+        elif x.position == 'DEF':
+            num_yr1_def += 1
+            x.rank = num_yr1_def
+            def_yr1_list.append(x)
+        elif x.position == 'K':
+            num_yr1_k += 1
+            x.rank = num_yr1_k
+            k_yr1_list.append(x)
+            
+            
+    b = Performance_Yr2.objects.all().order_by('rank')
+    qb_yr2_list = []
+    rb_yr2_list = []
+    wr_yr2_list = []
+    te_yr2_list = []
+    def_yr2_list = []
+    k_yr2_list = []
+
+    num_yr2_qb = 0
+    num_yr2_rb = 0
+    num_yr2_wr = 0
+    num_yr2_te = 0
+    num_yr2_def = 0
+    num_yr2_k = 0
+
+    for x in b:
+        if x.position == 'QB':
+            num_yr2_qb += 1
+            x.rank = num_yr2_qb
+            qb_yr2_list.append(x)
+        elif x.position == 'RB':
+            num_yr2_rb += 1
+            x.rank = num_yr2_rb
+            rb_yr2_list.append(x)
+        elif x.position == 'WR':
+            num_yr2_wr += 1
+            x.rank = num_yr2_wr
+            wr_yr2_list.append(x)
+        elif x.position == 'TE':
+            num_yr2_te += 1
+            x.rank = num_yr2_te
+            te_yr2_list.append(x)
+        elif x.position == 'Def':
+            num_yr2_def += 1
+            x.rank = num_yr2_def
+            def_yr2_list.append(x)
+        elif x.position == 'K':
+            num_yr2_k += 1
+            x.rank = num_yr2_k
+            k_yr2_list.append(x)        
+            
+    return render(request, 'league/league_performance.html', {'qb_yr1_list' : qb_yr1_list,
+                                                              'rb_yr1_list' : rb_yr1_list,
+                                                              'wr_yr1_list' : wr_yr1_list,
+                                                              'te_yr1_list' : te_yr1_list,
+                                                              'def_yr1_list' : def_yr1_list,
+                                                              'k_yr1_list' : k_yr1_list,
+                                                              'qb_yr2_list' : qb_yr2_list,
+                                                              'rb_yr2_list' : rb_yr2_list,
+                                                              'wr_yr2_list' : wr_yr2_list,
+                                                              'te_yr2_list' : te_yr2_list,
+                                                              'def_yr2_list' : def_yr2_list,
+                                                              'k_yr2_list' : k_yr2_list})
+
 def leaguefuturedraftpicks(request):
     return render(request, 'league/league_future_draft_picks.html', {})
 
 def leaguecapsummary(request):
     a = Player.objects.all()
+    b = Team.objects.all()
+
     team_list = []
     salary_list = []
     current_cap_penalty = []
     cap_space = []
-    for x in a:
-        team_list.append(x.team)
-    team_list = list(set(team_list))
-    team_list = sorted(team_list)
+
+    for x in b:
+        team_list.append(x.internal_name)
 
     for x in range(len(team_list)):
         salary_list.append(Decimal(0))
@@ -123,7 +831,6 @@ def leaguecapsummary(request):
             if x.team == team_list[y]:
                 salary_list[y] += (Decimal(x.yr1_salary)+Decimal(x.yr1_sb))
 
-    b = Team.objects.all()
     for x in b:
         for y in range(len(team_list)):
             if x.internal_name == team_list[y]:
@@ -289,13 +996,11 @@ def teamorganizationpage(request):
     if team_view == '':
         team_view = 'default'
 
-    cur.execute('SELECT team FROM dyno_player')
+    cur.execute('SELECT internal_name FROM dyno_team')
     c = cur.fetchall()
     team_list = []
-    for x in range(len(c)):
+    for x in range(0,len(c)):
         team_list.append(c[x][0])
-    team_list = list(set(team_list))
-    team_list = sorted(team_list)
 
     cur.execute('SELECT nickname, user, flex_1, flex_2, yr1_cap_penalty FROM dyno_team WHERE internal_name=?', [team_selected])
     d = cur.fetchone()
@@ -554,7 +1259,8 @@ def teamcapsituationpage(request):
                                                             'cap_pen_yr3' : cap_pen_yr3,
                                                             'cap_pen_yr4' : cap_pen_yr4,
                                                             'cap_pen_yr5' : cap_pen_yr5,
-                                                            'filtered_tags' : filtered_tags})
+                                                            'filtered_tags' : filtered_tags,
+                                                            'year_list' : year_list})
 
 def teamsettingspage(request):
     a = Team.objects.get(user=request.user)
@@ -589,6 +1295,24 @@ def teamsettingspage(request):
                                                        'current_balance' : current_balance,
                                                        'filtered_tags' : filtered_tags,
                                                        'role_list' : roles_list})
+
+def teampendingtransactionspage(request):
+    a = Team.objects.get(user=request.user)
+    team = a.internal_name
+    b = Transaction.objects.filter(var_t1='Pending').filter(team2=team)
+    return render(request, 'team/team_pending_transactions.html', {'transactions' : b})
+
+def teamtransactionspage(request):
+    #a = Transaction.objects.filter().order_by('-date')
+    team = Team.objects.get(user=request.user)
+    a = Transaction.objects.filter(Q(team1=team) | Q(team2=team)).order_by('-date')
+    trans_list = []
+    for x in a:
+        trans_list.append(x.transaction_type)
+    trans_list = list(set(trans_list))
+    trans_list = sorted(trans_list)
+    return render(request, 'team/team_transactions.html', {'transactions' : a,
+                                                           'trans_list' : trans_list})
 
 def teamreleaseplayerspage(request):
     current_user = str(request.user)
@@ -698,21 +1422,46 @@ def teamreleaseplayerspage(request):
                 'yr5_cap_pen' : cap_pen_yr5,}
 
     return render(request, 'team/team_release_players.html', {'player_list' : player_list,
-                                                              'team_info' : team_info})
+                                                              'team_info' : team_info,
+                                                              'years_list' : year_list})
+
+def teamalertspage(request):
+    type_list = ['Auction - Outbid', 'Auction - New Auction', 'Auction - Won']
+    a = Alert.objects.filter(user=request.user).order_by('-date')
+    b = []
+    for x in a:
+        if x.alert_type in type_list:
+            b.append(x)
+    return render(request, 'team/team_alerts.html', {'type_list' : type_list,
+                                                     'alerts' : b})
+
+def teammanagealerts(request):
+    a = AlertSetting.objects.get(user=request.user)
+    return render(request, 'team/team_manage_alerts.html', {'alert_settings' : a})
 
 def playerpage(request):
-    a = Variable.objects.get(name='player selected')
+    a = TeamVariable.objects.filter(user=request.user).get(name='PlayerForPlayerPage')
     player_selected = a.text_variable
+    a.text_variable = ''
+    a.save()
 
     b = Player.objects.order_by('name')
     player_list = []
     for x in b:
         player_list.append(x.name)
 
+    c = Team.objects.all()
+    team_list = []
+    for x in c:
+        team_list.append(x.internal_name)
+
     return render(request, 'player.html', {'player_list' : player_list,
-                                           'player_selected' : player_selected})
+                                           'player_selected' : player_selected,
+                                           'team_list' : team_list,
+                                           'year_list' : year_list})
 
 def settingspage(request):
+    #use commishofficepage instead
     return render(request, 'admin/settings.html', {})
 
 def batchpage(request):
@@ -809,7 +1558,12 @@ def processplayercontractsbatch(request):
                               yr3_sb=yr3_sb,
                               yr4_sb=yr4_sb,
                               yr5_sb=yr5_sb,
-                              notes=notes)
+                              notes=notes,
+                              yr1_role='--',
+                              yr2_role='--',
+                              yr3_role='--',
+                              yr4_role='--',
+                              yr5_role='--',)
         print(x)
     return HttpResponseRedirect('/batch')
 
@@ -973,3 +1727,573 @@ def featurelistchangelogpage(request):
 
     return render(request, 'admin/feature_list.html', {'features_list' : features_list,
                                                        'changelog' : changelog})
+
+def commishofficepage(request):
+    a = Variable.objects.get(name='Default AuctionClock')
+    default_auction_clock = int(a.int_variable / 60)
+
+    b = Variable.objects.get(name='Extensions Switch')
+    ext_switch = int(b.int_variable)
+
+    c = Variable.objects.get(name='CommishPeriodicState')
+    commish_periodic = int(c.int_variable)
+
+    return render(request, 'admin/settings.html', {'default_auction_clock' : default_auction_clock,
+                                                   'ext_switch' : ext_switch,
+                                                   'commish_periodic' : commish_periodic})
+
+def commishviewmodel(request):
+    a = Player.objects.all().order_by('name')
+    return render(request, 'commish/commish_view_model.html', {'players' : a})
+
+def commisheditmodel(request):
+    if request.method == 'POST':
+        player = Player.objects.get(name=request.POST['name'])
+        form = PlayerForm(request.POST, instance=player)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/commish/view_model')
+        else:
+            return HttpResponse('form wasnt valid')
+    else:
+        a = Variable.objects.get(name='player selected')
+        get_player = a.text_variable
+        player = Player.objects.get(name=get_player)
+        form = PlayerForm(instance=player)
+        a.text_variable = ''
+        a.save()
+
+    return render(request, 'model_edit/model_edit_player.html', {'form' : form})
+
+def commishtransactionpage(request):
+    a = Transaction.objects.all().order_by('-date')
+    trans_list = []
+    for x in a:
+        trans_list.append(x.transaction_type)
+    trans_list = list(set(trans_list))
+    trans_list = sorted(trans_list)
+    return render(request, 'commish/commish_transactions.html', {'transactions' : a,
+                                                                 'type_list' : trans_list})
+
+def commishpendingtransactionspage(request):
+    b = Transaction.objects.filter(var_t1='Pending').filter(var_t2='Confirmed')
+    return render(request, 'commish/commish_pending_transactions.html', {'transactions' : b})
+
+def commishpendingalerts(request):
+    a = Alert.objects.filter(user='commish').order_by('-date')
+    type_list = []
+    for x in a:
+        type_list.append(x.alert_type)
+    type_list = list(set(type_list))
+    type_list = sorted(type_list)
+    return render(request, 'commish/commish_pending_alerts.html', {'type_list' : type_list,
+                                                                    'alerts' : a})
+
+def commishallalerts(request):
+    a = Alert.objects.all().order_by('-date')
+    type_list = []
+    for x in a:
+        type_list.append(x.alert_type)
+    type_list = list(set(type_list))
+    type_list = sorted(type_list)
+    return render(request, 'commish/commish_all_alerts.html', {'type_list' : type_list,
+                                                               'alerts' : a})
+
+def setcontractstructurepage(request):
+    a = TeamVariable.objects.filter(user=request.user).get(name='PlayerForConStr')
+    player = a.text_variable
+    a.text_variable = ''
+    a.save()
+
+    b = Transaction.objects.filter(player=player).get(var_t1='Pending')
+
+    c = Message.objects.get(name='New Con Str Instructions')
+    instructions = c.content
+
+    signing_bonus = b.var_d1 * Decimal(0.40)
+    signing_bonus = round(signing_bonus*20)/20
+
+    salary = b.var_d1 - Decimal(signing_bonus)
+
+    d = Player.objects.get(name=player)
+    pos = d.position
+
+    max_years = 0
+
+    if pos == 'QB':
+        qb_contents = SalaryListing.objects.filter(position='QB').order_by('position', '-yearly_cost')
+        if b.var_d1 > Decimal(qb_contents[7].yearly_cost):
+            max_years = 5
+        elif b.var_d1 > Decimal(qb_contents[14].yearly_cost):
+            max_years = 4
+        else:
+            max_years = 3
+    elif pos == 'RB':
+        rb_contents = SalaryListing.objects.filter(position='RB').order_by('position', '-yearly_cost')
+        if b.var_d1 > Decimal(rb_contents[14].yearly_cost):
+            max_years = 5
+        elif b.var_d1 > Decimal(rb_contents[29].yearly_cost):
+            max_years = 4
+        else:
+            max_years = 3
+    elif pos == 'WR':
+        wr_contents = SalaryListing.objects.filter(position='WR').order_by('position', '-yearly_cost')
+        if b.var_d1 > Decimal(wr_contents[19].yearly_cost):
+            max_years = 5
+        elif b.var_d1 > Decimal(wr_contents[39].yearly_cost):
+            max_years = 4
+        else:
+            max_years = 3
+    elif pos == 'TE':
+        te_contents = SalaryListing.objects.filter(position='TE').order_by('position', '-yearly_cost')
+        if b.var_d1 > Decimal(te_contents[5].yearly_cost):
+            max_years = 5
+        elif b.var_d1 > Decimal(te_contents[11].yearly_cost):
+            max_years = 4
+        else:
+            max_years = 3
+    elif pos == 'DEF':
+        max_years = 5
+    elif pos == 'K':
+        max_years = 5
+
+    f = Team.objects.get(user=request.user)
+    team = f.internal_name
+
+    e = Player.objects.filter(team=team)
+    yr1_costs = 0
+    yr2_costs = 0
+    yr3_costs = 0
+    yr4_costs = 0
+    yr5_costs = 0
+
+    for x in e:
+        yr1_costs += (x.yr1_salary + x.yr1_sb)
+        yr2_costs += (x.yr2_salary + x.yr2_sb)
+        yr3_costs += (x.yr3_salary + x.yr3_sb)
+        yr4_costs += (x.yr4_salary + x.yr4_sb)
+        yr5_costs += (x.yr5_salary + x.yr5_sb)
+
+    g = Team.objects.get(internal_name=team)
+
+    yr1_cap_penalty = 0
+    yr2_cap_penalty = 0
+    yr3_cap_penalty = 0
+    yr4_cap_penalty = 0
+    yr5_cap_penalty = 0
+
+    if g.yr1_cap_penalty != None:
+        yr1_cap_penalty = g.yr1_cap_penalty
+
+    if g.yr2_cap_penalty != None:
+        yr2_cap_penalty = g.yr2_cap_penalty
+
+    if g.yr3_cap_penalty != None:
+        yr3_cap_penalty = g.yr3_cap_penalty
+
+    if g.yr4_cap_penalty != None:
+        yr4_cap_penalty = g.yr4_cap_penalty
+
+    if g.yr5_cap_penalty != None:
+        yr5_cap_penalty = g.yr5_cap_penalty
+
+    yr1_space = Decimal(200) - Decimal(yr1_costs) - yr1_cap_penalty
+    yr2_space = Decimal(200) - Decimal(yr2_costs) - yr2_cap_penalty
+    yr3_space = Decimal(200) - Decimal(yr3_costs) - yr3_cap_penalty
+    yr4_space = Decimal(200) - Decimal(yr4_costs) - yr4_cap_penalty
+    yr5_space = Decimal(200) - Decimal(yr5_costs) - yr5_cap_penalty
+
+
+    cap_dict =      {'yr1_costs' : yr1_costs,
+                   'yr2_costs' : yr2_costs,
+                   'yr3_costs' : yr3_costs,
+                   'yr4_costs' : yr4_costs,
+                   'yr5_costs' : yr5_costs,
+                   'yr1_pen' : yr1_cap_penalty,
+                   'yr2_pen' : yr2_cap_penalty,
+                   'yr3_pen' : yr3_cap_penalty,
+                   'yr4_pen' : yr4_cap_penalty,
+                   'yr5_pen' : yr5_cap_penalty,
+                   'yr1_space' : yr1_space,
+                   'yr2_space' : yr2_space,
+                   'yr3_space' : yr3_space,
+                   'yr4_space' : yr4_space,
+                   'yr5_space' : yr5_space}
+
+    return render(request, 'team/confirm_contract_structure.html', {'player' : b,
+                                                                    'instructions' : instructions,
+                                                                    'sb' : signing_bonus,
+                                                                    'salary' : salary,
+                                                                    'max_years' : max_years,
+                                                                    'cap_dict' : cap_dict,
+                                                                    'year_list' : year_list})
+
+def transactionsingleplayer(request):
+    a = Variable.objects.get(name='player selected')
+    id_selected = a.int_variable
+    a.int_variable = 0
+    a.save()
+
+    b = Transaction.objects.get(pk=id_selected)
+    player = b.player
+
+    c = Player.objects.get(name=player)
+
+    return render(request, 'commish/transaction_single_player.html', {'transaction' : b,
+                                                                      'player' : c})
+
+def tagspage(request):
+    aa = Team.objects.get(user=request.user)
+    team = aa.internal_name
+    waiver_extension_flag = aa.yr1_bonuses.strip().split(',')[1]
+
+    b = ADP.objects.all().order_by('rank')
+    c = Performance_Yr1.objects.all().order_by('rank')
+    d = Performance_Yr2.objects.all().order_by('rank')
+    e = SalaryListing.objects.all().order_by('-yearly_cost')
+
+    salary_listing_qb = []
+    salary_listing_rb = []
+    salary_listing_wr = []
+    salary_listing_te = []
+    salary_listing_def = []
+    salary_listing_k = []
+    for x in e:
+        if x.position == 'QB':
+            salary_listing_qb.append(float(x.yearly_cost))
+        elif x.position == 'RB':
+            salary_listing_rb.append(float(x.yearly_cost))
+        elif x.position == 'WR':
+            salary_listing_wr.append(float(x.yearly_cost))
+        elif x.position == 'TE':
+            salary_listing_te.append(float(x.yearly_cost))
+        elif x.position == 'DEF':
+            salary_listing_def.append(float(x.yearly_cost))
+        elif x.position == 'K':
+            salary_listing_k.append(float(x.yearly_cost))
+    qb_first = salary_listing_qb[0]*1.05
+    salary_listing_qb.insert(0, qb_first)
+    rb_first = salary_listing_rb[0]*1.05
+    salary_listing_rb.insert(0, rb_first)
+    wr_first = salary_listing_wr[0]*1.05
+    salary_listing_wr.insert(0, wr_first)
+    te_first = salary_listing_te[0]*1.05
+    salary_listing_te.insert(0, te_first)
+    def_first = salary_listing_def[0]*1.05
+    salary_listing_def.insert(0, def_first)
+    k_first = salary_listing_k[0]*1.05
+    salary_listing_k.insert(0, k_first)
+
+    adp_qb_list = []
+    adp_rb_list = []
+    adp_wr_list = []
+    adp_te_list = []
+    adp_def_list = []
+    adp_k_list = []
+
+    num_qb = 0
+    num_rb = 0
+    num_wr = 0
+    num_te = 0
+    num_def = 0
+    num_k = 0
+
+    for x in b:
+        if x.position == 'QB':
+            num_qb += 1
+            x.rank = num_qb
+            adp_qb_list.append(x)
+        elif x.position == 'RB':
+            num_rb += 1
+            x.rank = num_rb
+            adp_rb_list.append(x)
+        elif x.position == 'WR':
+            num_wr += 1
+            x.rank = num_wr
+            adp_wr_list.append(x)
+        elif x.position == 'TE':
+            num_te += 1
+            x.rank = num_te
+            adp_te_list.append(x)
+        elif x.position == 'Def':
+            num_def += 1
+            x.rank = num_def
+            adp_def_list.append(x)
+        elif x.position == 'K':
+            num_k += 1
+            x.rank = num_k
+            adp_k_list.append(x)
+
+    qb_yr1_list = []
+    rb_yr1_list = []
+    wr_yr1_list = []
+    te_yr1_list = []
+    def_yr1_list = []
+    k_yr1_list = []
+
+    num_yr1_qb = 0
+    num_yr1_rb = 0
+    num_yr1_wr = 0
+    num_yr1_te = 0
+    num_yr1_def = 0
+    num_yr1_k = 0
+
+    for x in c:
+        if x.position == 'QB':
+            num_yr1_qb += 1
+            x.rank = num_yr1_qb
+            qb_yr1_list.append(x)
+        elif x.position == 'RB':
+            num_yr1_rb += 1
+            x.rank = num_yr1_rb
+            rb_yr1_list.append(x)
+        elif x.position == 'WR':
+            num_yr1_wr += 1
+            x.rank = num_yr1_wr
+            wr_yr1_list.append(x)
+        elif x.position == 'TE':
+            num_yr1_te += 1
+            x.rank = num_yr1_te
+            te_yr1_list.append(x)
+        elif x.position == 'DEF':
+            num_yr1_def += 1
+            x.rank = num_yr1_def
+            def_yr1_list.append(x)
+        elif x.position == 'K':
+            num_yr1_k += 1
+            x.rank = num_yr1_k
+            k_yr1_list.append(x)
+
+    qb_yr2_list = []
+    rb_yr2_list = []
+    wr_yr2_list = []
+    te_yr2_list = []
+    def_yr2_list = []
+    k_yr2_list = []
+
+    num_yr2_qb = 0
+    num_yr2_rb = 0
+    num_yr2_wr = 0
+    num_yr2_te = 0
+    num_yr2_def = 0
+    num_yr2_k = 0
+
+    for x in d:
+        if x.position == 'QB':
+            num_yr2_qb += 1
+            x.rank = num_yr2_qb
+            qb_yr2_list.append(x)
+        elif x.position == 'RB':
+            num_yr2_rb += 1
+            x.rank = num_yr2_rb
+            rb_yr2_list.append(x)
+        elif x.position == 'WR':
+            num_yr2_wr += 1
+            x.rank = num_yr2_wr
+            wr_yr2_list.append(x)
+        elif x.position == 'TE':
+            num_yr2_te += 1
+            x.rank = num_yr2_te
+            te_yr2_list.append(x)
+        elif x.position == 'Def':
+            num_yr2_def += 1
+            x.rank = num_yr2_def
+            def_yr2_list.append(x)
+        elif x.position == 'K':
+            num_yr2_k += 1
+            x.rank = num_yr2_k
+            k_yr2_list.append(x)
+
+    f = Player.objects.filter(team=team).filter(yr2_salary=0).order_by('position', '-yr1_salary')
+    player_list = []
+    for x in f:
+        if (x.position == 'DEF' or x.position == 'K'):
+            franchise_tag = 'not eligible'
+            transition_tag = 'not eligible'
+        elif x.position == 'QB':
+            franchise_tag = sum(salary_listing_qb[0:5]) / 6
+            transition_tag = sum(salary_listing_qb[0:11]) / 12
+        elif x.position == 'RB':
+            franchise_tag = sum(salary_listing_rb[0:11]) / 12
+            transition_tag = sum(salary_listing_rb[0:23]) / 24
+        elif x.position == 'WR':
+            franchise_tag = sum(salary_listing_wr[0:11]) / 12
+            transition_tag = sum(salary_listing_wr[0:23]) / 24
+        elif x.position == 'TE':
+            franchise_tag = sum(salary_listing_te[0:5]) / 6
+            transition_tag = sum(salary_listing_te[0:11]) / 12
+
+        if transition_tag != 'not eligible':
+            twenty_percent = (float(x.yr1_salary) + float(x.yr1_sb)) * 1.20
+            if twenty_percent > transition_tag:
+                transition_tag = twenty_percent
+
+        if waiver_extension_flag == '1':
+            if x.notes != 'In-season pickup':
+                waiver_exception = 'not eligible'
+            else:
+                base_extension, avg_yearly, num_years = extension_calc(x,
+                                                                       adp_qb_list, adp_rb_list, adp_wr_list, adp_te_list, adp_def_list, adp_k_list,
+                                                                       salary_listing_qb, salary_listing_rb, salary_listing_wr, salary_listing_te, salary_listing_def, salary_listing_k,
+                                                                       qb_yr1_list, rb_yr1_list, wr_yr1_list, te_yr1_list, def_yr1_list, k_yr1_list,
+                                                                       qb_yr2_list, rb_yr2_list, wr_yr2_list, te_yr2_list, def_yr2_list, k_yr2_list,
+                                                                       )
+
+                waiver_exception = base_extension * 0.75
+
+                if waiver_exception < 1:
+                    waiver_exception = 1
+        else:
+            waiver_exception = 'not eligible'
+
+
+        player_list.append({'position' : x.position,
+                            'name' : x.name,
+                            'yr1_total' : x.yr1_salary + x.yr1_sb,
+                            'yr1_salary' : x.yr1_salary,
+                            'yr1_sb' : x.yr1_sb,
+                            'notes' : x.notes,
+                            'franchise_tag' : franchise_tag,
+                            'transition_tag' : transition_tag,
+                            'waiver_exception' : waiver_exception})
+
+    g = TeamVariable.objects.filter(name='TagsSubmissions').get(user=request.user)
+    has_waiver_ext = 0
+    has_fran_tag = 0
+    has_trans_tag = 0
+    try:
+        templist = g.text_variable.strip().split(',')
+        if templist[0] == '1':
+            has_waiver_ext = 1
+        if templist[1] == '1':
+            has_fran_tag = 1
+        if templist[2] == '1':
+            has_trans_tag = 1
+    except:
+        pass
+
+
+    return render(request, 'team/tags.html', {'player_list' : player_list,
+                                              'has_waiver_ext' : has_waiver_ext,
+                                              'has_fran_tag' : has_fran_tag,
+                                              'has_trans_tag' : has_trans_tag})
+
+def confirm_tags(request):
+    a = TeamVariable.objects.filter(name='PlayerForTags').get(user=request.user)
+    temp = a.text_variable.strip().split(':')
+    player = temp[0]
+    value = float(temp[1].split('$')[1])
+    type = a.int_variable
+
+    a.text_variable = ''
+    a.int_variable = 999
+    a.save()
+
+    sb = round(value * 0.4,1)
+    salary = value - sb
+
+    return render(request, 'team/confirm_tags.html', {'player' : player,
+                                                      'type' : type,
+                                                      'value' : value,
+                                                      'sb' : sb,
+                                                      'salary' : salary})
+
+def confirmextensionstructure(request):
+    a = TeamVariable.objects.filter(user=request.user).get(name='PlayerForExtension')
+    temp = a.text_variable
+    a.text_variable = ''
+    a.save()
+
+    templist = temp.strip().split(':')
+    player = templist[0]
+    team = templist[1]
+    try:
+        yr1_ext = float(templist[2])
+    except:
+        yr1_ext = 0
+    try:
+        yr2_ext = float(templist[3])
+    except:
+        yr2_ext = 0
+    try:
+        yr3_ext = float(templist[4])
+    except:
+        yr3_ext = 0
+    try:
+        yr4_ext = float(templist[5])
+    except:
+        yr4_ext = 0
+
+    b = Player.objects.get(name=player)
+
+    c = Message.objects.get(name='Ext Str Instructions')
+    instructions = c.content
+
+    e = Player.objects.filter(team=team)
+    yr1_costs = 0
+    yr2_costs = 0
+    yr3_costs = 0
+    yr4_costs = 0
+    yr5_costs = 0
+
+    for x in e:
+        yr1_costs += (x.yr1_salary + x.yr1_sb)
+        yr2_costs += (x.yr2_salary + x.yr2_sb)
+        yr3_costs += (x.yr3_salary + x.yr3_sb)
+        yr4_costs += (x.yr4_salary + x.yr4_sb)
+        yr5_costs += (x.yr5_salary + x.yr5_sb)
+
+    g = Team.objects.get(internal_name=team)
+
+    yr1_cap_penalty = 0
+    yr2_cap_penalty = 0
+    yr3_cap_penalty = 0
+    yr4_cap_penalty = 0
+    yr5_cap_penalty = 0
+
+    if g.yr1_cap_penalty != None:
+        yr1_cap_penalty = g.yr1_cap_penalty
+
+    if g.yr2_cap_penalty != None:
+        yr2_cap_penalty = g.yr2_cap_penalty
+
+    if g.yr3_cap_penalty != None:
+        yr3_cap_penalty = g.yr3_cap_penalty
+
+    if g.yr4_cap_penalty != None:
+        yr4_cap_penalty = g.yr4_cap_penalty
+
+    if g.yr5_cap_penalty != None:
+        yr5_cap_penalty = g.yr5_cap_penalty
+
+    yr1_space = Decimal(200) - Decimal(yr1_costs) - yr1_cap_penalty
+    yr2_space = Decimal(200) - Decimal(yr2_costs) - yr2_cap_penalty
+    yr3_space = Decimal(200) - Decimal(yr3_costs) - yr3_cap_penalty
+    yr4_space = Decimal(200) - Decimal(yr4_costs) - yr4_cap_penalty
+    yr5_space = Decimal(200) - Decimal(yr5_costs) - yr5_cap_penalty
+
+
+    cap_dict =      {'yr1_costs' : yr1_costs,
+                   'yr2_costs' : yr2_costs,
+                   'yr3_costs' : yr3_costs,
+                   'yr4_costs' : yr4_costs,
+                   'yr5_costs' : yr5_costs,
+                   'yr1_pen' : yr1_cap_penalty,
+                   'yr2_pen' : yr2_cap_penalty,
+                   'yr3_pen' : yr3_cap_penalty,
+                   'yr4_pen' : yr4_cap_penalty,
+                   'yr5_pen' : yr5_cap_penalty,
+                   'yr1_space' : yr1_space,
+                   'yr2_space' : yr2_space,
+                   'yr3_space' : yr3_space,
+                   'yr4_space' : yr4_space,
+                   'yr5_space' : yr5_space}
+
+    return render(request, 'team/confirm_extension_structure.html', {'player' : b,
+                                                                     'yr1_ext' : yr1_ext,
+                                                                     'yr2_ext' : yr2_ext,
+                                                                     'yr3_ext' : yr3_ext,
+                                                                     'yr4_ext' : yr4_ext,
+                                                                     'cap_dict' : cap_dict,
+                                                                     'year_list' : year_list,
+                                                                     'instructions' : instructions})

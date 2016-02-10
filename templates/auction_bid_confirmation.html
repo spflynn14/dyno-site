@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/auction_bid_confirmation.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="second_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        <div style="margin-left: 200px; margin-top: 100px; margin-right: 200px">
+            <h4 style="text-decoration: underline">Once confimed, the auction bids below are final and cannot be retracted. Please review carefully.</h4><br><br>
+            <h4>Your bid(s): </h4><br><br>
+            <table>
+                <thead>
+                    {% for x in bids_list %}
+                    <tr>
+                        <td style='color: blue' class="auction_confirm_player">{{ x.player }}</td>
+                        <td style='color: blue'>: &nbsp$</td>
+                        <td style='color: blue' class="auction_confirm_bid">{{ x.bid|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </thead>
+            </table>
+            <br><br>
+            <button id='confirm_bids_cancel_button' type="button" style="display: inline-block;color: red">Cancel</button>
+            <button id='confirm_bids_button' type="button" style="display: inline-block;color: blue">Confirm</button><br><br>
+            <div id="message_text" style="color: red;"></div>
+        </div>
+
+    </div>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'admin/commish_office.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/commish_pending_transactions.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+
+    <div class="tab_area" id="second_tab_area">
+        {% if request.path == '/commish/pending_transactions' %}
+            <a href="/commish/pending_transactions" class="second_tab_button_team" style="background-color: #2d99d4; color: white">Pending Transactions</a>
+        {% else %}
+            <a href="/commish/pending_transactions" class="second_tab_button_team">Pending Transactions</a>
+        {% endif %}
+
+        {% if request.path == '/commish/transactions' %}
+            <a href="/commish/transactions" class="second_tab_button_team" style="background-color: #2d99d4; color: white">All Transactions</a>
+        {% else %}
+            <a href="/commish/transactions" class="second_tab_button_team">All Transactions</a>
+        {% endif %}
+    </div>
+
+    <div id="display_area">
+        <div class="commish_pending_transactions_datagrid" style="height: 88%;">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="13%">Date</th>
+                        <th width="11%">Player</th>
+                        <th width="8%">Transaction Type</th>
+                        <th width="13%">Has Been Pending for...</th>
+                        <th width="11%">Team1</th>
+                        <th width="11%">Team2</th>
+                        <th width="11%">Var_t1</th>
+                        <th width="11%">Var_t2</th>
+                        <th width="11%">Var_t3</th>
+                    </tr>
+                </thead>
+                <tbody id="commish_pending_transactions_body">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="vw_1">
+        {% for x in transactions %}
+            <table>
+                <tr>
+                    <td id="vw_1-1">{{ x.date }}</td>
+                    <td id="vw_1-2">{{ x.player }}</td>
+                    <td id="vw_1-3">{{ x.team1 }}</td>
+                    <td id="vw_1-4">{{ x.team2 }}</td>
+                    <td id="vw_1-5">{{ x.transaction_type }}</td>
+                    <td id="vw_1-6">{{ x.var_d1 }}</td>
+                    <td id="vw_1-7">{{ x.var_d2 }}</td>
+                    <td id="vw_1-8">{{ x.var_d3 }}</td>
+                    <td id="vw_1-9">{{ x.var_i1 }}</td>
+                    <td id="vw_1-10">{{ x.var_i2 }}</td>
+                    <td id="vw_1-11">{{ x.var_t1 }}</td>
+                    <td id="vw_1-12">{{ x.var_t2 }}</td>
+                    <td id="vw_1-13">{{ x.var_t3 }}</td>
+                    <td id="vw_1-14">{{ x.date.isoformat }}</td>
+                    <td id="vw_1-15">{{ x.id }}</td>
+                </tr>
+            </table>
+        {% endfor %}
+    </div>
+
+{% endblock %}

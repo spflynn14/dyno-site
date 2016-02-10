@@ -1,0 +1,89 @@
+{% extends 'league.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/league_adp.js' %}"></script>
+    <script src="{% static 'js/jquery.tablesorter.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="third_tab_area">
+        {% if request.path == '/league/extensions' %}
+            <a href="/league/extensions" class="third_tab_button_team" style="background-color: #2d99d4; color: white">Extensions</a>
+        {% else %}
+            <a href="/league/extensions" class="third_tab_button_team">Extensions</a>
+        {% endif %}
+
+        {% if request.path == '/league/adp_info' %}
+            <a href="/league/adp_info" class="third_tab_button_team" style="background-color: #2d99d4; color: white">ADP Info</a>
+        {% else %}
+            <a href="/league/adp_info" class="third_tab_button_team">ADP Info</a>
+        {% endif %}
+
+        {% if request.path == '/league/performance_info' %}
+            <a href="/league/performance_info" class="third_tab_button_team" style="background-color: #2d99d4; color: white">Performance Info</a>
+        {% else %}
+            <a href="/league/performance_info" class="third_tab_button_team">Performance Info</a>
+        {% endif %}
+    </div>
+
+    <div id="display_area">
+        <div class="adp_datagrid">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="20%" style="text-align: center">Rank</th>
+                        <th width="20%" style="text-align: center">Pos</th>
+                        <th width="60%">Player</th>
+                    </tr>
+                </thead>
+                <tbody  id="adp_body">
+                    {% for x in qb_list %}
+                        <tr>
+                            <td style="text-align: center">{{ x.rank }}</td>
+                            <td style="text-align: center">{{ x.position }}</td>
+                            <td>{{ x.player }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for x in rb_list %}
+                        <tr>
+                            <td style="text-align: center">{{ x.rank }}</td>
+                            <td style="text-align: center">{{ x.position }}</td>
+                            <td>{{ x.player }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for x in wr_list %}
+                        <tr>
+                            <td style="text-align: center">{{ x.rank }}</td>
+                            <td style="text-align: center">{{ x.position }}</td>
+                            <td>{{ x.player }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for x in te_list %}
+                        <tr>
+                            <td style="text-align: center">{{ x.rank }}</td>
+                            <td style="text-align: center">{{ x.position }}</td>
+                            <td>{{ x.player }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for x in def_list %}
+                        <tr>
+                            <td style="text-align: center">{{ x.rank }}</td>
+                            <td style="text-align: center">{{ x.position }}</td>
+                            <td>{{ x.player }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for x in k_list %}
+                        <tr>
+                            <td style="text-align: center">{{ x.rank }}</td>
+                            <td style="text-align: center">{{ x.position }}</td>
+                            <td>{{ x.player }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

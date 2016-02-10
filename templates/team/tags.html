@@ -1,0 +1,119 @@
+{% extends 'team.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/tags.js' %}"></script>
+    <script src="{% static 'js/jquery.tablesorter.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="third_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        <div id="tags_table_area">
+            <div class="tags_datagrid" style="height: 100%;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="5%" style="text-align: center">Pos</th>
+                            <th width="15%">Player</th>
+                            <th width="21%">Current Contract</th>
+                            <th width="20%">Notes</th>
+                            <th width="13%" style="text-align: center">Waiver Exception</th>
+                            <th width="13%" style="text-align: center">Franchise Tag</th>
+                            <th width="13%" style="text-align: center">Transition Tag</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tags_body">
+                        {% for x in player_list %}
+                            <tr>
+                                <td style="text-align: center">{{ x.position }}</td>
+                                <td class="tags_name_cell">{{ x.name }}</td>
+                                <td>${{ x.yr1_total|floatformat:2 }} &nbsp&nbsp-&nbsp&nbsp <span style="font-size: smaller">${{ x.yr1_salary }} salary, ${{ x.yr1_sb }} signing bonus</span></td>
+                                <td>{{ x.notes }}</td>
+
+                                {% if x.waiver_exception == 'not eligible' %}
+                                    <td style="text-align: center">{{ x.waiver_exception }}</td>
+                                {% else %}
+                                    <td style="text-align: center">${{ x.waiver_exception|floatformat:2 }}</td>
+                                {% endif %}
+
+                                {% if x.franchise_tag == 'not eligible' %}
+                                    <td style="text-align: center">{{ x.franchise_tag }}</td>
+                                    <td style="text-align: center">{{ x.transition_tag }}</td>
+                                {% else %}
+                                    <td style="text-align: center">${{ x.franchise_tag|floatformat:2 }}</td>
+                                    <td style="text-align: center">${{ x.transition_tag|floatformat:2 }}</td>
+                                {% endif %}
+
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tags_selection_area">
+            <div style="margin-top: 4%">
+                {% if has_waiver_ext == 1 %}
+                    <p style="display: inline-block; float: left; margin-left: 40px">Waiver Extension has already been used</p><br>
+                {% else %}
+                    <p style="display: inline-block">Select player for Waiver Extension &nbsp&nbsp&nbsp&nbsp</p>
+                    <select style="display: inline-block" id="waiver_extension_select">
+                        {% for x in player_list %}
+                            {% if x.waiver_exception != 'not eligible' %}
+                                <option>{{ x.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <button type="button" style="display: inline-block; float: right; margin-right: 40px" id="submit_waiver_extension">Submit</button>
+                {% endif %}
+            </div>
+
+            <div style="margin-top: 9%">
+                {% if has_fran_tag == 1 %}
+                    <p style="display: inline-block; float: left; margin-left: 40px">Franchise Tag has already been used</p><br>
+                {% else %}
+                    <p style="display: inline-block">Select player for Franchise Tag &nbsp&nbsp&nbsp&nbsp</p>
+                    <select style="display: inline-block" id="franchise_tag_select">
+                        {% for x in player_list %}
+                            {% if x.franchise_tag != 'not eligible' %}
+                                <option>{{ x.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <button type="button" style="display: inline-block; float: right; margin-right: 40px" id="submit_franchise_tag">Submit</button>
+                {% endif %}
+            </div>
+
+            <div style="margin-top: 9%">
+                {% if has_trans_tag == 1 %}
+                    <p style="display: inline-block; float: left; margin-left: 40px">Transition Tag has already been used</p>
+                {% else %}
+                    <p style="display: inline-block">Select player for Transition Tag &nbsp&nbsp&nbsp&nbsp</p>
+                    <select style="display: inline-block" id="transition_tag_select">
+                        {% for x in player_list %}
+                            {% if x.franchise_tag != 'not eligible' %}
+                                <option>{{ x.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <button type="button" style="display: inline-block; float: right; margin-right: 40px" id="submit_transition_tag">Submit</button>
+                {% endif %}
+            </div>
+        </div>
+
+        <div id="tags_rules_area">
+            <span style="font-weight: bold; text-decoration: underline">Waiver Extension</span>: if you are eligible (by paying league fees on time), this extension is available to one player who was picked up off waiver during the season. The extension is a 1-year Regular contract at the salary shown.
+            <br><br>
+            <span style="font-weight: bold; text-decoration: underline">Franchise Tag</span>: only impending free agents are eligible. On March 1, all players given a franchise tag are put up for auction with the starting bid being the salary shown. If you lose your Tagged player, you are due compensation (see Rules page). A Franchise player is given a 3-year Regular contract.
+            <br><br>
+            <span style="font-weight: bold; text-decoration: underline">Transition Tag</span>: only impending free agents are eligible. A transition tagged player will be given a 1-year Regular contract at the salary shown. A transition tagged player will automatically become a free agent the following year (see Rules page).
+        </div>
+    </div>
+
+{% endblock %}

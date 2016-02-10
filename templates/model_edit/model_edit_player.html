@@ -1,0 +1,14 @@
+{% extends 'admin/commish_office.html' %}
+
+{% block content %}
+
+    <div>
+        <form method="POST" style="height: 600px; overflow-y: scroll">
+            {% csrf_token %}
+            <h4 style="color: red;">Reminder: Can't Change Player Name Here (view uses it for key)</h4>
+            {{ form.as_p }}
+            <button type="submit">Save</button>
+        </form>
+    </div>
+
+{% endblock %}

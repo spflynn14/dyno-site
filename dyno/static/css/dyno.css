@@ -48,7 +48,7 @@
 
 #display_area {
     height: 82%;
-    /*border: 1px solid green;*/
+    /*border: 1px solid green; */
 }
 
 .tab_button, .second_tab_button_league, .second_tab_button_team, .third_tab_button_team, .mini_tab_button_player {
@@ -107,12 +107,61 @@
 
 /* ALL PLAYERS DATAGRID */
 
+#all_players_header {
+    height: auto;
+    width: 100%;
+}
+
+#all_players_header:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+#all_players_filter_area {
+    height: auto;
+    max-height: 25%;
+    width: 100%;
+    float: left;
+}
+
+#all_players_filter_1 {
+    display: inline-block;
+    width: 20%;
+    float: left;
+}
+
+#all_players_filter_2 {
+    display: inline-block;
+    width: 20%;
+    float: left;
+}
+
+#all_players_filter_3 {
+    display: inline-block;
+    width: 20%;
+    float: left;
+}
+
+#all_players_filter_4 {
+    display: inline-block;
+    width: 20%;
+    float: left;
+}
+
+#all_players_filter_5 {
+    display: inline-block;
+    width: 20%;
+}
+
 .all_players_datagrid table {
     border-collapse: collapse;
     width: 100%;
+    table-layout: fixed;
 }
 .all_players_datagrid {
-    height: 100%;
+    height: auto;
+    width: 100%;
+    max-height: 100%;
+    float: left;
     padding-top: 1%;
     font: normal 0.75em/150% Arial, Helvetica, sans-serif;
     background: #fff;
@@ -147,7 +196,12 @@
 .all_players_datagrid table tbody tr:last-child td {
     border-bottom: none;
 }
-.all_player_data_aux {
+
+.all_players_datagrid th:hover {
+    cursor: pointer;
+}
+
+.all_players_datagrid tbody tr:nth-child(even) {
     background-color: #dcdcdc;
 }
 
@@ -412,9 +466,14 @@
     display: inline-block;
 }
 
-.team_organization_datagrid table td, .team_organization_datagrid table th {
+.team_organization_datagrid table td {
     padding: 4px 4px;
 }
+
+.team_organization_datagrid table th {
+    padding: 4px 0px;
+}
+
 .team_organization_datagrid table thead th {
     background-color:#2d99d4;
     color:#FFFFFF;
@@ -442,6 +501,15 @@
 .team_organization_data_aux {
     background-color: #dcdcdc;
 }
+
+.team_organization_datagrid tbody tr:nth-child(even) {
+    background-color: #dcdcdc;
+}
+
+.team_organization_datagrid th:hover {
+    cursor: pointer;
+}
+
 
 /* END TEAM ORG DATA GRID */
 
@@ -659,8 +727,13 @@
 .team_by_pos_datagrid table tbody tr:last-child td {
     border-bottom: none;
 }
-.team_by_pos_data_aux {
+
+.team_by_pos_datagrid tbody tr:nth-child(even) {
     background-color: #dcdcdc;
+}
+
+.team_by_pos_datagrid th:hover {
+    cursor: pointer;
 }
 
 /* END TEAM BY POS DATA GRID */
@@ -771,6 +844,9 @@
 /* END: TEAM SETTINGS */
 
 
+
+
+
 /* TEAM CAP SITUATION DATAGRID */
 
 .team_cap_datagrid table {
@@ -821,6 +897,14 @@
     background-color: #dcdcdc;
 }
 
+.team_cap_datagrid tbody tr:nth-child(even) {
+    background-color: #dcdcdc;
+}
+
+.team_cap_datagrid th:hover {
+    cursor: pointer;
+}
+
 /* END TEAM ORG DATA GRID */
 
 #team_info_div {
@@ -845,6 +929,13 @@
 }
 
 #cap_space_cap_sit_div {
+    height: 100%;
+    width: 15%;
+    display: inline-block;
+    text-align: center;
+}
+
+#num_players_cap_sit_div {
     height: 100%;
     width: 15%;
     display: inline-block;
@@ -1041,3 +1132,1046 @@
 }
 
 /* END: FEATURE LIST */
+
+
+
+/* AUCTION PAGE */
+
+#start_new_auction_area {
+    width: 80%;
+    height: 25%;
+    display: inline-block;
+    float: left;
+}
+
+#beware_multiple_names_area {
+    width: 20%;
+    height: auto;
+    max-height: 25%;
+    display: inline-block;
+}
+
+#active_auctions_table_area {
+    width: 100%;
+    height: 60%;
+    float: left;
+}
+
+#show_hide_dup_players:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#show_hide_new_auction:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#auction_page_bottom_area {
+    width: 100%;
+    height: 35%;
+    padding-top: 2%;
+    float: left;
+}
+
+#submit_auction_bids_div {
+    width: 30%;
+    float: right;
+    height: 100%;
+    display: inline-block;
+}
+
+
+.active_auctions_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+.active_auctions_datagrid {
+    width: 70%;
+    padding-top: 10px;
+    background: #fff;
+    overflow-y: auto;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.active_auctions_datagrid table td, .active_auctions_datagrid table th {
+    padding: 4px 4px;
+}
+.active_auctions_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.active_auctions_datagrid table thead th:first-child {
+    border: none;
+}
+.active_auctions_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 1em;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+.active_auctions_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.active_auctions_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+.active_auctions_data_aux {
+    background-color: #dcdcdc;
+}
+
+/* END: AUCTION PAGE */
+
+.commish_view_model_button {
+    font-size: 1.25em;
+    color: red;
+}
+
+
+
+/* COMMISH TRANSACTIONS PAGE */
+
+#commish_trans_date_filters_area {
+    width: 100%;
+    height: 10%;
+    float: left;
+}
+
+#commish_trans_cat_filters_area {
+    width: 20%;
+    height: 95%;
+    display: inline-block;
+    float: right;
+    margin-top: 50px;
+    overflow-y: auto;
+}
+
+.commish_trans_date_button {
+    display: inline-block;
+    margin-top: 15px;
+}
+
+.commish_transactions_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+.commish_transactions_datagrid {
+    width: 80%;
+    padding-top: 10px;
+    background: #fff;
+    font-size: 0.75em;
+    overflow-y: auto;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.commish_transactions_datagrid table td, .commish_transactions_datagrid table th {
+    padding: 4px 4px;
+}
+.commish_transactions_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.commish_transactions_datagrid table thead th:first-child {
+    border: none;
+}
+.commish_transactions_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 1em;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+.commish_transactions_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.commish_transactions_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+.commish_transactions_data_aux {
+    background-color: #dcdcdc;
+}
+
+.commish_transactions_datagrid th:hover {
+    cursor: pointer;
+}
+
+/* END: COMMISH TRANSACTIONS PAGE */
+
+
+
+/* TEAM PENDING TRANSACTIONS */
+
+.team_pending_transactions_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+.team_pending_transactions_datagrid {
+    width: 100%;
+    padding-top: 10px;
+    background: #fff;
+    font-size: 0.75em;
+    overflow-y: auto;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.team_pending_transactions_datagrid table td, .team_pending_transactions_datagrid table th {
+    padding: 4px 4px;
+}
+.team_pending_transactions_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.team_pending_transactions_datagrid table thead th:first-child {
+    border: none;
+}
+.team_pending_transactions_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 1em;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+.team_pending_transactions_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.team_pending_transactions_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+.team_pending_transactions_data_aux {
+    background-color: #dcdcdc;
+}
+
+/* END: TEAM PENDING TRANSACTIONS */
+
+
+
+
+/* SET CONTRACT STRUCTURE */
+
+#setconstr_header_area {
+    /*border: 1px solid red;*/
+    width: 50%;
+    height: 35%;
+    display: inline-block;
+}
+
+#setconstr_instructions_area {
+    /*border: 1px solid green;*/
+    width: 50%;
+    height: 35%;
+    float: right;
+    padding: 0px 20px 20px 60px;
+    display: inline-block;
+}
+
+#setconstr_contract_area {
+    /*border: 1px solid blue;*/
+    width: 60%;
+    height: 65%;
+    float: left;
+    display: inline-block;
+}
+
+#setconstr_cap_tables_area {
+    /*border: 1px solid purple;*/
+    width: 40%;
+    height: 65%;
+    display: inline-block;
+}
+
+.setconstr_cell {
+    text-align: center;
+    height: 35px;
+}
+
+.setconstr_totals_message_red {
+    text-align: center;
+    height: 35px;
+    color: red;
+}
+
+/* END: SET CONTRACT STRUCTURE */
+
+
+
+
+/* COMMISH PENDING TRANSACTIONS */
+
+.commish_pending_transactions_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+.commish_pending_transactions_datagrid {
+    width: 100%;
+    padding-top: 10px;
+    background: #fff;
+    font-size: 0.75em;
+    overflow-y: auto;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.commish_pending_transactions_datagrid table td, .commish_pending_transactions_datagrid table th {
+    padding: 4px 4px;
+}
+.commish_pending_transactions_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.commish_pending_transactions_datagrid table thead th:first-child {
+    border: none;
+}
+.commish_pending_transactions_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 1em;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+.commish_pending_transactions_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.commish_pending_transactions_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+.commish_pending_transactions_data_aux {
+    background-color: #dcdcdc;
+}
+
+.date_link:hover {
+    cursor: pointer;
+}
+
+/* END: COMMISH PENDING TRANSACTIONS */
+
+
+
+
+/* TRANSACTION - SINGLE PLAYER */
+
+#old_data_area {
+    width: 50%;
+    height: 85%;
+    display: inline-block;
+    float: left;
+    overflow-y: auto;
+}
+
+#new_data_area {
+    width: 50%;
+    height: 85%;
+    display: inline-block;
+    overflow-y: auto;
+}
+
+#submit_button_area {
+    width: 100%;
+    height: 6%;
+    float: left;
+}
+
+#show_transaction_data_area {
+    width: 100%;
+    height: 18%;
+    float: left;
+}
+
+.trans_single_row {
+    padding-left: 100px;
+    height: 22px;
+}
+
+.trans_single_header {
+    display: inline-block;
+    width: 30%;
+}
+
+.trans_single_text {
+    display: inline-block;
+}
+
+.trans_single_table_header_cell {
+    width: 200px;
+    text-align: center;
+}
+
+.trans_single_table_text_cell {
+    width: 200px;
+    text-align: center;
+}
+
+/* END: TRANSACTION - SINGLE PLAYER */
+
+
+
+
+
+/* TEAM: MANAGE ALERTS */
+
+#periodic_alerts_area {
+    border: 1px solid #cccccc;
+    width: 100%;
+    height: 30%;
+    float: left;
+    padding: 10px 10px 10px 10px;
+}
+
+#instant_alerts_area {
+    border-left: 1px solid #cccccc;
+    border-right: 1px solid #cccccc;
+    border-bottom: 1px solid #cccccc;
+    width: 100%;
+    height: 70%;
+    float: left;
+    padding: 10px 10px 10px 10px;
+}
+
+/* END: TEAM: MANAGE ALERTS */
+
+
+
+/* TEAM: ALERTS */
+
+#team_alerts_date_filters_area {
+    width: 100%;
+    height: 10%;
+    float: left;
+}
+
+#team_alerts_cat_filters_area {
+    width: 20%;
+    height: 80%;
+    display: inline-block;
+    float: right;
+    margin-top: 50px;
+    overflow-y: auto;
+}
+
+.team_alerts_date_button {
+    display: inline-block;
+    margin-top: 15px;
+}
+
+.team_alerts_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+.team_alerts_datagrid {
+    width: 80%;
+    padding-top: 10px;
+    background: #fff;
+    font-size: 0.75em;
+    overflow-y: auto;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.team_alerts_datagrid table td, .team_alerts_datagrid table th {
+    padding: 4px 4px;
+}
+.team_alerts_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.team_alerts_datagrid table thead th:first-child {
+    border: none;
+}
+.team_alerts_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 1em;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+.team_alerts_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.team_alerts_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+.team_alerts_data_aux {
+    background-color: #dcdcdc;
+}
+
+.team_alerts_datagrid th:hover {
+    cursor: pointer;
+}
+
+/* END: TEAM: ALERTS */
+
+
+
+
+
+/* TEAM TRANSACTIONS PAGE */
+
+#team_trans_date_filters_area {
+    width: 100%;
+    height: 10%;
+    float: left;
+}
+
+#team_trans_cat_filters_area {
+    width: 20%;
+    height: 80%;
+    display: inline-block;
+    float: right;
+    margin-top: 50px;
+    overflow-y: auto;
+}
+
+.team_trans_date_button {
+    display: inline-block;
+    margin-top: 15px;
+}
+
+.team_transactions_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+.team_transactions_datagrid {
+    width: 80%;
+    padding-top: 10px;
+    background: #fff;
+    font-size: 0.75em;
+    overflow-y: auto;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.team_transactions_datagrid table td, .team_transactions_datagrid table th {
+    padding: 4px 4px;
+}
+.team_transactions_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.team_transactions_datagrid table thead th:first-child {
+    border: none;
+}
+.team_transactions_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 1em;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+.team_transactions_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.team_transactions_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+.team_transactions_data_aux {
+    background-color: #dcdcdc;
+}
+
+.team_transactions_datagrid th:hover {
+    cursor: pointer;
+}
+
+/* END: TEAM TRANSACTIONS PAGE */
+
+
+
+
+/* COMMISH ALL ALERTS */
+
+#commish_alerts_date_filters_area {
+    width: 100%;
+    height: 10%;
+    float: left;
+}
+
+#commish_alerts_cat_filters_area {
+    width: 20%;
+    height: 80%;
+    display: inline-block;
+    float: right;
+    margin-top: 50px;
+    overflow-y: auto;
+}
+
+.commish_alerts_date_button {
+    display: inline-block;
+    margin-top: 15px;
+}
+
+.commish_alerts_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+.commish_alerts_datagrid {
+    width: 80%;
+    padding-top: 10px;
+    background: #fff;
+    font-size: 0.75em;
+    overflow-y: auto;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.commish_alerts_datagrid table td, .commish_alerts_datagrid table th {
+    padding: 4px 4px;
+}
+.commish_alerts_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.commish_alerts_datagrid table thead th:first-child {
+    border: none;
+}
+.commish_alerts_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 1em;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+.commish_alerts_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.commish_alerts_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+.commish_alerts_data_aux {
+    background-color: #dcdcdc;
+}
+
+.commish_alerts_datagrid th:hover {
+    cursor: pointer;
+}
+
+/* END: COMMISH ALL ALERTS */
+
+
+
+
+/* COMMISH PENDING ALERTS */
+
+#commish_pending_alerts_date_filters_area {
+    width: 100%;
+    height: 10%;
+    float: left;
+}
+
+#commish_pending_alerts_cat_filters_area {
+    width: 20%;
+    height: 80%;
+    display: inline-block;
+    float: right;
+    margin-top: 50px;
+    overflow-y: auto;
+}
+
+.commish_pending_alerts_date_button {
+    display: inline-block;
+    margin-top: 15px;
+}
+
+.commish_pending_alerts_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+.commish_pending_alerts_datagrid {
+    width: 80%;
+    padding-top: 10px;
+    background: #fff;
+    font-size: 0.75em;
+    overflow-y: auto;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.commish_pending_alerts_datagrid table td, .commish_pending_alerts_datagrid table th {
+    padding: 4px 4px;
+}
+.commish_pending_alerts_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.commish_pending_alerts_datagrid table thead th:first-child {
+    border: none;
+}
+.commish_pending_alerts_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 1em;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+.commish_pending_alerts_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.commish_pending_alerts_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+.commish_pending_alerts_data_aux {
+    background-color: #dcdcdc;
+}
+
+.commish_pending_alerts_datagrid th:hover {
+    cursor: pointer;
+}
+
+/* END: COMMISH PENDING ALERTS */
+
+
+
+/* TAGS */
+
+#tags_table_area {
+    width: 100%;
+    height: 50%;
+    float: left;
+}
+
+#tags_selection_area {
+    width: 50%;
+    height: 50%;
+    float: left;
+    display: inline-block;
+    padding: 5px 5px 5px 5px;
+}
+
+#tags_rules_area {
+    width: 50%;
+    height: 50%;
+    float: left;
+    display: inline-block;
+    padding: 10px 10px 10px 10px;
+}
+
+.tags_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+.tags_datagrid {
+    width: 100%;
+    padding-top: 10px;
+    background: #fff;
+    overflow-y: auto;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.tags_datagrid table td, .tags_datagrid table th {
+    padding: 4px 4px;
+}
+.tags_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.tags_datagrid table thead th:first-child {
+    border: none;
+}
+.tags_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 0.85em;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+.tags_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.tags_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.tags_datagrid th:hover {
+    cursor: pointer;
+}
+
+.tags_datagrid tbody tr:nth-child(even) {
+    background-color: #dcdcdc;
+}
+
+/* END: TAGS */
+
+
+
+
+/* ADP */
+
+.adp_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+.adp_datagrid {
+    padding-left: 20%;
+    width: 40%;
+    height: 90%;
+    margin-top: 40px;
+    background: #fff;
+    overflow-y: auto;
+    display: inline-block;
+}
+
+.adp_datagrid table td, .adp_datagrid table th {
+    padding: 4px 4px;
+}
+.adp_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.adp_datagrid table thead th:first-child {
+    border: none;
+}
+.adp_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 0.85em;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+.adp_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.adp_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.adp_datagrid th:hover {
+    cursor: pointer;
+}
+
+.adp_datagrid tbody tr:nth-child(even) {
+    background-color: #dcdcdc;
+}
+
+/* END: ADP */
+
+
+
+/* PERFORMANCE */
+
+.performance_yr_1_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+.performance_yr_1_datagrid {
+    width: 40%;
+    height: 90%;
+    margin-top: 40px;
+    background: #fff;
+    overflow-y: auto;
+    float: left;
+    display: inline-block;
+}
+
+.performance_yr_1_datagrid table td, .performance_yr_1_datagrid table th {
+    padding: 4px 4px;
+}
+.performance_yr_1_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.performance_yr_1_datagrid table thead th:first-child {
+    border: none;
+}
+.performance_yr_1_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 0.85em;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+.performance_yr_1_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.performance_yr_1_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.performance_yr_1_datagrid th:hover {
+    cursor: pointer;
+}
+
+.performance_yr_1_datagrid tbody tr:nth-child(even) {
+    background-color: #dcdcdc;
+}
+
+.performance_yr_2_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+.performance_yr_2_datagrid {
+    padding-left: 5%;
+    width: 40%;
+    height: 90%;
+    margin-top: 40px;
+    background: #fff;
+    overflow-y: auto;
+    display: inline-block;
+}
+
+.performance_yr_2_datagrid table td, .performance_yr_2_datagrid table th {
+    padding: 4px 4px;
+}
+.performance_yr_2_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.performance_yr_2_datagrid table thead th:first-child {
+    border: none;
+}
+.performance_yr_2_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 0.85em;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+.performance_yr_2_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.performance_yr_2_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.performance_yr_2_datagrid th:hover {
+    cursor: pointer;
+}
+
+.performance_yr_2_datagrid tbody tr:nth-child(even) {
+    background-color: #dcdcdc;
+}
+
+/* END: PERFORMANCE */
+
+
+
+
+
+/* EXTENSIONS */
+
+#extensions_filter_area {
+    height: 5%;
+    width: 100%;
+    float: left;
+    padding-top: 10px;
+    margin-left: 25%;
+}
+
+.extensions_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+.extensions_datagrid {
+    padding-top: 10px;
+    width: 80%;
+    height: 90%;
+    background: #fff;
+    overflow-y: auto;
+    display: inline-block;
+}
+
+.extensions_datagrid table td, .extensions_datagrid table th {
+    padding: 4px 4px;
+}
+.extensions_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+    font-size: 0.85em;
+}
+.extensions_datagrid table thead th:first-child {
+    border: none;
+}
+.extensions_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 0.85em;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+.extensions_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.extensions_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.extensions_datagrid th:hover {
+    cursor: pointer;
+}
+
+.extensions_datagrid tbody tr:nth-child(even) {
+    background-color: #dcdcdc;
+}
+
+/* END: EXTENSIONS */

@@ -1,11 +1,96 @@
 {% extends 'league.html' %}
 
-{% block content %}
-    <div class="tab_area" id="third_tab_area">
+{% load staticfiles %}
 
+{% block head %}
+    <script src="{% static 'js/league_extensions.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.tablesorter.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="third_tab_area">
+        {% if request.path == '/league/extensions' %}
+            <a href="/league/extensions" class="third_tab_button_team" style="background-color: #2d99d4; color: white">Extensions</a>
+        {% else %}
+            <a href="/league/extensions" class="third_tab_button_team">Extensions</a>
+        {% endif %}
+
+        {% if request.path == '/team/adp_info' %}
+            <a href="/league/adp_info" class="third_tab_button_team" style="background-color: #2d99d4; color: white">ADP Info</a>
+        {% else %}
+            <a href="/league/adp_info" class="third_tab_button_team">ADP Info</a>
+        {% endif %}
+
+        {% if request.path == '/team/performance_info' %}
+            <a href="/league/performance_info" class="third_tab_button_team" style="background-color: #2d99d4; color: white">Performance Info</a>
+        {% else %}
+            <a href="/league/performance_info" class="third_tab_button_team">Performance Info</a>
+        {% endif %}
     </div>
 
     <div id="display_area">
-        Coming soon!
+        <div id="extensions_filter_area">
+            <input type="checkbox" id="extensions_team_checkbox" style="display: inline-block;">
+            <p style="display: inline-block;">Show Only My Team</p>
+        </div>
+        <div class="extensions_datagrid">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="5%" style="text-align: center">Pos</th>
+                        <th width="14%">Player</th>
+                        <th width="10%">Team</th>
+                        <th width="7%" style="text-align: center">Avg Yearly Cost</th>
+                        <th width="7%" style="text-align: center">Years Left</th>
+                        <th width="7%" style="text-align: center">Base Extension Value</th>
+                        <th width="7%" style="text-align: center">Max Extension Length</th>
+                        <th width="7%" style="text-align: center">1-year Extension</th>
+                        <th width="7%" style="text-align: center">2-year Extension</th>
+                        <th width="7%" style="text-align: center">3-year Extension</th>
+                        <th width="7%" style="text-align: center">4-year Extension</th>
+                        <th width="12%"></th>
+                    </tr>
+                </thead>
+                <tbody  id="extensions_body">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="vw_1" hidden>
+        <table>
+            {% for x in player_list %}
+                <tr>
+                    <td id="vw_1-1">{{ x.pos }}</td>
+                    <td id="vw_1-2">{{ x.player }}</td>
+                    <td id="vw_1-3">{{ x.team }}</td>
+                    <td id="vw_1-4">{{ x.avg_yearly_cost }}</td>
+                    <td id="vw_1-5">{{ x.years_left }}</td>
+                    <td id="vw_1-6">{{ x.base_extension_value }}</td>
+                    <td id="vw_1-7">{{ x.max_extension_length }}</td>
+                    <td id="vw_1-8">{{ x.1yr_extension }}</td>
+                    <td id="vw_1-9">{{ x.2yr_extension }}</td>
+                    <td id="vw_1-10">{{ x.3yr_extension }}</td>
+                    <td id="vw_1-11">{{ x.4yr_extension }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div id="vw_2" hidden>
+        <p id="vw_2-1">{{ user_team }}</p>
+        <p id="vw_2-2">{{ ext_switch }}</p>
+    </div>
+
+    <div id="vw_3" hidden>
+        <table>
+            {% for x in submitted_extensions_list %}
+                <tr>
+                    <td id="vw_3-1">{{ x.player }}</td>
+                </tr>
+            {% endfor %}
+        </table>
     </div>
 {% endblock %}

@@ -2,7 +2,7 @@
 
 {% load staticfiles %}
 
-<!-- List of html for which nav_bar must be copied: league, team, batch, settings  -->
+<!-- List of html for which nav_bar must be copied: league, team, commish_office, batch, settings  -->
 
 <html lang="en">
     <head>
@@ -35,12 +35,18 @@
                     {% if request.user.is_staff %}
                         <li><a href="/admin">Admin</a></li>
                         <li><a href="/batch">Batch</a></li>
-                        <li><a href="/settings">Settings</a></li>
                         <li class="divider"></li>
-                    {% else %}
+                        <li><a href="/commish_office"><i class="glyphicon glyphicon-briefcase" style="padding-right: 8px"></i>Commish's Office</a></li>
+                        <li class="divider"></li>
                     {% endif %}
-                    <li><a href="/team/team_settings">Team Settings</a></li>
-                    <li class="divider"></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="/team/tags">Waiver Extension and Tags</a></li>
+                        <li class="divider"></li>
+                        <li><a href="/team/tags">Extensions</a></li>
+                        <li><a href="/team/tags">Pending Transactions</a></li>
+                        <li><a href="/team/tags">Manage Alerts</a></li>
+                        <li class="divider"></li>
+                    {% endif %}
                     <li><a href="/feature_list">Feature List & Changelog</a></li>
                     <li class="divider"></li>
                     <li><a href="/bug_tracking">Bug Tracking</a></li>

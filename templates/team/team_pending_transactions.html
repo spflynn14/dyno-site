@@ -1,0 +1,76 @@
+{% extends 'team.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/team_pending_transactions.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="third_tab_area">
+        {% if request.path == '/team/pending_transactions' %}
+            <a href="/team/pending_transactions" class="third_tab_button_team" id="team_pending_transactions" style="background-color: #2d99d4; color: white">Pending Transactions</a>
+        {% else %}
+            <a href="/team/pending_transactions" class="third_tab_button_team" id="team_pending_transactions">Pending Transactions</a>
+        {% endif %}
+
+        {% if request.path == '/team/release_players' %}
+            <a href="/team/release_players" class="third_tab_button_team" id="team_level_cuts" style="background-color: #2d99d4; color: white">Release Players</a>
+        {% else %}
+            <a href="/team/release_players" class="third_tab_button_team" id="team_level_cuts">Release Players</a>
+        {% endif %}
+
+        {% if request.path == '/team/transactions' %}
+            <a href="/team/transactions" class="third_tab_button_team" id="team_transactions" style="background-color: #2d99d4; color: white">Transaction Log</a>
+        {% else %}
+            <a href="/team/transactions" class="third_tab_button_team" id="team_transactions">Transaction Log</a>
+        {% endif %}
+    </div>
+
+    <div id="display_area">
+        <div id="message_area" style="height: 4%; margin-top: 2%">You have 0 items that require action</div>
+        <div class="team_pending_transactions_datagrid" style="height: 88%;">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="11%">Date</th>
+                        <th width="11%">Player</th>
+                        <th width="8%">Transaction Type</th>
+                        <th width="20%">Details</th>
+                        <th width="13%">Has Been Pending for...</th>
+                        <th width="20%">Actions</th>
+                        <th width="17%">Comments</th>
+                    </tr>
+                </thead>
+                <tbody id="team_pending_transactions_body">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="vw_1">
+        {% for x in transactions %}
+            <table>
+                <tr>
+                    <td id="vw_1-1">{{ x.date }}</td>
+                    <td id="vw_1-2">{{ x.player }}</td>
+                    <td id="vw_1-3">{{ x.team1 }}</td>
+                    <td id="vw_1-4">{{ x.team2 }}</td>
+                    <td id="vw_1-5">{{ x.transaction_type }}</td>
+                    <td id="vw_1-6">{{ x.var_d1 }}</td>
+                    <td id="vw_1-7">{{ x.var_d2 }}</td>
+                    <td id="vw_1-8">{{ x.var_d3 }}</td>
+                    <td id="vw_1-9">{{ x.var_i1 }}</td>
+                    <td id="vw_1-10">{{ x.var_i2 }}</td>
+                    <td id="vw_1-11">{{ x.var_t1 }}</td>
+                    <td id="vw_1-12">{{ x.var_t2 }}</td>
+                    <td id="vw_1-13">{{ x.var_t3 }}</td>
+                    <td id="vw_1-14">{{ x.date.isoformat }}</td>
+                </tr>
+            </table>
+        {% endfor %}
+    </div>
+
+{% endblock %}

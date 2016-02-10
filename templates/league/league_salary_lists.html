@@ -8,9 +8,10 @@
 
 {% block content %}
     {% csrf_token %}
-    <div class="tab_area" id="third_tab_area">
+    <div class="tab_area" id="third_tab_area" style="height: 10%;">
         <h5>***Note: The salary list for each position is maintained throughout the year, and the salaries listed on it are only changed once a new contract is signed. The salary list only lists the average salary for the life of the contract. The salary list is used solely for contract calculations, and is not to be used as a reference for player contracts in any other context.</h5>
         <h6>***This salary list contains only players that are making above the league minimum of $1.00</h6>
+        <h6>This list is purged at the end of free agency each year. Players that have not been rostered for one year are removed.</h6>
     </div>
 
     <div id="display_area">

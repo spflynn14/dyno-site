@@ -165,453 +165,153 @@ $(document).ready(function() {
          $('#TE_body').empty();
     }
 
-    function populate_starter_table_normal (data) {
-        $('<tr>').appendTo('#starters_body');
-        if (data != '') {
-            var $role_select = $('<select>').addClass('role_selects').attr('style','width:100%;height: 100%').appendTo('#starters_body');
-            $.each(data.avail_roles, function (index, value) {
-                if (value == data.role) {
-                    $role_select.append($('<option>')
-                        .attr('value',value)
-                        .prop('selected', true)
-                        .text(value));
-                } else {
-                    $role_select.append($('<option>')
-                        .attr('value',value)
-                        .text(value));
-                }
-            });
-            if ($team != $user_team) {
-                $role_select.prop('disabled', true);
-                $role_select.empty();
+    function get_row (data) {
+        var tr = $('<tr>');
+        var td_roles = $('<td>');
+        var td_pos = $('<td>');
+        var td_name = $('<td>');
+        var td_total_value = $('<td>');
+        var td_years_left = $('<td>');
+        var td_avg_yearly = $('<td>');
+        var td_cap = $('<td>');
+
+        td_pos.text(data.pos).attr('align','center');
+        var name_link = $('<div>').addClass('name_link').text(data.name);
+        td_name.append(name_link);
+        td_total_value.text('$' + data.total_value.toFixed(2)).attr('align','center');
+        td_years_left.text(data.yrs_left).attr('align','center');
+        td_avg_yearly.text('$' + data.avg_yearly.toFixed(2)).attr('align','center');
+        td_cap.text('$' + data.cap_hit.toFixed(2)).attr('align','center');
+
+        var role_select = $('<select>').addClass('role_selects').css({'height' : '100%', 'width' : '100%', 'border' : '0', 'background' : 'inherit'});
+        $.each(data.avail_roles, function (index, value) {
+            if (value == data.role) {
+                role_select.append($('<option>')
+                    .attr('value', value)
+                    .prop('selected', true)
+                    .text(value));
+            } else {
+                role_select.append($('<option>')
+                    .attr('value', value)
+                    .text(value));
             }
-            $('<td>').attr('align','center').text(data.pos).appendTo('#starters_body');
-            $('<td>').addClass('name_link').text(data.name).appendTo('#starters_body');
-            $('<td>').attr('align','center').text('$' + data.total_value.toFixed(2)).appendTo('#starters_body');
-            $('<td>').attr('align','center').text(data.yrs_left).appendTo('#starters_body');
-            $('<td>').attr('align','center').text('$' + data.avg_yearly.toFixed(2)).appendTo('#starters_body');
-            $('<td>').attr('align','center').text('$' + data.cap_hit.toFixed(2)).appendTo('#starters_body');
+        });
+        if ($team != $user_team) {
+            role_select.prop('disabled', true);
+            role_select.empty();
+        }
+        var roles_div = $('<div>').css({'height' : '100%', 'width' : '100%'});
+        roles_div.append(role_select);
+        td_roles.append(roles_div);
+
+        tr.append(td_roles);
+        tr.append(td_pos);
+        tr.append(td_name);
+        tr.append(td_total_value);
+        tr.append(td_years_left);
+        tr.append(td_avg_yearly);
+        tr.append(td_cap);
+
+        return tr;
+    }
+
+    function get_row_by_pos (data) {
+        var tr = $('<tr>');
+        var td_roles = $('<td>');
+        var td_name = $('<td>');
+        var td_years_left = $('<td>');
+        var td_avg_yearly = $('<td>');
+
+        var name_link = $('<div>').addClass('name_link').text(data.name);
+        td_name.append(name_link);
+        td_years_left.text(data.yrs_left).attr('align','center');
+        td_avg_yearly.text('$' + data.avg_yearly.toFixed(2)).attr('align','center');
+
+        var role_select = $('<select>').addClass('role_selects').css({'height' : '100%', 'width' : '100%', 'border' : '0', 'background' : 'inherit'});
+        $.each(data.avail_roles, function (index, value) {
+            if (value == data.role) {
+                role_select.append($('<option>')
+                    .attr('value', value)
+                    .prop('selected', true)
+                    .text(value));
+            } else {
+                role_select.append($('<option>')
+                    .attr('value', value)
+                    .text(value));
+            }
+        });
+        if ($team != $user_team) {
+            role_select.prop('disabled', true);
+            role_select.empty();
+        }
+        var roles_div = $('<div>').css({'height' : '100%', 'width' : '100%'});
+        roles_div.append(role_select);
+        td_roles.append(roles_div);
+
+        tr.append(td_roles);
+        tr.append(td_name);
+        tr.append(td_years_left);
+        tr.append(td_avg_yearly);
+
+        return tr;
+    }
+
+    function populate_starter_table (data) {
+        var data_len = data.length;
+        if (data_len != 0) {
+            var row = get_row(data);
+            row.appendTo('#starters_body');
         } else {
-            $('<td>').attr('style', 'height:20px').appendTo('#starters_body');
+            $('<tr>').attr('style', 'height:23px').appendTo('#starters_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         }
     }
 
-    function populate_starter_table_aux (data) {
-        $('<tr>').appendTo('#starters_body');
-        if (data != '') {
-            var $role_select = $('<select>').addClass('role_selects').attr('style','width:100%;height: 100%').appendTo('#starters_body');
-            $.each(data.avail_roles, function (index, value) {
-                if (value == data.role) {
-                    $role_select.append($('<option>')
-                        .attr('value',value)
-                        .prop('selected', true)
-                        .text(value));
-                } else {
-                    $role_select.append($('<option>')
-                        .attr('value',value)
-                        .text(value));
-                }
-            });
-            if ($team != $user_team) {
-                $role_select.prop('disabled', true);
-                $role_select.empty();
-            }
-            $('<td>').attr('align','center').addClass('team_organization_data_aux').text(data.pos).appendTo('#starters_body');
-            $('<td>').addClass('name_link').addClass('team_organization_data_aux').text(data.name).appendTo('#starters_body');
-            $('<td>').attr('align','center').addClass('team_organization_data_aux').text('$' + data.total_value.toFixed(2)).appendTo('#starters_body');
-            $('<td>').attr('align','center').addClass('team_organization_data_aux').text(data.yrs_left).appendTo('#starters_body');
-            $('<td>').attr('align','center').addClass('team_organization_data_aux').text('$' + data.avg_yearly.toFixed(2)).appendTo('#starters_body');
-            $('<td>').attr('align','center').addClass('team_organization_data_aux').text('$' + data.cap_hit.toFixed(2)).appendTo('#starters_body');
-        } else {
-            $('<td>').addClass('team_organization_data_aux').attr('style', 'height:20px').appendTo('#starters_body');
-            $('<td>').addClass('team_organization_data_aux').attr('style', 'height:20px').appendTo('#starters_body');
-            $('<td>').addClass('team_organization_data_aux').attr('style', 'height:20px').appendTo('#starters_body');
-            $('<td>').addClass('team_organization_data_aux').attr('style', 'height:20px').appendTo('#starters_body');
-            $('<td>').addClass('team_organization_data_aux').attr('style', 'height:20px').appendTo('#starters_body');
-            $('<td>').addClass('team_organization_data_aux').attr('style', 'height:20px').appendTo('#starters_body');
-            $('<td>').addClass('team_organization_data_aux').attr('style', 'height:20px').appendTo('#starters_body');
-        }
-    }
-
-    function populate_def_k_table_normal (data) {
+    function populate_def_k_table (data) {
         if ($.inArray(data.role, filtered_tags) == -1) {
-            $('<tr>').appendTo('#def_k_body');
-            var $role_select = $('<select>').addClass('role_selects').attr('style', 'width:100%;height: 100%').appendTo('#def_k_body');
-            $.each(data.avail_roles, function (index, value) {
-                if (value == data.role) {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .prop('selected', true)
-                        .text(value));
-                } else {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .text(value));
-                }
-            });
-            if ($team != $user_team) {
-                $role_select.prop('disabled', true);
-                $role_select.empty();
-            }
-            $('<td>').attr('align', 'center').text(data.pos).appendTo('#def_k_body');
-            $('<td>').addClass('name_link').text(data.name).appendTo('#def_k_body');
-            $('<td>').attr('align', 'center').text('$' + data.total_value.toFixed(2)).appendTo('#def_k_body');
-            $('<td>').attr('align', 'center').text(data.yrs_left).appendTo('#def_k_body');
-            $('<td>').attr('align', 'center').text('$' + data.avg_yearly.toFixed(2)).appendTo('#def_k_body');
-            $('<td>').attr('align', 'center').text('$' + data.cap_hit.toFixed(2)).appendTo('#def_k_body');
+            var row = get_row(data);
+            row.appendTo('#def_k_body');
         }
     }
 
-    function populate_def_k_table_aux (data) {
+    function populate_bench_table (data) {
         if ($.inArray(data.role, filtered_tags) == -1) {
-            $('<tr>').appendTo('#def_k_body');
-            var $role_select = $('<select>').addClass('role_selects').attr('style', 'width:100%;height: 100%').appendTo('#def_k_body');
-            $.each(data.avail_roles, function (index, value) {
-                if (value == data.role) {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .prop('selected', true)
-                        .text(value));
-                } else {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .text(value));
-                }
-            });
-            if ($team != $user_team) {
-                $role_select.prop('disabled', true);
-                $role_select.empty();
-            }
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text(data.pos).appendTo('#def_k_body');
-            $('<td>').addClass('name_link').addClass('team_organization_data_aux').text(data.name).appendTo('#def_k_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.total_value.toFixed(2)).appendTo('#def_k_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text(data.yrs_left).appendTo('#def_k_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.avg_yearly.toFixed(2)).appendTo('#def_k_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.cap_hit.toFixed(2)).appendTo('#def_k_body');
+            var row = get_row(data);
+            row.appendTo('#bench_body');
         }
     }
 
-    function populate_bench_table_normal (data) {
+    function populate_dev_table (data) {
         if ($.inArray(data.role, filtered_tags) == -1) {
-            $('<tr>').appendTo('#bench_body');
-            var $role_select = $('<select>').addClass('role_selects').attr('style','width:100%;height: 100%').appendTo('#bench_body');
-            $.each(data.avail_roles, function (index, value) {
-                if (value == data.role) {
-                    $role_select.append($('<option>')
-                        .attr('value',value)
-                        .prop('selected', true)
-                        .text(value));
-                } else {
-                    $role_select.append($('<option>')
-                        .attr('value',value)
-                        .text(value));
-                }
-            });
-            if ($team != $user_team) {
-                $role_select.prop('disabled', true);
-                $role_select.empty();
-            }
-            $('<td>').attr('align','center').text(data.pos).appendTo('#bench_body');
-            $('<td>').addClass('name_link').text(data.name).appendTo('#bench_body');
-            $('<td>').attr('align','center').text('$' + data.total_value.toFixed(2)).appendTo('#bench_body');
-            $('<td>').attr('align','center').text(data.yrs_left).appendTo('#bench_body');
-            $('<td>').attr('align','center').text('$' + data.avg_yearly.toFixed(2)).appendTo('#bench_body');
-            $('<td>').attr('align','center').text('$' + data.cap_hit.toFixed(2)).appendTo('#bench_body');
+            var row = get_row(data);
+            row.appendTo('#dev_body');
         }
     }
 
-    function populate_bench_table_aux (data) {
+    function populate_QB_table (data) {
         if ($.inArray(data.role, filtered_tags) == -1) {
-            $('<tr>').appendTo('#bench_body');
-            var $role_select = $('<select>').addClass('role_selects').attr('style', 'width:100%;height: 100%').appendTo('#bench_body');
-            $.each(data.avail_roles, function (index, value) {
-                if (value == data.role) {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .prop('selected', true)
-                        .text(value));
-                } else {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .text(value));
-                }
-            });
-            if ($team != $user_team) {
-                $role_select.prop('disabled', true);
-                $role_select.empty();
-            }
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text(data.pos).appendTo('#bench_body');
-            $('<td>').addClass('name_link').addClass('team_organization_data_aux').text(data.name).appendTo('#bench_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.total_value.toFixed(2)).appendTo('#bench_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text(data.yrs_left).appendTo('#bench_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.avg_yearly.toFixed(2)).appendTo('#bench_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.cap_hit.toFixed(2)).appendTo('#bench_body');
+            var row = get_row_by_pos(data);
+            row.appendTo('#QB_body');
         }
     }
 
-    function populate_dev_table_normal (data) {
+    function populate_RB_table (data) {
         if ($.inArray(data.role, filtered_tags) == -1) {
-            $('<tr>').appendTo('#dev_body');
-            var $role_select = $('<select>').addClass('role_selects').attr('style', 'width:100%;height: 100%').appendTo('#dev_body');
-            $.each(data.avail_roles, function (index, value) {
-                if (value == data.role) {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .prop('selected', true)
-                        .text(value));
-                } else {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .text(value));
-                }
-            });
-            if ($team != $user_team) {
-                $role_select.prop('disabled', true);
-                $role_select.empty();
-            }
-            $('<td>').attr('align', 'center').text(data.pos).appendTo('#dev_body');
-            $('<td>').addClass('name_link').text(data.name).appendTo('#dev_body');
-            $('<td>').attr('align', 'center').text('$' + data.total_value.toFixed(2)).appendTo('#dev_body');
-            $('<td>').attr('align', 'center').text(data.yrs_left).appendTo('#dev_body');
-            $('<td>').attr('align', 'center').text('$' + data.avg_yearly.toFixed(2)).appendTo('#dev_body');
-            $('<td>').attr('align', 'center').text('$' + data.cap_hit.toFixed(2)).appendTo('#dev_body');
+            var row = get_row_by_pos(data);
+            row.appendTo('#RB_body');
         }
     }
 
-    function populate_dev_table_aux (data) {
+    function populate_WR_table (data) {
         if ($.inArray(data.role, filtered_tags) == -1) {
-            $('<tr>').appendTo('#dev_body');
-            var $role_select = $('<select>').addClass('role_selects').attr('style', 'width:100%;height: 100%').appendTo('#dev_body');
-            $.each(data.avail_roles, function (index, value) {
-                if (value == data.role) {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .prop('selected', true)
-                        .text(value));
-                } else {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .text(value));
-                }
-            });
-            if ($team != $user_team) {
-                $role_select.prop('disabled', true);
-                $role_select.empty();
-            }
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text(data.pos).appendTo('#dev_body');
-            $('<td>').addClass('name_link').addClass('team_organization_data_aux').text(data.name).appendTo('#dev_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.total_value.toFixed(2)).appendTo('#dev_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text(data.yrs_left).appendTo('#dev_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.avg_yearly.toFixed(2)).appendTo('#dev_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.cap_hit.toFixed(2)).appendTo('#dev_body');
+            var row = get_row_by_pos(data);
+            row.appendTo('#WR_body');
         }
     }
 
-    function populate_QB_table_normal (data) {
+    function populate_TE_table (data) {
         if ($.inArray(data.role, filtered_tags) == -1) {
-            $('<tr>').appendTo('#QB_body');
-            var $role_select = $('<select>').addClass('role_selects').attr('style', 'width:100%;height: 100%').appendTo('#QB_body');
-            $.each(data.avail_roles, function (index, value) {
-                if (value == data.role) {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .prop('selected', true)
-                        .text(value));
-                } else {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .text(value));
-                }
-            });
-            if ($team != $user_team) {
-                $role_select.prop('disabled', true);
-                $role_select.empty();
-            }
-            $('<td>').addClass('name_link').text(data.name).appendTo('#QB_body');
-            $('<td>').attr('align', 'center').text(data.yrs_left).appendTo('#QB_body');
-            $('<td>').attr('align', 'center').text('$' + data.avg_yearly.toFixed(2)).appendTo('#QB_body');
-        }
-    }
-
-    function populate_QB_table_aux (data) {
-        if ($.inArray(data.role, filtered_tags) == -1) {
-            $('<tr>').appendTo('#QB_body');
-            var $role_select = $('<select>').addClass('role_selects').attr('style', 'width:100%;height: 100%').appendTo('#QB_body');
-            $.each(data.avail_roles, function (index, value) {
-                if (value == data.role) {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .prop('selected', true)
-                        .text(value));
-                } else {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .text(value));
-                }
-            });
-            if ($team != $user_team) {
-                $role_select.prop('disabled', true);
-                $role_select.empty();
-            }
-            $('<td>').addClass('name_link').addClass('team_organization_data_aux').text(data.name).appendTo('#QB_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text(data.yrs_left).appendTo('#QB_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.avg_yearly.toFixed(2)).appendTo('#QB_body');
-        }
-    }
-
-    function populate_RB_table_normal (data) {
-        if ($.inArray(data.role, filtered_tags) == -1) {
-            $('<tr>').appendTo('#RB_body');
-            var $role_select = $('<select>').addClass('role_selects').attr('style', 'width:100%;height: 100%').appendTo('#RB_body');
-            $.each(data.avail_roles, function (index, value) {
-                if (value == data.role) {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .prop('selected', true)
-                        .text(value));
-                } else {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .text(value));
-                }
-            });
-            if ($team != $user_team) {
-                $role_select.prop('disabled', true);
-                $role_select.empty();
-            }
-            $('<td>').addClass('name_link').text(data.name).appendTo('#RB_body');
-            $('<td>').attr('align', 'center').text(data.yrs_left).appendTo('#RB_body');
-            $('<td>').attr('align', 'center').text('$' + data.avg_yearly.toFixed(2)).appendTo('#RB_body');
-        }
-    }
-
-    function populate_RB_table_aux (data) {
-        if ($.inArray(data.role, filtered_tags) == -1) {
-            $('<tr>').appendTo('#RB_body');
-            var $role_select = $('<select>').addClass('role_selects').attr('style', 'width:100%;height: 100%').appendTo('#RB_body');
-            $.each(data.avail_roles, function (index, value) {
-                if (value == data.role) {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .prop('selected', true)
-                        .text(value));
-                } else {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .text(value));
-                }
-            });
-            if ($team != $user_team) {
-                $role_select.prop('disabled', true);
-                $role_select.empty();
-            }
-            $('<td>').addClass('name_link').addClass('team_organization_data_aux').text(data.name).appendTo('#RB_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text(data.yrs_left).appendTo('#RB_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.avg_yearly.toFixed(2)).appendTo('#RB_body');
-        }
-    }
-
-    function populate_WR_table_normal (data) {
-        if ($.inArray(data.role, filtered_tags) == -1) {
-            $('<tr>').appendTo('#WR_body');
-            var $role_select = $('<select>').addClass('role_selects').attr('style', 'width:100%;height: 100%').appendTo('#WR_body');
-            $.each(data.avail_roles, function (index, value) {
-                if (value == data.role) {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .prop('selected', true)
-                        .text(value));
-                } else {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .text(value));
-                }
-            });
-            if ($team != $user_team) {
-                $role_select.prop('disabled', true);
-                $role_select.empty();
-            }
-            $('<td>').addClass('name_link').text(data.name).appendTo('#WR_body');
-            $('<td>').attr('align', 'center').text(data.yrs_left).appendTo('#WR_body');
-            $('<td>').attr('align', 'center').text('$' + data.avg_yearly.toFixed(2)).appendTo('#WR_body');
-        }
-    }
-
-    function populate_WR_table_aux (data) {
-        if ($.inArray(data.role, filtered_tags) == -1) {
-            $('<tr>').appendTo('#WR_body');
-            var $role_select = $('<select>').addClass('role_selects').attr('style', 'width:100%;height: 100%;').appendTo('#WR_body');
-            $.each(data.avail_roles, function (index, value) {
-                if (value == data.role) {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .prop('selected', true)
-                        .text(value));
-                } else {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .text(value));
-                }
-            });
-            if ($team != $user_team) {
-                $role_select.prop('disabled', true);
-                $role_select.empty();
-            }
-            $('<td>').addClass('name_link').addClass('team_organization_data_aux').text(data.name).appendTo('#WR_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text(data.yrs_left).appendTo('#WR_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.avg_yearly.toFixed(2)).appendTo('#WR_body');
-        }
-    }
-
-    function populate_TE_table_normal (data) {
-        if ($.inArray(data.role, filtered_tags) == -1) {
-            $('<tr>').appendTo('#TE_body');
-            var $role_select = $('<select>').addClass('role_selects').attr('style', 'width:100%;height: 100%').appendTo('#TE_body');
-            $.each(data.avail_roles, function (index, value) {
-                if (value == data.role) {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .prop('selected', true)
-                        .text(value));
-                } else {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .text(value));
-                }
-            });
-            if ($team != $user_team) {
-                $role_select.prop('disabled', true);
-                $role_select.empty();
-            }
-            $('<td>').addClass('name_link').text(data.name).appendTo('#TE_body');
-            $('<td>').attr('align', 'center').text(data.yrs_left).appendTo('#TE_body');
-            $('<td>').attr('align', 'center').text('$' + data.avg_yearly.toFixed(2)).appendTo('#TE_body');
-        }
-    }
-
-    function populate_TE_table_aux (data) {
-        if ($.inArray(data.role, filtered_tags) == -1) {
-            $('<tr>').appendTo('#TE_body');
-            var $role_select = $('<select>').addClass('role_selects').attr('style', 'width:100%;height: 100%').appendTo('#TE_body');
-            $.each(data.avail_roles, function (index, value) {
-                if (value == data.role) {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .prop('selected', true)
-                        .text(value));
-                } else {
-                    $role_select.append($('<option>')
-                        .attr('value', value)
-                        .text(value));
-                }
-            });
-            if ($team != $user_team) {
-                $role_select.prop('disabled', true);
-                $role_select.empty();
-            }
-            $('<td>').addClass('name_link').addClass('team_organization_data_aux').text(data.name).appendTo('#TE_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text(data.yrs_left).appendTo('#TE_body');
-            $('<td>').attr('align', 'center').addClass('team_organization_data_aux').text('$' + data.avg_yearly.toFixed(2)).appendTo('#TE_body');
+            var row = get_row_by_pos(data);
+            row.appendTo('#TE_body');
         }
     }
 
@@ -993,50 +693,32 @@ $(document).ready(function() {
     //populate starter table
     var sorted_starter_list = order_starter_list(starter_list, list_of_starter_roles);
     $.each(sorted_starter_list, function(index, value) {
-        var num_rows = $('#starters_body').find('tr').length;
-        if (num_rows % 2 == 0) {
-            populate_starter_table_normal(value);
-        } else {
-            populate_starter_table_aux(value);
-        }
+        populate_starter_table(value);
     });
 
     //populate def_k table
     var sorted_def_k_list = sort_list(def_k_list, 'avg_yearly');
     $.each(sorted_def_k_list, function(index, value) {
-        var num_rows = $('#def_k_body').find('tr').length;
-        if (num_rows % 2 == 0) {
-            populate_def_k_table_normal(value);
-        } else {
-            populate_def_k_table_aux(value);
-        }
+        populate_def_k_table(value);
     });
 
     //populate bench table
     var sorted_bench_list = sort_list(bench_list, 'avg_yearly');
     $.each(sorted_bench_list, function(index, value) {
-        var num_rows = $('#bench_body').find('tr').length;
-        if (num_rows % 2 == 0) {
-            populate_bench_table_normal(value);
-        } else {
-            populate_bench_table_aux(value);
-        }
+        populate_bench_table(value);
     });
 
     //populate dev table
     var sorted_dev_list = sort_list(dev_list, 'avg_yearly');
     $.each(sorted_dev_list, function(index, value) {
-        var num_rows = $('#dev_body').find('tr').length;
-        if (num_rows % 2 == 0) {
-            populate_dev_table_normal(value);
-        } else {
-            populate_dev_table_aux(value);
-        }
+        populate_dev_table(value);
     });
 
     //populate flex selects
     populate_flex_1();
     populate_flex_2();
+
+    $(".team_organization_datagrid table").tablesorter();
 
     //END ON READY ACTIONS
 
@@ -1073,46 +755,27 @@ $(document).ready(function() {
         //populate starter table
         sorted_starter_list = order_starter_list(starter_list, list_of_starter_roles);
         $.each(sorted_starter_list, function(index, value) {
-            var num_rows = $('#starters_body').find('tr').length;
-            if (num_rows % 2 == 0) {
-                populate_starter_table_normal(value);
-            } else {
-                populate_starter_table_aux(value);
-            }
+            populate_starter_table(value);
         });
 
         //populate def_k table
         sorted_def_k_list = sort_list(def_k_list, 'avg_yearly');
         $.each(sorted_def_k_list, function(index, value) {
-            var num_rows = $('#def_k_body').find('tr').length;
-            if (num_rows % 2 == 0) {
-                populate_def_k_table_normal(value);
-            } else {
-                populate_def_k_table_aux(value);
-            }
+            populate_def_k_table(value);
         });
 
         //populate bench table
         sorted_bench_list = sort_list(bench_list, 'avg_yearly');
         $.each(sorted_bench_list, function(index, value) {
-            var num_rows = $('#bench_body').find('tr').length;
-            if (num_rows % 2 == 0) {
-                populate_bench_table_normal(value);
-            } else {
-                populate_bench_table_aux(value);
-            }
+            populate_bench_table(value);
         });
 
         //populate dev table
         sorted_dev_list = sort_list(dev_list, 'avg_yearly');
         $.each(sorted_dev_list, function(index, value) {
-            var num_rows = $('#dev_body').find('tr').length;
-            if (num_rows % 2 == 0) {
-                populate_dev_table_normal(value);
-            } else {
-                populate_dev_table_aux(value);
-            }
+            populate_dev_table(value);
         });
+        $(".team_organization_datagrid table").trigger('update');
     });
 
     //change flex 2 select *********
@@ -1141,55 +804,37 @@ $(document).ready(function() {
         split_master_into_lists();
         sorted_starter_list = order_starter_list(starter_list, list_of_starter_roles);
         $.each(sorted_starter_list, function(index, value) {
-            var num_rows = $('#starters_body').find('tr').length;
-            if (num_rows % 2 == 0) {
-                populate_starter_table_normal(value);
-            } else {
-                populate_starter_table_aux(value);
-            }
+            populate_starter_table(value);
         });
 
         //populate def_k table
         sorted_def_k_list = sort_list(def_k_list, 'avg_yearly');
         $.each(sorted_def_k_list, function(index, value) {
-            var num_rows = $('#def_k_body').find('tr').length;
-            if (num_rows % 2 == 0) {
-                populate_def_k_table_normal(value);
-            } else {
-                populate_def_k_table_aux(value);
-            }
+            populate_def_k_table(value);
         });
 
         //populate bench table
         sorted_bench_list = sort_list(bench_list, 'avg_yearly');
         $.each(sorted_bench_list, function(index, value) {
-            var num_rows = $('#bench_body').find('tr').length;
-            if (num_rows % 2 == 0) {
-                populate_bench_table_normal(value);
-            } else {
-                populate_bench_table_aux(value);
-            }
+            populate_bench_table(value);
         });
 
         //populate dev table
         sorted_dev_list = sort_list(dev_list, 'avg_yearly');
         $.each(sorted_dev_list, function(index, value) {
-            var num_rows = $('#dev_body').find('tr').length;
-            if (num_rows % 2 == 0) {
-                populate_dev_table_normal(value);
-            } else {
-                populate_dev_table_aux(value);
-            }
+            populate_dev_table(value);
         });
+        $(".team_organization_datagrid table").trigger('update');
     });
 
     //role change **********
     $(document.body).on('change', '.role_selects', function() {
         if ($view == 'Default') {
-            var s_name = $(this).next().next().text();
+            var s_name = $(this).parent().parent().next().next().text();
         } else if ($view == 'By Position') {
-            var s_name = $(this).next().text();
+            var s_name = $(this).parent().parent().next().text();
         }
+        console.log(s_name);
         var s_role = $(this).val();
         var previous_role = '';
         var this_pos = '';
@@ -1272,90 +917,52 @@ $(document).ready(function() {
         //populate starter table
         sorted_starter_list = order_starter_list(starter_list, list_of_starter_roles);
         $.each(sorted_starter_list, function(index, value) {
-            var num_rows = $('#starters_body').find('tr').length;
-            if (num_rows % 2 == 0) {
-                populate_starter_table_normal(value);
-            } else {
-                populate_starter_table_aux(value);
-            }
+            populate_starter_table(value);
         });
 
         //populate def_k table
         sorted_def_k_list = sort_list(def_k_list, 'avg_yearly');
         $.each(sorted_def_k_list, function(index, value) {
-            var num_rows = $('#def_k_body').find('tr').length;
-            if (num_rows % 2 == 0) {
-                populate_def_k_table_normal(value);
-            } else {
-                populate_def_k_table_aux(value);
-            }
+            populate_def_k_table(value);
         });
 
         //populate bench table
         sorted_bench_list = sort_list(bench_list, 'avg_yearly');
         $.each(sorted_bench_list, function(index, value) {
-            var num_rows = $('#bench_body').find('tr').length;
-            if (num_rows % 2 == 0) {
-                populate_bench_table_normal(value);
-            } else {
-                populate_bench_table_aux(value);
-            }
+            populate_bench_table(value);
         });
 
         //populate dev table
         sorted_dev_list = sort_list(dev_list, 'avg_yearly');
         $.each(sorted_dev_list, function(index, value) {
-            var num_rows = $('#dev_body').find('tr').length;
-            if (num_rows % 2 == 0) {
-                populate_dev_table_normal(value);
-            } else {
-                populate_dev_table_aux(value);
-            }
+            populate_dev_table(value);
         });
 
         //populate QB table
         var sorted_QB_list = sort_list(QB_list, 'role');
         $.each(sorted_QB_list, function(index, value) {
-            var num_rows = $('#QB_body').find('tr').length;
-            if (num_rows % 2 == 0) {
-                populate_QB_table_normal(value);
-            } else {
-                populate_QB_table_aux(value);
-            }
+            populate_QB_table(value);
         });
 
         //populate RB table
         var sorted_RB_list = sort_list(RB_list, 'role');
         $.each(sorted_RB_list, function(index, value) {
-            var num_rows = $('#RB_body').find('tr').length;
-            if (num_rows % 2 == 0) {
-                populate_RB_table_normal(value);
-            } else {
-                populate_RB_table_aux(value);
-            }
+            populate_RB_table(value);
         });
 
         //populate WR table
         var sorted_WR_list = sort_list(WR_list, 'role');
         $.each(sorted_WR_list, function(index, value) {
-            var num_rows = $('#WR_body').find('tr').length;
-            if (num_rows % 2 == 0) {
-                populate_WR_table_normal(value);
-            } else {
-                populate_WR_table_aux(value);
-            }
+            populate_WR_table(value);
         });
 
         //populate TE table
         var sorted_TE_list = sort_list(TE_list, 'role');
         $.each(sorted_TE_list, function(index, value) {
-            var num_rows = $('#TE_body').find('tr').length;
-            if (num_rows % 2 == 0) {
-                populate_TE_table_normal(value);
-            } else {
-                populate_TE_table_aux(value);
-            }
+            populate_TE_table(value);
         });
+        $(".team_organization_datagrid table").trigger('update');
+        $(".team_by_pos_datagrid table").trigger('update');
     });
 
     //click on a name to go to player page
@@ -1373,8 +980,11 @@ $(document).ready(function() {
     });
 
     //change view
-    $('.organization_view_select').change(function() {
+    $(document).on('click', '.organization_view_select', function() {
         var new_view = $(this).val();
+        if (new_view == $view) {
+            return;
+        }
         //store team selected variable
         $.ajax({
             url: '/team_org_store_view_selected',
@@ -1382,14 +992,14 @@ $(document).ready(function() {
             data: {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value, 'new_view': new_view},
             dataType: 'json',
             success: function (data) {
-                //do nothing
+                console.log(data);
+                //change variable locally
+                $view = new_view;
+                //change view
+                switch_view();
+                populate_select_view();
             }
         });
-        //change variable locally
-        $view = new_view;
-        //change view
-        switch_view();
-        populate_select_view();
     });
 
 
@@ -1400,46 +1010,28 @@ $(document).ready(function() {
     //populate QB table
     var sorted_QB_list = sort_list(QB_list, 'role');
     $.each(sorted_QB_list, function(index, value) {
-        var num_rows = $('#QB_body').find('tr').length;
-        if (num_rows % 2 == 0) {
-            populate_QB_table_normal(value);
-        } else {
-            populate_QB_table_aux(value);
-        }
+        populate_QB_table(value);
     });
 
     //populate RB table
     var sorted_RB_list = sort_list(RB_list, 'role');
     $.each(sorted_RB_list, function(index, value) {
-        var num_rows = $('#RB_body').find('tr').length;
-        if (num_rows % 2 == 0) {
-            populate_RB_table_normal(value);
-        } else {
-            populate_RB_table_aux(value);
-        }
+        populate_RB_table(value);
     });
 
     //populate WR table
     var sorted_WR_list = sort_list(WR_list, 'role');
     $.each(sorted_WR_list, function(index, value) {
-        var num_rows = $('#WR_body').find('tr').length;
-        if (num_rows % 2 == 0) {
-            populate_WR_table_normal(value);
-        } else {
-            populate_WR_table_aux(value);
-        }
+        populate_WR_table(value);
     });
 
     //populate TE table
     var sorted_TE_list = sort_list(TE_list, 'role');
     $.each(sorted_TE_list, function(index, value) {
-        var num_rows = $('#TE_body').find('tr').length;
-        if (num_rows % 2 == 0) {
-            populate_TE_table_normal(value);
-        } else {
-            populate_TE_table_aux(value);
-        }
+        populate_TE_table(value);
     });
+
+    $(".team_by_pos_datagrid table").tablesorter();
 
 
 

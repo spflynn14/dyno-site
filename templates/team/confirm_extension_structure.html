@@ -1,0 +1,195 @@
+{% extends 'team.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/confirm_extension_structure.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="third_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        <div id="setconstr_header_area">
+            <h4 id='player_label' style="color: blue;">{{ player.name }}</h4>
+            <p style="height: 4px"></p>
+            <h5 style="text-decoration: underline">Current Yearly Cost</h5>
+            <table style="table-layout: fixed; width: 100%">
+                <tr>
+                    <td style="width: 10%;">{{ year_list.0 }}: &nbsp</td>
+                    <td style="width: 40%;">${{ player.yr1_salary|add:player.yr1_sb|floatformat:2 }}</td>
+                    <td style="width: 50%;"><p>1-year Extension: &nbsp${{ yr1_ext|floatformat:2 }}</p></td>
+                </tr>
+                <tr>
+                    {% if player.yr2_salary > 0 %}
+                        <td>{{ year_list.1 }}: &nbsp</td>
+                        <td>${{ player.yr2_salary|add:player.yr2_sb|floatformat:2 }}</td>
+                    {% else %}
+                        <td></td>
+                        <td></td>
+                    {% endif %}
+                    <td>
+                        {% if yr2_ext != 0 %}
+                            <p>2-year Extension: &nbsp${{ yr2_ext|floatformat:2 }}</p>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    {% if player.yr3_salary > 0 %}
+                        <td>{{ year_list.2 }}: &nbsp</td>
+                        <td>${{ player.yr3_salary|add:player.yr3_sb|floatformat:2 }}</td>
+                    {% else %}
+                        <td></td>
+                        <td></td>
+                    {% endif %}
+                    <td>
+                        {% if yr3_ext != 0 %}
+                            <p>3-year Extension: &nbsp${{ yr3_ext|floatformat:2 }}</p>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    {% if player.yr4_salary > 0 %}
+                        <td>{{ year_list.3 }}: &nbsp</td>
+                        <td>${{ player.yr4_salary|add:player.yr4_sb|floatformat:2 }}</td>
+                    {% else %}
+                        <td></td>
+                        <td></td>
+                    {% endif %}
+                    <td>
+                        {% if yr4_ext != 0 %}
+                            <p>4-year Extension: &nbsp${{ yr4_ext|floatformat:2 }}</p>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    {% if player.yr5_salary > 0 %}
+                        <td>{{ year_list.4 }}: &nbsp</td>
+                        <td>${{ player.yr5_salary|add:player.yr5_sb|floatformat:2 }}</td>
+                    {% endif %}
+            </table>
+        </div>
+
+        <div id='setconstr_instructions_area'>
+            {{ instructions|linebreaks }}
+        </div>
+
+        <div id="setconstr_contract_area">
+            <div>
+                <button id="setconstr_add_year_button" type="button" style="float: right; margin-right: 20%">Add Year</button>
+                <button id="setconstr_remove_year_button" type="button" style="float: right; margin-right: 20px">Remove Year</button>
+            </div>
+            <br><br><br>
+            <table style="table-layout: fixed; width: 80%; height: auto">
+                <thead>
+                    <tr>
+                        <th style="width: 25%; text-align: center">Year</th>
+                        <th style="width: 25%; text-align: center">Total Cost</th>
+                        <th style="width: 25%; text-align: center">Signing Bonus</th>
+                        <th style="width: 25%; text-align: center">Salary</th>
+                    </tr>
+                </thead>
+                <tbody id="setconstr_table_body">
+
+                </tbody>
+            </table>
+            <table style="table-layout: fixed; width: 80%; margin-top: 30px">
+                <tbody id="setconstr_totals_body">
+                    <tr>
+                        <td class='setconstr_cell' style="width: 25%; text-align: center">Totals</td>
+                        <td class='setconstr_cell' id="setconstr_totals_total_cost" style="width: 25%; text-align: center">total cost</td>
+                        <td class='setconstr_cell' id="setconstr_totals_sb" style="width: 25%; text-align: center">sb</td>
+                        <td class='setconstr_cell' id="setconstr_totals_salary" style="width: 25%; text-align: center">salary</td>
+                    </tr>
+                    <tr>
+                        <td class='setconstr_cell' style="width: 25%; text-align: center"></td>
+                        <td class='setconstr_cell' style="width: 25%; text-align: center"></td>
+                        <td class='setconstr_cell' style="width: 25%; text-align: center"></td>
+                        <td class='setconstr_cell' id="setconstr_totals_message" style="width: 25%; text-align: center"></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 25%; text-align: center"></td>
+                        <td style="width: 25%; text-align: center"></td>
+                        <td style="width: 25%; text-align: center"></td>
+                        <td style="width: 25%; text-align: center; padding-top: 20px">
+                            <button id='confirm_ext_cancel_button' type="button" style="display: inline-block;color: red">Cancel</button>
+                            <button id='confirm_ext_submit_button' type="button" style="display: inline-block;color: blue; margin-left: 20px">Submit</button><br><br>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="setconstr_cap_tables_area">
+            <table style="table-layout: fixed; width: 100%; margin-top: 50px">
+                <thead>
+                    <tr>
+                        <th class='player_interaction_cells' style="text-align: center; width: 25%;"></th>
+                        <th class='player_interaction_cells' style="text-align: center; width: 25%;">Total Players Costs</th>
+                        <th class='player_interaction_cells' style="text-align: center; width: 25%;">Cap Penalties</th>
+                        <th class='player_interaction_cells' style="text-align: center; width: 25%;">Cap Space</th>
+                    </tr>
+                </thead>
+                <tbody id="player_interaction_2">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="vw_1" hidden>
+        <table>
+            <tr>
+                <td id="vw_1-1">{{ yr1_ext }}</td>
+                <td id="vw_1-2">{{ yr2_ext }}</td>
+                <td id="vw_1-3">{{ yr3_ext }}</td>
+                <td id="vw_1-4">{{ yr4_ext }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="vw_2" hidden>
+        <table>
+            <tr>
+                <td id="vw_2-1">{{ cap_dict.yr1_costs }}</td>
+                <td id="vw_2-2">{{ cap_dict.yr2_costs }}</td>
+                <td id="vw_2-3">{{ cap_dict.yr3_costs }}</td>
+                <td id="vw_2-4">{{ cap_dict.yr4_costs }}</td>
+                <td id="vw_2-5">{{ cap_dict.yr5_costs }}</td>
+                <td id="vw_2-6">{{ cap_dict.yr1_pen }}</td>
+                <td id="vw_2-7">{{ cap_dict.yr2_pen }}</td>
+                <td id="vw_2-8">{{ cap_dict.yr3_pen }}</td>
+                <td id="vw_2-9">{{ cap_dict.yr4_pen }}</td>
+                <td id="vw_2-10">{{ cap_dict.yr5_pen }}</td>
+                <td id="vw_2-11">{{ cap_dict.yr1_space }}</td>
+                <td id="vw_2-12">{{ cap_dict.yr2_space }}</td>
+                <td id="vw_2-13">{{ cap_dict.yr3_space }}</td>
+                <td id="vw_2-14">{{ cap_dict.yr4_space }}</td>
+                <td id="vw_2-15">{{ cap_dict.yr5_space }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="vw_3" hidden>
+        {% for x in year_list %}
+            <p>{{ x }}</p>
+        {% endfor %}
+    </div>
+
+    <div id="vw_4" hidden>
+        <table>
+            <tr>
+                <td id="vw_4-1">{{ player.yr1_salary }}</td>
+                <td id="vw_4-2">{{ player.yr2_salary }}</td>
+                <td id="vw_4-3">{{ player.yr3_salary }}</td>
+                <td id="vw_4-4">{{ player.yr4_salary }}</td>
+                <td id="vw_4-5">{{ player.yr5_salary }}</td>
+                <td id="vw_4-6">{{ player.team }}</td>
+            </tr>
+        </table>
+    </div>
+
+{% endblock %}

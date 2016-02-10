@@ -1,5 +1,4 @@
 from __future__ import unicode_literals
-import sqlite3 as sql3
 
 from django.db import models
 
@@ -112,6 +111,17 @@ class Variable(models.Model):
     def __str__(self):
         return self.name
 
+class TeamVariable(models.Model):
+    team = models.CharField(max_length=20)
+    user = models.CharField(max_length=20)
+    name = models.CharField(max_length=20)
+    text_variable = models.TextField(null=True, blank=True)
+    int_variable = models.IntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return_string = self.team + ' - ' + self.name
+        return return_string
+
 class Role(models.Model):
     name = models.CharField(max_length=60)
     yr1_role = models.CharField(max_length=8, null=True, blank=True)
@@ -180,3 +190,151 @@ class RequestedFeature(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+class Auction(models.Model):
+    player = models.CharField(max_length=60)
+    high_bidder = models.CharField(max_length=20)
+    high_bid = models.DecimalField(max_digits=5, decimal_places=2)
+    high_bidder_proxy_bid = models.DecimalField(max_digits=5, decimal_places=2)
+    clock_reset = models.DateTimeField()
+    clock_timeout_minutes = models.IntegerField(default=4320)
+
+    def __str__(self):
+        return self.player
+
+class Transaction(models.Model):
+    player = models.CharField(max_length=60)
+    team1 = models.CharField(max_length=20, null=True, blank=True)
+    team2 = models.CharField(max_length=20, null=True, blank=True)
+    transaction_type = models.CharField(max_length=40)
+    var_d1 = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    var_d2 = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    var_d3 = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    var_i1 = models.IntegerField(null=True, blank=True)
+    var_i2 = models.IntegerField(null=True, blank=True)
+    var_t1 = models.TextField(null=True, blank=True)
+    var_t2 = models.TextField(null=True, blank=True)
+    var_t3 = models.TextField(null=True, blank=True)
+    date = models.DateTimeField()
+
+    '''
+    Transaction Type Details:
+
+    Auction Created:
+        team2 = team starting auction
+        var_d1 = proxy bid
+
+    Auction Bid:
+        team2 = team bidding
+        var_d1 = proxy bid
+
+    Contract Set:
+        team2 = owner
+        var_d1 = total cost per year
+        var_d2 = signing bonus per year
+        var_i1 = total years of contract
+        var_t1 = status (pending)
+        var_t2 = status (confirmed)
+        var_t3 = per year total cost list (split by comma)
+
+    Contract Processed:
+        team2 = owner
+        var_d1 = total cost per year
+        var_d2 = signing bonus per year
+        var_i1 = total years of contract
+        var_t3 = per year SALARY list (split by comma)
+
+    Waiver Extension:
+        team2 = owner
+        var_d1 = total cost
+        var_d2 = signing bonus
+        var_d3 = salary
+        var_t1 = status (pending)
+        var_t2 = status (confirmed)
+
+    Franchise Tag:
+        team2 = owner
+        var_d1 = total cost, auction start
+        var_t1 = status (pending)
+        var_t2 = status (confirmed)
+
+    Transition Tag:
+        team2 = owner
+        var_d1 = total cost
+        var_d2 = signing bonus
+        var_d3 = salary
+        var_t1 = status (pending)
+        var_t2 = status (confirmed)
+
+    Extension Submitted:
+        team2 = owner
+        var_d1 = extension cost per year
+        var_d2 = signing bonus per year
+        var_i1 = num_years
+        var_t1 = per year SALARY list (split by comma)
+
+    Expansion Draft Pick:
+        team1 = old team
+        team2 = new team
+        var_i1 = pick used
+    '''
+
+    def __str__(self):
+        return_string = self.player + ' - ' + self.transaction_type + ' - ' + str(self.date)
+        return return_string
+
+class Alert(models.Model):
+    user = models.CharField(max_length=20)
+    alert_type = models.CharField(max_length=40)
+    var_d1 = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    var_d2 = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    var_d3 = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    var_i1 = models.IntegerField(null=True, blank=True)
+    var_i2 = models.IntegerField(null=True, blank=True)
+    var_t1 = models.TextField(null=True, blank=True)
+    var_t2 = models.TextField(null=True, blank=True)
+    var_t3 = models.TextField(null=True, blank=True)
+    date = models.DateTimeField()
+
+    def __str__(self):
+        return_string = str(self.date) + ' - ' + self.user + ' - ' + self.alert_type
+        return return_string
+
+class AlertSetting(models.Model):
+    user = models.CharField(max_length=20)
+    daily_emails = models.IntegerField(default=0)
+    daily_emails_time = models.TimeField(default='06:00')
+    weekly_emails = models.IntegerField(default=0)
+    weekly_emails_day = models.CharField(max_length=20, default='Monday')
+    weekly_emails_time = models.TimeField(default='06:00')
+    blank_emails = models.IntegerField(default=0)
+    instant_alerts = models.CommaSeparatedIntegerField(max_length=50)
+
+    def __str__(self):
+        return self.user
+
+class ADP(models.Model):
+    rank = models.IntegerField(default=0)
+    position = models.CharField(max_length=3)
+    player = models.CharField(max_length=60)
+
+    def __str__(self):
+        return self.player
+
+class Performance_Yr1(models.Model):
+    rank = models.IntegerField(default=0)
+    position = models.CharField(max_length=3)
+    player = models.CharField(max_length=60)
+    points = models.FloatField(default=0)
+
+    def __str__(self):
+        return self.player
+
+class Performance_Yr2(models.Model):
+    rank = models.IntegerField(default=0)
+    position = models.CharField(max_length=3)
+    player = models.CharField(max_length=60)
+    points = models.FloatField(default=0)
+
+    def __str__(self):
+        return self.player

@@ -1,0 +1,155 @@
+{% extends 'team.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/team_manage_alerts.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="third_tab_area">
+        {% if request.path == '/team/alerts' %}
+            <a href="/team/alerts" class="third_tab_button_team" id="team_alerts" style="background-color: #2d99d4; color: white">Alerts</a>
+        {% else %}
+            <a href="/team/alerts" class="third_tab_button_team" id="team_alerts">Alerts</a>
+        {% endif %}
+
+        {% if request.path == '/team/manage_alerts' %}
+            <a href="/team/manage_alerts" class="third_tab_button_team" id="team_alerts" style="background-color: #2d99d4; color: white">Manage Alerts</a>
+        {% else %}
+            <a href="/team/manage_alerts" class="third_tab_button_team" id="team_alerts">Manage Alerts</a>
+        {% endif %}
+    </div>
+
+    <div id="display_area">
+        <div id="periodic_alerts_area">
+            <h4 style="display: inline-block"><span style="text-decoration: underline">Periodic Alerts</span>&nbsp&nbsp</h4><i class="glyphicon glyphicon-question-sign" style="padding-right: 8px" title="A daily email will contain all alerts you've accumulated for the previous 24 hour period. A weekly email will contain all alerts for the previous 7 day period."></i>
+            <button style="display: inline-block; float: right" type="button" id="send_test_email">Send Test Email</button>
+            <div>
+                <table style="table-layout: fixed; width: 60%; display: inline-block">
+                    <tr style="height: 40px;">
+                        <td style="width: 25%; text-align: right"><input type="checkbox" id="daily_email_checkbox"/></td>
+                        <td style="width: 25%; text-align: left">&nbsp&nbsp Daily</td>
+                        <td style="width: 10%"></td>
+                        <td style="width: 10%; text-align: right"><input type="checkbox" id="weekly_email_checkbox"/></td>
+                        <td style="width: 10%; text-align: left">&nbsp&nbsp Weekly</td>
+                        <td style="width: 10%"></td>
+                        <td style="width: 10%"></td>
+                    </tr>
+                    <tr style="height: 40px;">
+                        <td style="width: 25%; text-align: right">Time&nbsp&nbsp </td>
+                        <td style="width: 25%; text-align: left">
+                            <select id="daily_email_time_select">
+                                <option>4:00 am</option>
+                                <option>6:00 am</option>
+                                <option>7:00 am</option>
+                                <option>8:00 am</option>
+                                <option>9:00 am</option>
+                                <option>10:00 am</option>
+                                <option>11:00 am</option>
+                                <option>12:00 pm</option>
+                                <option>1:00 pm</option>
+                                <option>2:00 pm</option>
+                                <option>3:00 pm</option>
+                                <option>4:00 pm</option>
+                                <option>5:00 pm</option>
+                                <option>6:00 pm</option>
+                                <option>7:00 pm</option>
+                                <option>8:00 pm</option>
+                                <option>9:00 pm</option>
+                                <option>10:00 pm</option>
+                                <option>11:00 pm</option>
+                                <option>12:00 am</option>
+                            </select>
+                        </td>
+                        <td style="width: 10%"></td>
+                        <td style="width: 10%; text-align: right">Day&nbsp&nbsp </td>
+                        <td style="width: 10%; text-align: left">
+                            <select id="weekly_email_day_select">
+                                <option>Monday</option>
+                                <option>Tuesday</option>
+                                <option>Wednesday</option>
+                                <option>Thursday</option>
+                                <option>Friday</option>
+                                <option>Saturday</option>
+                                <option>Sunday</option>
+                            </select>
+                        </td>
+                        <td style="width: 10%; text-align: right">Time&nbsp&nbsp </td>
+                        <td style="width: 10%; text-align: left">
+                            <select id="weekly_email_time_select">
+                                <option>4:00 am</option>
+                                <option>6:00 am</option>
+                                <option>7:00 am</option>
+                                <option>8:00 am</option>
+                                <option>9:00 am</option>
+                                <option>10:00 am</option>
+                                <option>11:00 am</option>
+                                <option>12:00 pm</option>
+                                <option>1:00 pm</option>
+                                <option>2:00 pm</option>
+                                <option>3:00 pm</option>
+                                <option>4:00 pm</option>
+                                <option>5:00 pm</option>
+                                <option>6:00 pm</option>
+                                <option>7:00 pm</option>
+                                <option>8:00 pm</option>
+                                <option>9:00 pm</option>
+                                <option>10:00 pm</option>
+                                <option>11:00 pm</option>
+                                <option>12:00 am</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <table style="table-layout: fixed; width: 50%">
+                    <tr style="height: 40px;">
+                        <td style="width: 10%; text-align: right"><input type="checkbox" id="email_send_blank_checkbox"/></td>
+                        <td style="width: 90%; text-align: left">&nbsp&nbsp Send email even if there are no alerts</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div id="instant_alerts_area">
+            <h4 style="display: inline-block"><span style="text-decoration: underline">Instant Alerts</span>&nbsp&nbsp</h4><i class="glyphicon glyphicon-question-sign" style="padding-right: 8px" title="You will receive an email the instant an event happens, if the corresponding box below is checked."></i>
+            <br><br>
+            <table style="table-layout: fixed; width: 80%;">
+                <tr style="height: 50px;">
+                    <th style="width: 20%; text-align: left">Auction - Outbid</th>
+                    <td style="width: 55%; text-align: left; font-size: smaller">You will receive an alert if you are outbid on any auction for which you are currently the high bidder.</td>
+                    <td style="width: 15%; text-align: right"><input type="radio" name="instant_auction-outbid_checkbox" value="yes"> &nbsp&nbspYES, send alert</td>
+                    <td style="width: 10%; text-align: right"><input type="radio" name="instant_auction-outbid_checkbox" value="no"> &nbsp&nbspNo</td>
+                </tr>
+                <tr style="height: 50px;">
+                    <th style="width: 20%; text-align: left">Auction - New Auction</th>
+                    <td style="width: 55%; text-align: left; font-size: smaller">You will receive an alert whenever an auction is started by another owner. You will not receive an alert for auctions you start yourself.</td>
+                    <td style="width: 15%; text-align: right"><input type="radio" name="instant_auction-new_checkbox" value="yes"> &nbsp&nbspYES, send alert</td>
+                    <td style="width: 10%; text-align: right"><input type="radio" name="instant_auction-new_checkbox" value="no"> &nbsp&nbspNo</td>
+                </tr>
+                <tr style="height: 50px;">
+                    <th style="width: 20%; text-align: left">Auction - Won</th>
+                    <td style="width: 55%; text-align: left; font-size: smaller">You will receive an alert once you have won an auction. You will have 48 hours from the end of the auction to set the contract structure of your new signing.</td>
+                    <td style="width: 15%; text-align: right"><input type="radio" name="instant_auction-won_checkbox" value="yes"> &nbsp&nbspYES, send alert</td>
+                    <td style="width: 10%; text-align: right"><input type="radio" name="instant_auction-won_checkbox" value="no"> &nbsp&nbspNo</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div id="vw_1">
+        <table>
+            <tr>
+                <td id="vw_1-1">{{ alert_settings.daily_emails }}</td>
+                <td id="vw_1-2">{{ alert_settings.daily_emails_time }}</td>
+                <td id="vw_1-3">{{ alert_settings.weekly_emails }}</td>
+                <td id="vw_1-4">{{ alert_settings.weekly_emails_day }}</td>
+                <td id="vw_1-5">{{ alert_settings.weekly_emails_time }}</td>
+                <td id="vw_1-6">{{ alert_settings.blank_emails }}</td>
+                <td id="vw_1-7">{{ alert_settings.instant_alerts }}</td>
+            </tr>
+        </table>
+    </div>
+
+{% endblock %}

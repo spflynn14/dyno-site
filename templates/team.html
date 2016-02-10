@@ -32,12 +32,18 @@
                     {% if request.user.is_staff %}
                         <li><a href="/admin">Admin</a></li>
                         <li><a href="/batch">Batch</a></li>
-                        <li><a href="/settings">Settings</a></li>
                         <li class="divider"></li>
-                    {% else %}
+                        <li><a href="/commish_office"><i class="glyphicon glyphicon-briefcase" style="padding-right: 8px"></i>Commish's Office</a></li>
+                        <li class="divider"></li>
                     {% endif %}
-                    <li><a href="/team/team_settings">Team Settings</a></li>
-                    <li class="divider"></li>
+                    {% if user.is_authenticated %}
+                        li><a href="/team/tags">Waiver Extension and Tags</a></li>
+                        <li class="divider"></li>
+                        <li><a href="/team/tags">Extensions</a></li>
+                        <li><a href="/team/tags">Pending Transactions</a></li>
+                        <li><a href="/team/tags">Manage Alerts</a></li>
+                        <li class="divider"></li>
+                    {% endif %}
                     <li><a href="/feature_list">Feature List & Changelog</a></li>
                     <li class="divider"></li>
                     <li><a href="/bug_tracking">Bug Tracking</a></li>
@@ -76,10 +82,22 @@
                             <a href="/team/cap_situation" class="second_tab_button_team" id="cap_situation_by_year">Cap Situation By Year</a>
                         {% endif %}
 
-                        {% if request.path == '/team/release_players' %}
-                            <a href="/team/release_players" class="second_tab_button_team" id="team_level_cuts" style="background-color: #2d99d4; color: white">Release Players</a>
+                        {% if request.path == '/team/pending_transactions' %}
+                            <a href="/team/pending_transactions" class="second_tab_button_team" id="team_transactions" style="background-color: #2d99d4; color: white">Transactions</a>
+                        {% elif request.path == '/team/release_players' %}
+                            <a href="/team/pending_transactions" class="second_tab_button_team" id="team_transactions" style="background-color: #2d99d4; color: white">Transactions</a>
+                        {% elif request.path == '/team/transactions' %}
+                            <a href="/team/pending_transactions" class="second_tab_button_team" id="team_transactions" style="background-color: #2d99d4; color: white">Transactions</a>
                         {% else %}
-                            <a href="/team/release_players" class="second_tab_button_team" id="team_level_cuts">Release Players</a>
+                            <a href="/team/pending_transactions" class="second_tab_button_team" id="team_transactions">Transactions</a>
+                        {% endif %}
+
+                        {% if request.path == '/team/alerts' %}
+                            <a href="/team/alerts" class="second_tab_button_team" id="team_alerts" style="background-color: #2d99d4; color: white">Alerts</a>
+                        {% elif request.path == '/team/manage_alerts' %}
+                            <a href="/team/alerts" class="second_tab_button_team" id="team_alerts" style="background-color: #2d99d4; color: white">Alerts</a>
+                        {% else %}
+                            <a href="/team/alerts" class="second_tab_button_team" id="team_alerts">Alerts</a>
                         {% endif %}
 
                         {% if request.path == '/team/team_settings' %}

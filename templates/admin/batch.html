@@ -65,6 +65,38 @@
                          {% csrf_token %}
                          Click To Reset Available Roles &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="submit" value="Submit">
                      </form>
+
+                     <form method="post" action="/create_team_variable">
+                         {% csrf_token %}
+                         Create Team Variable: <textarea rows="1" cols="60" maxlength='20' name="team_variable_text"></textarea><br>
+                         <input type="submit" value="Submit">
+                     </form>
+                     <br><br>
+                     <form method="post" action="/change_team_name">
+                         {% csrf_token %}
+                         Change Team Name: <br>
+                         From: <input type="text" name="change_team_before"><br>
+                         To: <input type="text" name="change_team_after"><br>
+                         <input type="submit" value="Submit">
+                     </form>
+                     <br><br>
+                     <form method="post" action="/process_adp">
+                         {% csrf_token %}
+                         ADP Batch: <textarea rows="8" cols="120" name="adp_text"></textarea><br>
+                         <input type="submit" value="Submit">
+                     </form>
+                     <br><br>
+                     <form method="post" action="/process_performance_yr1">
+                         {% csrf_token %}
+                         Performance Year 1 Batch: <textarea rows="8" cols="120" name="perf_text"></textarea><br>
+                         <input type="submit" value="Submit">
+                     </form>
+                     <br><br>
+                     <form method="post" action="/process_performance_yr2">
+                         {% csrf_token %}
+                         Performance Year 2 Batch: <textarea rows="8" cols="120" name="perf_text"></textarea><br>
+                         <input type="submit" value="Submit">
+                     </form>
                  </div>
 
             </div>

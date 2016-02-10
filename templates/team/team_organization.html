@@ -4,6 +4,7 @@
 
 {% block head %}
     <script src="{% static 'js/team_organization.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.tablesorter.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -52,9 +53,9 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th width="18%" >Role</th>
-                                    <th width="7%" style="text-align: center">Pos</th>
-                                    <th width="33%">Name</th>
+                                    <th width="18%" style="padding-left: 4px;">Role</th>
+                                    <th width="8%" style="text-align: center">Pos</th>
+                                    <th width="32%" style="padding-left: 4px;">Name</th>
                                     <th width="12%" style="text-align: center">Total Value</th>
                                     <th width="7%" style="text-align: center">Yrs Left</th>
                                     <th width="12%" style="text-align: center">Avg Yrly $$</th>
@@ -76,9 +77,9 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th width="18%" >Role</th>
-                                    <th width="7%" style="text-align: center">Pos</th>
-                                    <th width="33%">Name</th>
+                                    <th width="18%" style="padding-left: 4px;">Role</th>
+                                    <th width="8%" style="text-align: center">Pos</th>
+                                    <th width="32%" style="padding-left: 4px;">Name</th>
                                     <th width="12%" style="text-align: center">Total Value</th>
                                     <th width="7%" style="text-align: center">Yrs Left</th>
                                     <th width="12%" style="text-align: center">Avg Yrly $$</th>
@@ -105,9 +106,9 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th width="18%" >Role</th>
-                                    <th width="7%" style="text-align: center">Pos</th>
-                                    <th width="33%">Name</th>
+                                    <th width="18%" style="padding-left: 4px;">Role</th>
+                                    <th width="8%" style="text-align: center">Pos</th>
+                                    <th width="32%" style="padding-left: 4px;">Name</th>
                                     <th width="12%" style="text-align: center">Total Value</th>
                                     <th width="7%" style="text-align: center">Yrs Left</th>
                                     <th width="12%" style="text-align: center">Avg Yrly $$</th>
@@ -129,9 +130,9 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th width="18%" >Role</th>
-                                    <th width="7%" style="text-align: center">Pos</th>
-                                    <th width="33%">Name</th>
+                                    <th width="18%" style="padding-left: 4px;">Role</th>
+                                    <th width="8%" style="text-align: center">Pos</th>
+                                    <th width="32%" style="padding-left: 4px;">Name</th>
                                     <th width="12%" style="text-align: center">Total Value</th>
                                     <th width="7%" style="text-align: center">Yrs Left</th>
                                     <th width="12%" style="text-align: center">Avg Yrly $$</th>
@@ -175,6 +176,8 @@
                     <h5 style="font-weight: bold; text-decoration: underline">Cap Space Available</h5>
                     <h4 style="padding-top: 10px; color: green;">${{ cap_space|floatformat:2 }}</h4>
                 </div>
+                <br><br>
+                <p style="font-size: small">Players under contract: &nbsp{{ player_list|length }}</p>
             </div>
         </div>
     </div>
@@ -385,6 +388,8 @@
                     <h5 style="font-weight: bold; text-decoration: underline">Cap Space Available</h5>
                     <h4 style="padding-top: 10px; color: green;">${{ cap_space|floatformat:2 }}</h4>
                 </div>
+                <br><br>
+                <p style="font-size: small">Players under contract: &nbsp{{ player_list|length }}</p>
             </div>
         </div>
     </div>

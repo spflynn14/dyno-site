@@ -1,15 +1,119 @@
 {% extends 'base.html' %}
 
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/auction.js' %}"></script>
+{% endblock %}
+
 {% block content %}
+    {% csrf_token %}
     <div class="tab_area" id="second_tab_area">
 
     </div>
 
-    <div class="tab_area" id="third_tab_area">
+    <div id="display_area">
+        <div id="start_new_auction_area">
+            <h4 id="show_hide_new_auction">Click Here To Start A New Auction</h4><br>
+            <div id="new_auction_interactive">
+                <table style="table-layout: fixed; width: 70%">
+                    <thead>
+                        <tr>
+                            <td style="width: 40%;">Select Player</td>
+                            <td style="width: 40%;">Enter Proxy Bid ($0.25 increments)</td>
+                            <td style="width: 20%;"></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <select id="new_auction_player_select">
+                                    {% for x in new_auction_player_list %}
+                                        <option>{{ x }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td>
+                                <input id='new_auction_proxy_bid' type="text" />
+                            </td>
+                            <td>
+                                <button id='add_new_auction_button' style="display: inline-block" type="button">Begin Auction</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
+        </div>
+
+        <div id="beware_multiple_names_area">
+            <p>Be aware of players sharing the same name</p>
+            <p style='font-size: smaller' id="show_hide_dup_players">(Click here to show a list of these players)</p>
+            <div id="dup_players_list">
+                <table style="table-layout: fixed; width: 100%;">
+                    <tbody>
+                        <tr>
+                            <td style='font-size: smaller;width: 50%;'>Griffin, Ryan</td>
+                            <td style='font-size: smaller;width: 50%;'>Miller, Zach</td>
+                        </tr>
+                        <tr>
+                            <td style='font-size: smaller'>Harper, Chris</td>
+                            <td style='font-size: smaller'>Johnson, David</td>
+                        </tr>
+                        <tr>
+                            <td style='font-size: smaller'>Smith, Alex</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="active_auctions_table_area">
+            <h5>Be aware of your roster. If you win an auction with no available roster spots, you will have to drop a player. If you win an auction you WILL have to roster the player you won.</h5>
+            <div class="active_auctions_datagrid" style="height: 88%;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="20%" >Player</th>
+                            <th width="15%">High Bidder</th>
+                            <th width="10%" style="text-align: center">High Bid</th>
+                            <th width="30%" style="text-align: center">Auction Time Remaining</th>
+                            <th width="15%" style="text-align: center">Your Proxy Bid<br><span style="font-size: x-small">(if you are high bidder)</span></th>
+                            <th width="10%" style="text-align: center">Place Bid</th>
+                        </tr>
+                    </thead>
+                    <tbody id="active_auctions_body">
+                        {% for x in auctions %}
+                            <tr>
+                                <td id="auction_player{{ forloop.counter0 }}">{{ x.player }}</td>
+                                <td>{{ x.high_bidder }}</td>
+                                <td style="text-align: center">${{ x.high_bid }}</td>
+                                <td id="auction_time_left{{ forloop.counter0 }}" style="text-align: center">{{ x.clock_reset.isoformat }}</td>
+                                {% if x.high_bidder == current_team %}
+                                    <td style="text-align: center">${{ x.high_bidder_proxy_bid }}</td>
+                                {% else %}
+                                    <td></td>
+                                {% endif %}
+                                <td style="text-align: center">
+                                    <input type="text" class="auction_input_textbox" id="bid_input_text{{ forloop.counter0 }}" size="6"/>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div id="submit_auction_bids_div">
+                <button id='submit_auction_bids_button' type="button" style="float: left; margin-left: 10%;margin-top: 82%;display: inline-block">Submit Bids</button>
+            </div>
+            <div id="auction_page_bottom_area">
+                <h5>We use a proxy bid system (eBay style bidding). You set the highest amount you are willing to bid, and the system increments by $0.25 with each new bid made by another owner. If, after you enter your proxy bid, the high bid matches your proxy bid, but another owner is the high bidder, this means your bid did not exceed the other owner's proxy bid. If you wish to win the auction, you must place a higher bid.</h5>
+            </div>
+        </div>
     </div>
 
-    <div id="display_area">
-        Next on my to-do list
+    <div id="vw_1">
+        {% for x in auctions %}
+            <p>{{ x.clock_timeout_minutes }}</p>
+        {% endfor %}
     </div>
 {% endblock %}

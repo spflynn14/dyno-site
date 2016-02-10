@@ -51,35 +51,35 @@
                 <div class='hidden_divs' style="width: 20%; font-weight: bold; display: inline-block; text-align: center">Signing Bonus</div>
             </div>
             <div class='display_div' id="line_4">
-                <div class='hidden_headers' id="yr1_header" style="width: 15%; text-align: right;">2015</div>
+                <div class='hidden_headers' id="yr1_header" style="width: 15%; text-align: right;">{{ year_list.0 }}</div>
                 <div style="width: 5%; display: inline-block"></div>
                 <div class='line_text' id="yr1_total_text"></div>
                 <div class='line_text' id="yr1_salary_text"></div>
                 <div class='line_text' id="yr1_sb_text"></div>
             </div>
             <div class='display_div' id="line_5">
-                <div class='hidden_headers' id="yr2_header" style="width: 15%; text-align: right;">2016</div>
+                <div class='hidden_headers' id="yr2_header" style="width: 15%; text-align: right;">{{ year_list.1 }}</div>
                 <div style="width: 5%; display: inline-block"></div>
                 <div class='line_text' id="yr2_total_text"></div>
                 <div class='line_text' id="yr2_salary_text"></div>
                 <div class='line_text' id="yr2_sb_text"></div>
             </div>
             <div class='display_div' id="line_6">
-                <div class='hidden_headers' id="yr3_header" style="width: 15%; text-align: right;">2017</div>
+                <div class='hidden_headers' id="yr3_header" style="width: 15%; text-align: right;">{{ year_list.2 }}</div>
                 <div style="width: 5%; display: inline-block"></div>
                 <div class='line_text' id="yr3_total_text"></div>
                 <div class='line_text' id="yr3_salary_text"></div>
                 <div class='line_text' id="yr3_sb_text"></div>
             </div>
             <div class='display_div' id="line_7">
-                <div class='hidden_headers' id="yr4_header" style="width: 15%; text-align: right;">2018</div>
+                <div class='hidden_headers' id="yr4_header" style="width: 15%; text-align: right;">{{ year_list.3 }}</div>
                 <div style="width: 5%; display: inline-block"></div>
                 <div class='line_text' id="yr4_total_text"></div>
                 <div class='line_text' id="yr4_salary_text"></div>
                 <div class='line_text' id="yr4_sb_text"></div>
             </div>
             <div class='display_div' id="line_8">
-                <div class='hidden_headers' id="yr5_header" style="width: 15%; text-align: right;">2019</div>
+                <div class='hidden_headers' id="yr5_header" style="width: 15%; text-align: right;">{{ year_list.4 }}</div>
                 <div style="width: 5%; display: inline-block"></div>
                 <div class='line_text' id="yr5_total_text"></div>
                 <div class='line_text' id="yr5_salary_text"></div>
@@ -132,7 +132,7 @@
 
                             <!-- ROW 1 -->
                             <tr>
-                                <td class='player_interaction_cells_restructure' style="font-weight: bold; width: 15%;">2015</td>
+                                <td class='player_interaction_cells_restructure' style="font-weight: bold; width: 15%;">{{ year_list.0 }}</td>
                                 <td class='player_interaction_cells_restructure' style="width: 40%">
                                     <div id="slider_1" style="margin: auto"></div>
                                 </td>
@@ -149,7 +149,7 @@
 
                             <!-- ROW 2 -->
                             <tr>
-                                <td class='player_interaction_cells_restructure' style="font-weight: bold; width: 15%;">2016</td>
+                                <td class='player_interaction_cells_restructure' style="font-weight: bold; width: 15%;">{{ year_list.1 }}</td>
                                 <td class='player_interaction_cells_restructure' style="width: 40%">
                                     <div id="slider_2" style="margin: auto"></div>
                                 </td>
@@ -166,7 +166,7 @@
 
                             <!-- ROW 3 -->
                             <tr>
-                                <td class='player_interaction_cells_restructure' style="font-weight: bold; width: 15%;">2017</td>
+                                <td class='player_interaction_cells_restructure' style="font-weight: bold; width: 15%;">{{ year_list.2 }}</td>
                                 <td class='player_interaction_cells_restructure' style="width: 40%">
                                     <div id="slider_3" style="margin: auto"></div>
                                 </td>
@@ -183,7 +183,7 @@
 
                             <!-- ROW 4 -->
                             <tr>
-                                <td class='player_interaction_cells_restructure' style="font-weight: bold; width: 15%;">2018</td>
+                                <td class='player_interaction_cells_restructure' style="font-weight: bold; width: 15%;">{{ year_list.3 }}</td>
                                 <td class='player_interaction_cells_restructure' style="width: 40%">
                                     <div id="slider_4" style="margin: auto"></div>
                                 </td>
@@ -200,7 +200,7 @@
 
                             <!-- ROW 5 -->
                             <tr>
-                                <td class='player_interaction_cells_restructure' style="font-weight: bold; width: 15%;">2019</td>
+                                <td class='player_interaction_cells_restructure' style="font-weight: bold; width: 15%;">{{ year_list.4 }}</td>
                                 <td class='player_interaction_cells_restructure' style="width: 40%">
                                     <div id="slider_5" style="margin: auto"></div>
                                 </td>
@@ -260,4 +260,17 @@
         </div>
 
     </div>
+
+    <div id="vw_1" hidden>
+        {% for x in team_list %}
+            <p>{{ x }}</p>
+        {% endfor %}
+    </div>
+
+    <div id="vw_2" hidden>
+        {% for x in year_list %}
+            <p>{{ x }}</p>
+        {% endfor %}
+    </div>
+
 {% endblock %}

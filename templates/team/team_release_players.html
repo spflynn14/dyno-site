@@ -9,7 +9,23 @@
 {% block content %}
     {% csrf_token %}
     <div class="tab_area" id="third_tab_area">
+        {% if request.path == '/team/pending_transactions' %}
+            <a href="/team/pending_transactions" class="third_tab_button_team" id="team_pending_transactions" style="background-color: #2d99d4; color: white">Pending Transactions</a>
+        {% else %}
+            <a href="/team/pending_transactions" class="third_tab_button_team" id="team_pending_transactions">Pending Transactions</a>
+        {% endif %}
 
+        {% if request.path == '/team/release_players' %}
+            <a href="/team/release_players" class="third_tab_button_team" id="team_level_cuts" style="background-color: #2d99d4; color: white">Release Players</a>
+        {% else %}
+            <a href="/team/release_players" class="third_tab_button_team" id="team_level_cuts">Release Players</a>
+        {% endif %}
+
+        {% if request.path == '/team/transactions' %}
+            <a href="/team/transactions" class="third_tab_button_team" id="team_transactions" style="background-color: #2d99d4; color: white">Transaction Log</a>
+        {% else %}
+            <a href="/team/transactions" class="third_tab_button_team" id="team_transactions">Transaction Log</a>
+        {% endif %}
     </div>
 
     <div id="display_area">
@@ -23,11 +39,11 @@
                             <th width="6%" style="text-align: center">Pos</th>
                             <th width="17%">Name</th>
                             <th width="8%" style="text-align: center">Contract Type</th>
-                            <th width="13%" style="text-align: center">2015 Salary<br><span style="color: #00e100">Signing Bonus</span></th>
-                            <th width="13%" style="text-align: center">2016 Salary<br><span style="color: #00e100">Signing Bonus</span></th>
-                            <th width="13%" style="text-align: center">2017 Salary<br><span style="color: #00e100">Signing Bonus</span></th>
-                            <th width="13%" style="text-align: center">2018 Salary<br><span style="color: #00e100">Signing Bonus</span></th>
-                            <th width="13%" style="text-align: center">2019 Salary<br><span style="color: #00e100">Signing Bonus</span></th>
+                            <th width="13%" style="text-align: center">{{ years_list.0 }} Salary<br><span style="color: #00e100">Signing Bonus</span></th>
+                            <th width="13%" style="text-align: center">{{ years_list.1 }} Salary<br><span style="color: #00e100">Signing Bonus</span></th>
+                            <th width="13%" style="text-align: center">{{ years_list.2 }} Salary<br><span style="color: #00e100">Signing Bonus</span></th>
+                            <th width="13%" style="text-align: center">{{ years_list.3 }} Salary<br><span style="color: #00e100">Signing Bonus</span></th>
+                            <th width="13%" style="text-align: center">{{ years_list.4 }} Salary<br><span style="color: #00e100">Signing Bonus</span></th>
                         </tr>
                     </thead>
                     <tbody id="team_release_body">
@@ -79,31 +95,31 @@
                     </thead>
                     <tbody id="team_release_right_table_1">
                         <tr>
-                            <td class='team_release_right_cells' style="font-weight: bold">2015</td>
+                            <td class='team_release_right_cells' style="font-weight: bold">{{ years_list.0 }}</td>
                             <td class='team_release_right_cells' id='trr1_1-1'></td>
                             <td class='team_release_right_cells' id='trr1_1-2' style="color: red"></td>
                             <td class='team_release_right_cells' id='trr1_1-3' style="color: green"></td>
                         </tr>
                         <tr>
-                            <td class='team_release_right_cells' style="font-weight: bold">2016</td>
+                            <td class='team_release_right_cells' style="font-weight: bold">{{ years_list.1 }}</td>
                             <td class='team_release_right_cells' id='trr1_2-1'></td>
                             <td class='team_release_right_cells' id='trr1_2-2' style="color: red"></td>
                             <td class='team_release_right_cells' id='trr1_2-3' style="color: green"></td>
                         </tr>
                         <tr>
-                            <td class='team_release_right_cells' style="font-weight: bold">2017</td>
+                            <td class='team_release_right_cells' style="font-weight: bold">{{ years_list.2 }}</td>
                             <td class='team_release_right_cells' id='trr1_3-1'></td>
                             <td class='team_release_right_cells' id='trr1_3-2' style="color: red"></td>
                             <td class='team_release_right_cells' id='trr1_3-3' style="color: green"></td>
                         </tr>
                         <tr>
-                            <td class='team_release_right_cells' style="font-weight: bold">2018</td>
+                            <td class='team_release_right_cells' style="font-weight: bold">{{ years_list.3 }}</td>
                             <td class='team_release_right_cells' id='trr1_4-1'></td>
                             <td class='team_release_right_cells' id='trr1_4-2' style="color: red"></td>
                             <td class='team_release_right_cells' id='trr1_4-3' style="color: green"></td>
                         </tr>
                         <tr>
-                            <td class='team_release_right_cells' style="font-weight: bold">2019</td>
+                            <td class='team_release_right_cells' style="font-weight: bold">{{ years_list.4 }}</td>
                             <td class='team_release_right_cells' id='trr1_5-1'></td>
                             <td class='team_release_right_cells' id='trr1_5-2' style="color: red"></td>
                             <td class='team_release_right_cells' id='trr1_5-3' style="color: green"></td>
@@ -126,31 +142,31 @@
                     </thead>
                     <tbody id="team_release_right_table_2">
                         <tr>
-                            <td class='team_release_right_cells' style="font-weight: bold">2015</td>
+                            <td class='team_release_right_cells' style="font-weight: bold">{{ years_list.0 }}</td>
                             <td class='team_release_right_cells' id='trr2_1-1'></td>
                             <td class='team_release_right_cells' id='trr2_1-2' style="color: red"></td>
                             <td class='team_release_right_cells' id='trr2_1-3' style="color: green"></td>
                         </tr>
                         <tr>
-                            <td class='team_release_right_cells' style="font-weight: bold">2016</td>
+                            <td class='team_release_right_cells' style="font-weight: bold">{{ years_list.1 }}</td>
                             <td class='team_release_right_cells' id='trr2_2-1'></td>
                             <td class='team_release_right_cells' id='trr2_2-2' style="color: red"></td>
                             <td class='team_release_right_cells' id='trr2_2-3' style="color: green"></td>
                         </tr>
                         <tr>
-                            <td class='team_release_right_cells' style="font-weight: bold">2017</td>
+                            <td class='team_release_right_cells' style="font-weight: bold">{{ years_list.2 }}</td>
                             <td class='team_release_right_cells' id='trr2_3-1'></td>
                             <td class='team_release_right_cells' id='trr2_3-2' style="color: red"></td>
                             <td class='team_release_right_cells' id='trr2_3-3' style="color: green"></td>
                         </tr>
                         <tr>
-                            <td class='team_release_right_cells' style="font-weight: bold">2018</td>
+                            <td class='team_release_right_cells' style="font-weight: bold">{{ years_list.3 }}</td>
                             <td class='team_release_right_cells' id='trr2_4-1'></td>
                             <td class='team_release_right_cells' id='trr2_4-2' style="color: red"></td>
                             <td class='team_release_right_cells' id='trr2_4-3' style="color: green"></td>
                         </tr>
                         <tr>
-                            <td class='team_release_right_cells' style="font-weight: bold">2019</td>
+                            <td class='team_release_right_cells' style="font-weight: bold">{{ years_list.4 }}</td>
                             <td class='team_release_right_cells' id='trr2_5-1'></td>
                             <td class='team_release_right_cells' id='trr2_5-2' style="color: red"></td>
                             <td class='team_release_right_cells' id='trr2_5-3' style="color: green"></td>

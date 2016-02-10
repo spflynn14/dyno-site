@@ -32,12 +32,18 @@
                     {% if request.user.is_staff %}
                         <li><a href="/admin">Admin</a></li>
                         <li><a href="/batch">Batch</a></li>
-                        <li><a href="/settings">Settings</a></li>
                         <li class="divider"></li>
-                    {% else %}
+                        <li><a href="/commish_office"><i class="glyphicon glyphicon-briefcase" style="padding-right: 8px"></i>Commish's Office</a></li>
+                        <li class="divider"></li>
                     {% endif %}
-                    <li><a href="/team/team_settings">Team Settings</a></li>
-                    <li class="divider"></li>
+                    {% if user.is_authenticated %}
+                        li><a href="/team/tags">Waiver Extension and Tags</a></li>
+                        <li class="divider"></li>
+                        <li><a href="/team/tags">Extensions</a></li>
+                        <li><a href="/team/tags">Pending Transactions</a></li>
+                        <li><a href="/team/tags">Manage Alerts</a></li>
+                        <li class="divider"></li>
+                    {% endif %}
                     <li><a href="/feature_list">Feature List & Changelog</a></li>
                     <li class="divider"></li>
                     <li><a href="/bug_tracking">Bug Tracking</a></li>
@@ -75,6 +81,10 @@
                     {% if user.is_authenticated %}
 
                         {% if request.path == '/league/extensions' %}
+                            <a href="/league/extensions" class="second_tab_button_league" id="extensions_button" style="background-color: #2d99d4; color: white">Extensions</a>
+                        {% elif request.path == '/league/adp_info' %}
+                            <a href="/league/extensions" class="second_tab_button_league" id="extensions_button" style="background-color: #2d99d4; color: white">Extensions</a>
+                        {% elif request.path == '/league/performance_info' %}
                             <a href="/league/extensions" class="second_tab_button_league" id="extensions_button" style="background-color: #2d99d4; color: white">Extensions</a>
                         {% else %}
                             <a href="/league/extensions" class="second_tab_button_league" id="extensions_button">Extensions</a>

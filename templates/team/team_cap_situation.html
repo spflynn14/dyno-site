@@ -4,20 +4,25 @@
 
 {% block head %}
     <script src="{% static 'js/team_cap_situation.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.tablesorter.js' %}"></script>
 {% endblock %}
 
 {% block content %}
     {% csrf_token %}
     <div class="tab_area" id="third_tab_area">
-        <div class="third_tab_button_team" id="yr1_cap_situation">2015</div>
-        <div class="third_tab_button_team" id="yr2_cap_situation">2016</div>
-        <div class="third_tab_button_team" id="yr3_cap_situation">2017</div>
-        <div class="third_tab_button_team" id="yr4_cap_situation">2018</div>
-        <div class="third_tab_button_team" id="yr5_cap_situation">2019</div>
+        <div class="third_tab_button_team" id="yr1_cap_situation">{{ year_list.0 }}</div>
+        <div class="third_tab_button_team" id="yr2_cap_situation">{{ year_list.1 }}</div>
+        <div class="third_tab_button_team" id="yr3_cap_situation">{{ year_list.2 }}</div>
+        <div class="third_tab_button_team" id="yr4_cap_situation">{{ year_list.3 }}</div>
+        <div class="third_tab_button_team" id="yr5_cap_situation">{{ year_list.4 }}</div>
     </div>
 
     <div id="display_area" style="padding: 1% 15% 0px 14%">
         <div id="team_info_div">
+            <div id="num_players_cap_sit_div">
+                <h6 style="font-weight: bold">Players</h6>
+                <p style="font-size: small" id="num_player_text"></p>
+            </div>
             <div id="total_cost_cap_sit_div">
                 <h6 style="font-weight: bold">Total Player Cost</h6>
                 <p style="font-size: small" id="total_cost_text"></p>
@@ -53,7 +58,7 @@
         </div>
     </div>
 
-    <div id="vw_1">
+    <div id="vw_1" hidden>
         {% for x in team_json %}
             <table>
                 <tr>
@@ -106,7 +111,7 @@
         {% endfor %}
     </div>
 
-    <div id="vw_2">
+    <div id="vw_2" hidden>
         {% for x in avail_roles %}
             <table>
                 <tr id="vw_2_tr">
@@ -123,27 +128,27 @@
         {% endfor %}
     </div>
 
-    <div id="vw_3">
+    <div id="vw_3" hidden>
         <p>{{ cap_pen_yr1 }}</p>
     </div>
 
-    <div id="vw_4">
+    <div id="vw_4" hidden>
         <p>{{ cap_pen_yr2 }}</p>
     </div>
 
-    <div id="vw_5">
+    <div id="vw_5" hidden>
         <p>{{ cap_pen_yr3 }}</p>
     </div>
 
-    <div id="vw_6">
+    <div id="vw_6" hidden>
         <p>{{ cap_pen_yr4 }}</p>
     </div>
 
-    <div id="vw_7">
+    <div id="vw_7" hidden>
         <p>{{ cap_pen_yr5 }}</p>
     </div>
 
-    <div id="vw_8">
+    <div id="vw_8" hidden>
         <table>
             <tr>
                 {% for x in filtered_tags %}
@@ -151,6 +156,12 @@
                 {% endfor %}
             </tr>
         </table>
+    </div>
+
+    <div id="vw_9" hidden>
+        {% for x in year_list %}
+            <p>{{ x }}</p>
+        {% endfor %}
     </div>
 
 {% endblock %}

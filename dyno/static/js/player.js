@@ -1,4 +1,17 @@
 $(document).ready(function() {
+
+    var team_list = [];
+    $('#vw_1').find('p').each(function() {
+        team_list.push($(this).text());
+        $(this).remove();
+    });
+
+    var year_list = [];
+    $('#vw_2').find('p').each(function() {
+        year_list.push($(this).text());
+        $(this).remove();
+    });
+
     $('#user_icon').hide();
     $('.hidden_divs').hide();
     $('.hidden_headers').hide();
@@ -39,7 +52,7 @@ $(document).ready(function() {
                             'yr2_space' : 0,
                             'yr3_space' : 0,
                             'yr4_space' : 0,
-                            'yr5_space' : 0,
+                            'yr5_space' : 0
     };
 
     var $t = [];
@@ -50,6 +63,7 @@ $(document).ready(function() {
     $('#player_interaction_area').hide();
 
     function display_player () {
+        $('#player_interaction_area').hide();
         $.ajax({
             url: '/player_processing_2',
             type: 'POST',
@@ -98,8 +112,10 @@ $(document).ready(function() {
                 $('#contract_type_text').text(data.contract_type);
                 $('#notes_text').text(data.notes);
 
-                $('#player_interaction_area').show();
-                $('#player_interaction_display_area').hide();
+                if ($.inArray(data.team, team_list) != -1) {
+                    $('#player_interaction_area').show();
+                    $('#player_interaction_display_area').hide();
+                }
             }
         });
     }
@@ -158,14 +174,14 @@ $(document).ready(function() {
             success: function(data){
                 $('#player_interaction_1').empty();
                 //row 1
-                $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text('2015').appendTo('#player_interaction_1');
+                $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text(year_list[0]).appendTo('#player_interaction_1');
                 $('<td>').addClass('player_interaction_cells').attr('align','center').text('$'+data.yr1_total_cost).appendTo('#player_interaction_1');
                 $('<td>').addClass('player_interaction_cells').attr('align','center').text('$'+data.yr1_guar).appendTo('#player_interaction_1');
                 $('<td>').addClass('player_interaction_cells').attr('align','center').css('color', 'green').text('$0.00').appendTo('#player_interaction_1');
                 if (Number(data.yr2_total_cost) != 0) {
                     //row 2
                     $('<tr>').appendTo('#player_interaction_1');
-                    $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text('2016').appendTo('#player_interaction_1');
+                    $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text(year_list[1]).appendTo('#player_interaction_1');
                     $('<td>').addClass('player_interaction_cells').attr('align','center').text('$'+data.yr2_total_cost).appendTo('#player_interaction_1');
                     $('<td>').addClass('player_interaction_cells').attr('align','center').text('$'+data.yr2_guar).appendTo('#player_interaction_1');
                     $('<td>').addClass('player_interaction_cells').attr('align','center').css('color', 'green').text('$'+data.yr2_salary).appendTo('#player_interaction_1');
@@ -173,7 +189,7 @@ $(document).ready(function() {
                 if (Number(data.yr3_total_cost) != 0) {
                     //row 3
                     $('<tr>').appendTo('#player_interaction_1');
-                    $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text('2017').appendTo('#player_interaction_1');
+                    $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text(year_list[2]).appendTo('#player_interaction_1');
                     $('<td>').addClass('player_interaction_cells').attr('align','center').text('$'+data.yr3_total_cost).appendTo('#player_interaction_1');
                     $('<td>').addClass('player_interaction_cells').attr('align','center').text('$'+data.yr3_guar).appendTo('#player_interaction_1');
                     $('<td>').addClass('player_interaction_cells').attr('align','center').css('color', 'green').text('$'+data.yr3_salary).appendTo('#player_interaction_1');
@@ -181,7 +197,7 @@ $(document).ready(function() {
                 if (Number(data.yr4_total_cost) != 0) {
                     //row 4
                     $('<tr>').appendTo('#player_interaction_1');
-                    $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text('2018').appendTo('#player_interaction_1');
+                    $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text(year_list[3]).appendTo('#player_interaction_1');
                     $('<td>').addClass('player_interaction_cells').attr('align','center').text('$'+data.yr4_total_cost).appendTo('#player_interaction_1');
                     $('<td>').addClass('player_interaction_cells').attr('align','center').text('$'+data.yr4_guar).appendTo('#player_interaction_1');
                     $('<td>').addClass('player_interaction_cells').attr('align','center').css('color', 'green').text('$'+data.yr4_salary).appendTo('#player_interaction_1');
@@ -189,7 +205,7 @@ $(document).ready(function() {
                 if (Number(data.yr5_total_cost) != 0) {
                     //row 5
                     $('<tr>').appendTo('#player_interaction_1');
-                    $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text('2019').appendTo('#player_interaction_1');
+                    $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text(year_list[4]).appendTo('#player_interaction_1');
                     $('<td>').addClass('player_interaction_cells').attr('align','center').text('$'+data.yr5_total_cost).appendTo('#player_interaction_1');
                     $('<td>').addClass('player_interaction_cells').attr('align','center').text('$'+data.yr5_guar).appendTo('#player_interaction_1');
                     $('<td>').addClass('player_interaction_cells').attr('align','center').css('color', 'green').text('$'+data.yr5_salary).appendTo('#player_interaction_1');
@@ -204,31 +220,31 @@ $(document).ready(function() {
 
                 $('#player_interaction_2').empty();
                 //row 1
-                $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text('2015').appendTo('#player_interaction_2');
+                $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text(year_list[0]).appendTo('#player_interaction_2');
                 $('<td>').addClass('player_interaction_cells').attr('align','center').text('$'+data.yr1_costs).appendTo('#player_interaction_2');
                 $('<td>').addClass('player_interaction_cells').attr('align','center').css('color', 'red').text('$'+Number(data.yr1_pen).toFixed(2)).appendTo('#player_interaction_2');
                 $('<td>').addClass('player_interaction_cells').attr('align','center').css('color', 'green').text('$'+data.yr1_space).appendTo('#player_interaction_2');
                 //row 2
                 $('<tr>').appendTo('#player_interaction_2');
-                $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text('2016').appendTo('#player_interaction_2');
+                $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text(year_list[1]).appendTo('#player_interaction_2');
                 $('<td>').addClass('player_interaction_cells').attr('align','center').text('$'+data.yr2_costs).appendTo('#player_interaction_2');
                 $('<td>').addClass('player_interaction_cells').attr('align','center').css('color', 'red').text('$'+Number(data.yr2_pen).toFixed(2)).appendTo('#player_interaction_2');
                 $('<td>').addClass('player_interaction_cells').attr('align','center').css('color', 'green').text('$'+data.yr2_space).appendTo('#player_interaction_2');
                 //row 3
                 $('<tr>').appendTo('#player_interaction_2');
-                $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text('2017').appendTo('#player_interaction_2');
+                $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text(year_list[2]).appendTo('#player_interaction_2');
                 $('<td>').addClass('player_interaction_cells').attr('align','center').text('$'+data.yr3_costs).appendTo('#player_interaction_2');
                 $('<td>').addClass('player_interaction_cells').attr('align','center').css('color', 'red').text('$'+Number(data.yr3_pen).toFixed(2)).appendTo('#player_interaction_2');
                 $('<td>').addClass('player_interaction_cells').attr('align','center').css('color', 'green').text('$'+data.yr3_space).appendTo('#player_interaction_2');
                 //row 4
                 $('<tr>').appendTo('#player_interaction_2');
-                $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text('2018').appendTo('#player_interaction_2');
+                $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text(year_list[3]).appendTo('#player_interaction_2');
                 $('<td>').addClass('player_interaction_cells').attr('align','center').text('$'+data.yr4_costs).appendTo('#player_interaction_2');
                 $('<td>').addClass('player_interaction_cells').attr('align','center').css('color', 'red').text('$'+Number(data.yr4_pen).toFixed(2)).appendTo('#player_interaction_2');
                 $('<td>').addClass('player_interaction_cells').attr('align','center').css('color', 'green').text('$'+data.yr4_space).appendTo('#player_interaction_2');
                 //row 5
                 $('<tr>').appendTo('#player_interaction_2');
-                $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text('2019').appendTo('#player_interaction_2');
+                $('<td>').addClass('player_interaction_cells').attr('align','center').css('font-weight', 'bold').text(year_list[4]).appendTo('#player_interaction_2');
                 $('<td>').addClass('player_interaction_cells').attr('align','center').text('$'+data.yr5_costs).appendTo('#player_interaction_2');
                 $('<td>').addClass('player_interaction_cells').attr('align','center').css('color', 'red').text('$'+Number(data.yr5_pen).toFixed(2)).appendTo('#player_interaction_2');
                 $('<td>').addClass('player_interaction_cells').attr('align','center').css('color', 'green').text('$'+data.yr5_space).appendTo('#player_interaction_2');
@@ -292,7 +308,7 @@ $(document).ready(function() {
         var yr5_space_diff = Number(data.yr5_space) - yr5_space;
 
         //row 1
-        $('<td>').addClass('player_interaction_cells').attr('align', 'center').css('font-weight', 'bold').text('2015').appendTo('#player_interaction_2');
+        $('<td>').addClass('player_interaction_cells').attr('align', 'center').css('font-weight', 'bold').text(year_list[0]).appendTo('#player_interaction_2');
         $('<td>').addClass('player_interaction_cells').attr('align', 'center').text('$' + yr1_costs.toFixed(2)).appendTo('#player_interaction_2');
         $('<td>').addClass('player_interaction_cells').attr('align', 'center').css('color', 'red').text('$' + Number(yr1_pen).toFixed(2)).appendTo('#player_interaction_2');
         if (yr1_space_diff > 0) {
@@ -302,7 +318,7 @@ $(document).ready(function() {
         }
         //row 2
         $('<tr>').appendTo('#player_interaction_2');
-        $('<td>').addClass('player_interaction_cells').attr('align', 'center').css('font-weight', 'bold').text('2016').appendTo('#player_interaction_2');
+        $('<td>').addClass('player_interaction_cells').attr('align', 'center').css('font-weight', 'bold').text(year_list[1]).appendTo('#player_interaction_2');
         $('<td>').addClass('player_interaction_cells').attr('align', 'center').text('$' + yr2_costs.toFixed(2)).appendTo('#player_interaction_2');
         $('<td>').addClass('player_interaction_cells').attr('align', 'center').css('color', 'red').text('$' + Number(yr2_pen).toFixed(2)).appendTo('#player_interaction_2');
         if (yr2_space_diff > 0) {
@@ -311,7 +327,7 @@ $(document).ready(function() {
         $('<td>').addClass('player_interaction_cells').attr('align', 'center').css('color', 'green').text('$' + yr2_space.toFixed(2) + ' (' + yr2_space_diff.toFixed(2) + ')').appendTo('#player_interaction_2');
         }//row 3
         $('<tr>').appendTo('#player_interaction_2');
-        $('<td>').addClass('player_interaction_cells').attr('align', 'center').css('font-weight', 'bold').text('2017').appendTo('#player_interaction_2');
+        $('<td>').addClass('player_interaction_cells').attr('align', 'center').css('font-weight', 'bold').text(year_list[2]).appendTo('#player_interaction_2');
         $('<td>').addClass('player_interaction_cells').attr('align', 'center').text('$' + yr3_costs.toFixed(2)).appendTo('#player_interaction_2');
         $('<td>').addClass('player_interaction_cells').attr('align', 'center').css('color', 'red').text('$' + Number(yr3_pen).toFixed(2)).appendTo('#player_interaction_2');
         if (yr3_space_diff > 0) {
@@ -320,7 +336,7 @@ $(document).ready(function() {
         $('<td>').addClass('player_interaction_cells').attr('align', 'center').css('color', 'green').text('$' + yr3_space.toFixed(2) + ' (' + yr3_space_diff.toFixed(2) + ')').appendTo('#player_interaction_2');
         }//row 4
         $('<tr>').appendTo('#player_interaction_2');
-        $('<td>').addClass('player_interaction_cells').attr('align', 'center').css('font-weight', 'bold').text('2018').appendTo('#player_interaction_2');
+        $('<td>').addClass('player_interaction_cells').attr('align', 'center').css('font-weight', 'bold').text(year_list[3]).appendTo('#player_interaction_2');
         $('<td>').addClass('player_interaction_cells').attr('align', 'center').text('$' + yr4_costs.toFixed(2)).appendTo('#player_interaction_2');
         $('<td>').addClass('player_interaction_cells').attr('align', 'center').css('color', 'red').text('$' + Number(yr4_pen).toFixed(2)).appendTo('#player_interaction_2');
         if (yr4_space_diff > 0) {
@@ -329,7 +345,7 @@ $(document).ready(function() {
         $('<td>').addClass('player_interaction_cells').attr('align', 'center').css('color', 'green').text('$' + yr4_space.toFixed(2) + ' (' + yr4_space_diff.toFixed(2) + ')').appendTo('#player_interaction_2');
         }//row 5
         $('<tr>').appendTo('#player_interaction_2');
-        $('<td>').addClass('player_interaction_cells').attr('align', 'center').css('font-weight', 'bold').text('2019').appendTo('#player_interaction_2');
+        $('<td>').addClass('player_interaction_cells').attr('align', 'center').css('font-weight', 'bold').text(year_list[4]).appendTo('#player_interaction_2');
         $('<td>').addClass('player_interaction_cells').attr('align', 'center').text('$' + yr5_costs.toFixed(2)).appendTo('#player_interaction_2');
         $('<td>').addClass('player_interaction_cells').attr('align', 'center').css('color', 'red').text('$' + Number(yr5_pen).toFixed(2)).appendTo('#player_interaction_2');
         if (yr5_space_diff > 0) {
@@ -510,19 +526,19 @@ $(document).ready(function() {
         var last_year = Math.round((total_avail_pool - (per_year * (enabled_sliders - 2))) * 100) / 100;
 
 
-        console.log('per_year = ',per_year);
-        console.log('last_year = ',last_year);
-        console.log('total_avail_pool = ',total_avail_pool);
-        console.log('disabled_pool = ',disabled_pool);
-        console.log('enabled_slider_list = ',enabled_slider_list);
-        console.log('current_slider_value = ',current_slider_value);
-        console.log('max_salary = ',max_salary);
-        console.log('spinner_1 = ',$('#spinner_1').val());
-        console.log('spinner_2 = ',$('#spinner_2').val());
-        console.log('spinner_3 = ',$('#spinner_3').val());
-        console.log('spinner_4 = ',$('#spinner_4').val());
-        console.log('spinner_5 = ',$('#spinner_5').val());
-        console.log('**********');
+        //console.log('per_year = ',per_year);
+        //console.log('last_year = ',last_year);
+        //console.log('total_avail_pool = ',total_avail_pool);
+        //console.log('disabled_pool = ',disabled_pool);
+        //console.log('enabled_slider_list = ',enabled_slider_list);
+        //console.log('current_slider_value = ',current_slider_value);
+        //console.log('max_salary = ',max_salary);
+        //console.log('spinner_1 = ',$('#spinner_1').val());
+        //console.log('spinner_2 = ',$('#spinner_2').val());
+        //console.log('spinner_3 = ',$('#spinner_3').val());
+        //console.log('spinner_4 = ',$('#spinner_4').val());
+        //console.log('spinner_5 = ',$('#spinner_5').val());
+        //console.log('**********');
 
 
 
@@ -943,18 +959,5 @@ $(document).ready(function() {
     });
 
 
-
-    window.onbeforeunload = unload_var;
-    function unload_var() {
-        $.ajax({
-            url : '/unload_player_selected_variable',
-            type: "POST",
-            data: {csrfmiddlewaretoken:document.getElementsByName('csrfmiddlewaretoken')[0].value},
-            dataType: 'json',
-            success: function(data){
-                //do nothing
-            }
-        });
-    }
 });
 

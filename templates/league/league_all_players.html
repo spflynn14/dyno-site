@@ -4,108 +4,264 @@
 
 {% block head %}
     <script src="{% static 'js/league_all_players.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.tablesorter.js' %}"></script>
 {% endblock %}
 
 {% block content %}
-    <div class="tab_area" id="third_tab_area">
-
+    <div id="all_players_header">
+        <h5 id="all_player_filter_toggle">Click Here To Show/Hide Filters</h5>
+    </div>
+    <div id="all_players_filter_area" hidden>
+        <div id="all_players_filter_1">
+            <h6 style="color: blue; text-decoration: underline; margin-left: 20px">Position</h6>
+            <table style="width: 85%; table-layout: fixed">
+                <tr>
+                    <td style="width: 16%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_QB" checked>
+                    </td>
+                    <td style="width: 16%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbsp QB</span>
+                    </td>
+                    <td style="width: 16%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_WR" checked>
+                    </td>
+                    <td style="width: 16%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbsp WR</span>
+                    </td>
+                    <td style="width: 16%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_DEF" checked>
+                    </td>
+                    <td style="width: 16%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbspDEF</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 16%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_RB" checked>
+                    </td>
+                    <td style="width: 16%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbsp RB</span>
+                    </td>
+                    <td style="width: 16%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_TE" checked>
+                    </td>
+                    <td style="width: 16%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbsp TE</span>
+                    </td>
+                    <td style="width: 16%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_K" checked>
+                    </td>
+                    <td style="width: 16%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbsp K</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="all_players_filter_2">
+            <h6 style="color: blue; text-decoration: underline; margin-left: 20px">Team</h6>
+            <table style="width: 85%; table-layout: fixed">
+                <tr>
+                    <td style="width: 15%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_Alexander" checked>
+                    </td>
+                    <td style="width: 35%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbspAlexander</span>
+                    </td>
+                    <td style="width: 15%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_CLucas" checked>
+                    </td>
+                    <td style="width: 35%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbspCLucas</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 15%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_Burd" checked>
+                    </td>
+                    <td style="width: 35%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbspBurd</span>
+                    </td>
+                    <td style="width: 15%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_Marchek" checked>
+                    </td>
+                    <td style="width: 35%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbspMarchek</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 15%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_Confer" checked>
+                    </td>
+                    <td style="width: 35%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbspConfer</span>
+                    </td>
+                    <td style="width: 15%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_Pape" checked>
+                    </td>
+                    <td style="width: 35%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbspPape</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 15%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_Fletemake" checked>
+                    </td>
+                    <td style="width: 35%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbspFletemake</span>
+                    </td>
+                    <td style="width: 15%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_Riley" checked>
+                    </td>
+                    <td style="width: 35%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbspRiley</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 15%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_Flynn" checked>
+                    </td>
+                    <td style="width: 35%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbspFlynn</span>
+                    </td>
+                    <td style="width: 15%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_Runkle" checked>
+                    </td>
+                    <td style="width: 35%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbspRunkle</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 15%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_DLucas" checked>
+                    </td>
+                    <td style="width: 35%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbspDLucas</span>
+                    </td>
+                    <td style="width: 15%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_Wilcox" checked>
+                    </td>
+                    <td style="width: 35%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbspWilcox</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="all_players_filter_3">
+            <h6 style="color: blue; text-decoration: underline; margin-left: 40px">Contract Type</h6>
+            <table style="width: 85%; table-layout: fixed">
+                <tr>
+                    <td style="width: 25%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_Regular" checked>
+                    </td>
+                    <td style="width: 75%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbsp Regular</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 25%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_Rookie" checked>
+                    </td>
+                    <td style="width: 75%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbsp Rookie</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="all_players_filter_4">
+            <h6 style="color: blue; text-decoration: underline; margin-left: 0px">Salary Range</h6>
+            <select id="all_players_filter_select_year">
+                <option>{{ year_list.0 }}</option>
+                <option>{{ year_list.1 }}</option>
+                <option>{{ year_list.2 }}</option>
+                <option>{{ year_list.3 }}</option>
+                <option>{{ year_list.4 }}</option>
+            </select>
+            <table style="width: 85%; table-layout: fixed">
+                <tr style="height: 50px">
+                    <td>&nbspBetween</td>
+                </tr>
+                <tr>
+                    <td style="width: 33%; text-align: center">
+                        <input type="text" size="6" id="all_players_filter_salary_from" value="0">
+                    </td>
+                    <td style="width: 34%; text-align: center">and</td>
+                    <td style="width: 33%; text-align: center">
+                        <input type="text" size="6" id="all_players_filter_salary_to" value="99">
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="all_players_filter_5">
+            <h6 style="color: blue; text-decoration: underline; margin-left: 25px">Notes</h6>
+            <table style="width: 100%; table-layout: fixed">
+                <tr>
+                    <td style="width: 15%; text-align: right">
+                        <input type="checkbox" id="all_players_filter_inpickup">
+                    </td>
+                    <td style="width: 85%;  text-align: left">
+                        <span style="font-size: small">&nbsp&nbsp "In-Season Pickup" only</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
     </div>
 
     <div id="display_area">
         {% csrf_token %}
         <div class="all_players_datagrid">
-            <table>
+            <table id="all_players_table">
                 <thead>
                     <tr>
-                        <th>Position</th>
-                        <th width="120px">Name</th>
-                        <th>Team</th>
-                        <th style="text-align: center">Contract Type</th>
-                        <th style="text-align: center">Total Value</th>
-                        <th style="text-align: center">Signing Bonus</th>
-                        <th style="text-align: center">Salary</th>
-                        <th style="text-align: center">2015 Salary/<br>Signing Bonus</th>
-                        <th style="text-align: center">2016 Salary/<br>Signing Bonus</th>
-                        <th style="text-align: center">2017 Salary/<br>Signing Bonus</th>
-                        <th style="text-align: center">2018 Salary/<br>Signing Bonus</th>
-                        <th style="text-align: center">2019 Salary/<br>Signing Bonus</th>
-                        <th width="180px">Notes</th>
+                        <th width="6%">Position</th>
+                        <th width="8%">Name</th>
+                        <th width="6%">Team</th>
+                        <th width="6%" style="text-align: center">Contract Type</th>
+                        <th width="6%" style="text-align: center">Total Value</th>
+                        <th width="6%" style="text-align: center">Signing Bonus</th>
+                        <th width="6%" style="text-align: center">Salary</th>
+                        <th width="8%" style="text-align: center">{{ year_list.0 }} Salary/<br>Signing Bonus</th>
+                        <th width="8%" style="text-align: center">{{ year_list.1 }} Salary/<br>Signing Bonus</th>
+                        <th width="8%" style="text-align: center">{{ year_list.2 }} Salary/<br>Signing Bonus</th>
+                        <th width="8%" style="text-align: center">{{ year_list.3 }} Salary/<br>Signing Bonus</th>
+                        <th width="8%" style="text-align: center">{{ year_list.4 }} Salary/<br>Signing Bonus</th>
+                        <th width="16%">Notes</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {% for x in table_contents %}
-                        {% if forloop.counter0|divisibleby:2 %}
-                            <tr>
-                                <td>{{ x.position }}</td>
-                                <td>
-                                    <div class="name_link">{{ x.name }}</div>
-                                </td>
-                                <td>{{ x.team }}</td>
-                                <td align="center">{{ x.contract_type }}</td>
-                                <td align="center">${{ x.total_value }}</td>
-                                <td align="center">${{ x.signing_bonus }}</td>
-                                <td align="center">${{ x.salary }}</td>
-                                <td align="center">${{ x.yr1_salary }} &nbsp(${{ x.yr1_sb }})</td>
-                                {% if x.yr2_salary == None %}
-                                    <td></td>
-                                {% else %}
-                                    <td align="center">${{ x.yr2_salary }} &nbsp(${{ x.yr2_sb }})</td>
-                                {% endif %}
-                                {% if x.yr3_salary == None %}
-                                    <td></td>
-                                {% else %}
-                                    <td align="center">${{ x.yr3_salary }} &nbsp(${{ x.yr3_sb }})</td>
-                                {% endif %}
-                                {% if x.yr4_salary == None %}
-                                    <td></td>
-                                {% else %}
-                                    <td align="center">${{ x.yr4_salary }} &nbsp(${{ x.yr4_sb }})</td>
-                                {% endif %}
-                                {% if x.yr5_salary == None %}
-                                    <td></td>
-                                {% else %}
-                                    <td align="center">${{ x.yr5_salary }} &nbsp(${{ x.yr5_sb }})</td>
-                                {% endif %}
-                                <td>{{ x.notes }}</td>
-                            </tr>
-                        {% else %}
-                            <tr class="all_player_data_aux">
-                                <td>{{ x.position }}</td>
-                                <td>
-                                    <div class="name_link">{{ x.name }}</div>
-                                </td>
-                                <td>{{ x.team }}</td>
-                                <td align="center">{{ x.contract_type }}</td>
-                                <td align="center">${{ x.total_value }}</td>
-                                <td align="center">${{ x.signing_bonus }}</td>
-                                <td align="center">${{ x.salary }}</td>
-                                <td align="center">${{ x.yr1_salary }} &nbsp(${{ x.yr1_sb }})</td>
-                                {% if x.yr2_salary == None %}
-                                    <td></td>
-                                {% else %}
-                                    <td align="center">${{ x.yr2_salary }} &nbsp(${{ x.yr2_sb }})</td>
-                                {% endif %}
-                                {% if x.yr3_salary == None %}
-                                    <td></td>
-                                {% else %}
-                                    <td align="center">${{ x.yr3_salary }} &nbsp(${{ x.yr3_sb }})</td>
-                                {% endif %}
-                                {% if x.yr4_salary == None %}
-                                    <td></td>
-                                {% else %}
-                                    <td align="center">${{ x.yr4_salary }} &nbsp(${{ x.yr4_sb }})</td>
-                                {% endif %}
-                                {% if x.yr5_salary == None %}
-                                    <td></td>
-                                {% else %}
-                                    <td align="center">${{ x.yr5_salary }} &nbsp(${{ x.yr5_sb }})</td>
-                                {% endif %}
-                                <td>{{ x.notes }}</td>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
+                <tbody  id="all_players_body">
+
                 </tbody>
             </table>
         </div>
+    </div>
+
+    <div id="vw_1" hidden>
+        <table>
+            {% for x in table_contents %}
+                <tr>
+                    <td id="vw_1-1">{{ x.position }}</td>
+                    <td id="vw_1-2">{{ x.name }}</td>
+                    <td id="vw_1-3">{{ x.team }}</td>
+                    <td id="vw_1-4">{{ x.contract_type }}</td>
+                    <td id="vw_1-5">{{ x.total_value }}</td>
+                    <td id="vw_1-6">{{ x.signing_bonus }}</td>
+                    <td id="vw_1-7">{{ x.salary }}</td>
+                    <td id="vw_1-8">{{ x.yr1_salary }}</td>
+                    <td id="vw_1-9">{{ x.yr1_sb }}</td>
+                    <td id="vw_1-10">{{ x.yr2_salary }}</td>
+                    <td id="vw_1-11">{{ x.yr2_sb }}</td>
+                    <td id="vw_1-12">{{ x.yr3_salary }}</td>
+                    <td id="vw_1-13">{{ x.yr2_sb }}</td>
+                    <td id="vw_1-14">{{ x.yr4_salary }}</td>
+                    <td id="vw_1-15">{{ x.yr4_sb }}</td>
+                    <td id="vw_1-16">{{ x.yr5_salary }}</td>
+                    <td id="vw_1-17">{{ x.yr5_sb }}</td>
+                    <td id="vw_1-18">{{ x.notes }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div id="vw_2" hidden>
+        <p id="vw_2-1">{{ user.is_authenticated }}</p>
     </div>
 {% endblock %}

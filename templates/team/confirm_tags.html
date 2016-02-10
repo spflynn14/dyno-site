@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/confirm_tags.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="second_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        <div style="margin-left: 200px; margin-top: 100px; margin-right: 200px">
+            <h4 style="text-decoration: underline">Please confirm your submission: </h4><br><br>
+            <table>
+                <thead>
+                    <tr>
+                        {% if type == 0 %}
+                            <td style='color: blue; vertical-align: top' class="tags_confirm_type">Waiver Exception: &nbsp</td>
+                            <td class="tags_confirm_player">{{ player }} will be signed to a 1-year Regular contract:<br><br>Total: &nbsp${{ value|floatformat:2 }}<br>Salary: &nbsp${{ salary|floatformat:2 }}<br>Signing Bonus: &nbsp${{ sb|floatformat:2 }}</td>
+                        {% elif type == 1 %}
+                            <td style='color: blue; vertical-align: top' class="tags_confirm_type">Franchise Tag: &nbsp</td>
+                            <td class="tags_confirm_player">{{ player }} will be put up for auction on March 1, with bidding starting at: &nbsp${{ value|floatformat:2 }}</td>
+                        {% elif type == 2 %}
+                            <td style='color: blue; vertical-align: top' class="tags_confirm_type">Transition Tag: &nbsp</td>
+                            <td class="tags_confirm_player">{{ player }} will be signed to a 1-year Regular contract:<br><br>Total: &nbsp${{ value|floatformat:2 }}<br>Salary: &nbsp${{ salary|floatformat:2 }}<br>Signing Bonus: &nbsp${{ sb|floatformat:2 }}</td>
+                        {% endif %}
+                    </tr>
+                </thead>
+            </table>
+            <br><br>
+            <button id='tags_cancel_button' type="button" style="display: inline-block;color: red">Cancel</button>
+            <button id='tags_confirm_button' type="button" style="display: inline-block;color: blue">Confirm</button><br><br>
+            <div id="message_text" style="color: red;"></div>
+        </div>
+
+    </div>
+
+    <div id="vw_1" hidden>
+        <table>
+            <tr>
+                <td id="vw_1-1">{{ player }}</td>
+                <td id="vw_1-2">{{ type }}</td>
+                <td id="vw_1-3">{{ value }}</td>
+                <td id="vw_1-4">{{ sb }}</td>
+                <td id="vw_1-5">{{ salary }}</td>
+            </tr>
+        </table>
+    </div>
+{% endblock %}
