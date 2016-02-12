@@ -97,7 +97,7 @@
 
 #welcome_message {
     padding-left: 150px;
-    padding-top: 100px;
+    padding-top: 0px;
 }
 
 #rules_text {
@@ -859,7 +859,7 @@
     padding-top: 10px;
     font: normal 0.75em/150% Arial, Helvetica, sans-serif;
     background: #fff;
-    overflow-y: scroll;
+    overflow-y: auto;
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
     border-radius: 10px;

@@ -978,12 +978,17 @@ def teamorganizationpage(request):
         con = sql3.connect('/home/spflynn/dyno-site/db.sqlite3')
     cur = con.cursor()
 
-    cur.execute('SELECT text_variable FROM dyno_variable WHERE name=?', ['team selected'])
-    a = cur.fetchone()
-    team_selected = a[0]
+    a = TeamVariable.objects.filter(name='TeamSelectedForOrg').get(user=request.user)
+    team_selected = a.text_variable
+    a.text_variable = ''
+    a.save()
 
     aa = Team.objects.get(user=request.user)
     user_team = aa.internal_name
+
+    if team_selected == '' or team_selected is None:
+        team_selected = user_team
+
     if user_team == team_selected:
         f_t = aa.filtered_tags
         filtered_tags = f_t.strip().split(',')[:-1]
@@ -2297,3 +2302,35 @@ def confirmextensionstructure(request):
                                                                      'cap_dict' : cap_dict,
                                                                      'year_list' : year_list,
                                                                      'instructions' : instructions})
+
+def confirmcutplayers(request):
+    a = TeamVariable.objects.filter(name='PlayersForCut').get(user=request.user)
+    temp = a.text_variable
+    from_int = int(a.int_variable)
+    a.text_variable = ''
+    a.int_variable = 0
+    a.save()
+
+    b = Player.objects.all()
+
+    if from_int == 0:
+        player_list = [temp]
+    elif from_int == 1:
+        player_list = temp.strip().split(',')
+
+    player_dict = []
+
+    for x in player_list:
+        for y in b:
+            if y.name == x:
+                player_dict.append({'name' : x,
+                                    'pos' : y.position})
+
+    c = Team.objects.get(user=request.user)
+    team = c.internal_name
+
+    d = Asset.objects.filter(team=team).filter(asset_type='Amnesty')
+
+    return render(request, 'team/confirm_cut_players.html', {'player_list' : player_dict,
+                                                             'from_int' : from_int,
+                                                             'assets' : d})

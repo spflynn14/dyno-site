@@ -834,7 +834,6 @@ $(document).ready(function() {
         } else if ($view == 'By Position') {
             var s_name = $(this).parent().parent().next().text();
         }
-        console.log(s_name);
         var s_role = $(this).val();
         var previous_role = '';
         var this_pos = '';
@@ -992,7 +991,6 @@ $(document).ready(function() {
             data: {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value, 'new_view': new_view},
             dataType: 'json',
             success: function (data) {
-                console.log(data);
                 //change variable locally
                 $view = new_view;
                 //change view

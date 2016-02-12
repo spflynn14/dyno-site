@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/confirm_cut_players.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="second_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        <div style="margin-left: 200px; margin-top: 100px; margin-right: 200px">
+            <h4>Please confirm you are cutting the player(s) listed below. If you have an Amnesty you wish to apply to a player, click on the dropdown box to select it.</h4><br><br>
+            <table style="width: 100%; table-layout: fixed;">
+                <thead>
+                    <tr>
+                        <th style='width: 30%' ></th>
+                        <th style='width: 30%' ></th>
+                        <th style='width: 40%' ></th>
+                    </tr>
+                </thead>
+                <tbody id="confirm_cut_tbody">
+
+                </tbody>
+            </table>
+            <br><br>
+            <button id='cut_cancel_button' type="button" style="display: inline-block;color: red">Cancel</button>
+            <button id='cut_confirm_button' type="button" style="display: inline-block;color: blue">Confirm</button><br><br>
+            <div id="message_text" style="color: red;"></div>
+        </div>
+    </div>
+
+    <div id="vw_1" hidden>
+        {% for x in player_list %}
+            <table>
+                <tr>
+                    <td id="vw_1-1">{{ x.name }}</td>
+                    <td id="vw_1-2">{{ x.pos }}</td>
+                </tr>
+            </table>
+        {% endfor %}
+    </div>
+
+    <div id="vw_2" hidden>
+        {% for x in assets %}
+            <table>
+                <tr>
+                    <td id="vw_2-1">{{ x.asset_type }}</td>
+                    <td id="vw_2-2">{{ x.var_i1 }}</td>
+                    <td id="vw_2-3">{{ x.var_t1 }}</td>
+                    <td id="vw_2-4">{{ x.id }}</td>
+                </tr>
+            </table>
+        {% endfor %}
+    </div>
+
+    <div id="vw_3" hidden>
+        <p id="vw_3-1">{{ from_int }}</p>
+    </div>
+{% endblock %}

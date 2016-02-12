@@ -95,4 +95,7 @@ urlpatterns = [
     url(r'^confirm_extension_structure$', views.confirmextensionstructure, name='confirm extension structure'),
     url(r'^save_extension_switch$', processing.save_extension_switch, name='save extension switch state'),
     url(r'^save_commish_periodic$', processing.save_commish_periodic, name='save commish periodic alerts state'),
+    url(r'^save_data_cut_player$', processing.save_data_cut_player, name='save data from cut player - player page'),
+    url(r'^confirm_cut_players$', views.confirmcutplayers, name='confirm cut players'),
+    url(r'^process_cuts$', processing.process_cuts, name='process cut players'),
 ]

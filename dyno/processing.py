@@ -36,6 +36,12 @@ def generate_alert_email_line(source_info, alert_type, var_list):
             return 'A contract has been submitted for your approval by ' + var_list[1] + ' on ' + var_list[0] + '.'
         elif source_info == 'alert object':
             return 'There is no email line for alert objects'
+    elif alert_type == 'Player Cut':
+        #var_list = player
+        if source_info == 'direct':
+            return var_list[0] + ' has been submitted to be released.'
+        elif source_info == 'alert object':
+            return 'There is no email line for alert objects'
 
 def send_instant_alert(alert_type, user, email, var_list):
     if user != 'commish':
@@ -90,6 +96,16 @@ def send_instant_alert(alert_type, user, email, var_list):
                   '',
                   [target_email],
                   fail_silently=False)
+    elif alert_type == 'Player Cut':
+        #var_list = player
+        target_email = email
+        subject_line = '[Dynasty League] COMMISH ALERT - Player Cuts to Process'
+        email_body = generate_alert_email_line('direct', alert_type, var_list)
+        send_mail(subject_line,
+                  email_body + alert_settings_message + email_footer,
+                  '',
+                  [target_email],
+                  fail_silently=False)
 
 def create_alerts(alert_type, current_user, var_list):
     date_time = timezone.now()
@@ -137,6 +153,14 @@ def create_alerts(alert_type, current_user, var_list):
                              var_t1=var_list[0],
                              var_t2=var_list[1])
         send_instant_alert(alert_type, 'commish', 'spflynn0@gmail.com', var_list)
+    elif alert_type == 'Player Cut':
+        #var_list = player
+        Alert.objects.create(user='commish',
+                             alert_type=alert_type,
+                             date=date_time,
+                             var_t1=var_list[0])
+        send_instant_alert(alert_type, 'commish', 'spflynn0@gmail.com', var_list)
+
 
 def auction_end_routine():
     def strptime(val):
@@ -387,6 +411,8 @@ def player_processing_1(request):
 def player_processing_2(request):
     player_selected = request.POST['player_selected']
     a = Player.objects.get(name=player_selected)
+    b = Team.objects.get(user=request.user)
+    user_team = b.internal_name
     return_data = {'name' : a.name,
                    'pos' : a.position,
                    'team' : a.team,
@@ -409,7 +435,8 @@ def player_processing_2(request):
                    'yr3_total' : a.yr3_salary+a.yr3_sb,
                    'yr4_total' : a.yr4_salary+a.yr4_sb,
                    'yr5_total' : a.yr5_salary+a.yr5_sb,
-                   'notes' : a.notes}
+                   'notes' : a.notes,
+                   'user_team' : user_team}
 
     return JsonResponse(return_data)
 
@@ -610,7 +637,7 @@ def team_org_change_team_selected(request):
         if x.id == team_number:
             selected_team = x.internal_name
 
-    c = Variable.objects.get(name='team selected')
+    c = TeamVariable.objects.filter(name='TeamSelectedForOrg').get(user=request.user)
     c.text_variable = selected_team
     c.save()
 
@@ -1481,5 +1508,42 @@ def save_commish_periodic(request):
         a = Variable.objects.get(name='CommishPeriodicState')
         a.int_variable = commish_periodic_state
         a.save()
+
+    return JsonResponse('test', safe=False)
+
+def save_data_cut_player(request):
+    player = request.POST['player']
+    from_page = request.POST['from']
+
+    a = TeamVariable.objects.filter(name='PlayersForCut').get(user=request.user)
+    a.text_variable = player
+    a.int_variable = 0
+    a.save()
+
+    return JsonResponse('test', safe=False)
+
+def process_cuts(request):
+    total_players = int(request.POST['total_players'])
+
+    l = []
+    for x in range(0,total_players):
+        t1 = 'cut_list[' + str(x) + '][name]'
+        t2 = 'cut_list[' + str(x) + '][current_selection]'
+        a = request.POST.getlist(t1)
+        b = request.POST.getlist(t2)
+        try:
+            l.append({'player' : a[0],
+                    'current_selection' : int(b[0])})
+        except:
+            pass
+
+    for x in l:
+        a = Player.objects.get(name=x.player)
+        Transaction.objects.create(player=x.player,
+                                   team2=a.team,
+                                   transaction_type='Player Cut',
+                                   var_i1=x.current_selection,
+                                   date=timezone.now())
+        create_alerts('Player Cut', request.user, [x.player])
 
     return JsonResponse('test', safe=False)

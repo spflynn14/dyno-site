@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    console.log('ready');
 
     var team_list = [];
     $('#vw_1').find('p').each(function() {
@@ -116,6 +117,13 @@ $(document).ready(function() {
                     $('#player_interaction_area').show();
                     $('#player_interaction_display_area').hide();
                 }
+
+                if (data.team != data.user_team) {
+                    $('#player_cut_player_button').hide();
+                } else {
+                    $('#player_cut_player_button').show();
+                }
+                $('#player_cut_player_button').hide();
             }
         });
     }
@@ -832,25 +840,25 @@ $(document).ready(function() {
         fill_total_cost_column();
         fill_bottom_table_restructure($bottom_table_data);
     });
-     $('#slider_2').on('slide', function(event, ui) {
+    $('#slider_2').on('slide', function(event, ui) {
         $('#spinner_2').val(((ui.value/20)).toFixed(2));
          adjust_sliders(ui, 'slider', 2);
         fill_total_cost_column();
         fill_bottom_table_restructure($bottom_table_data);
     });
-     $('#slider_3').on('slide', function(event, ui) {
+    $('#slider_3').on('slide', function(event, ui) {
         $('#spinner_3').val(((ui.value/20)).toFixed(2));
          adjust_sliders(ui, 'slider', 3);
         fill_total_cost_column();
         fill_bottom_table_restructure($bottom_table_data);
     });
-     $('#slider_4').on('slide', function(event, ui) {
+    $('#slider_4').on('slide', function(event, ui) {
         $('#spinner_4').val(((ui.value/20)).toFixed(2));
          adjust_sliders(ui, 'slider', 4);
         fill_total_cost_column();
         fill_bottom_table_restructure($bottom_table_data);
     });
-     $('#slider_5').on('slide', function(event, ui) {
+    $('#slider_5').on('slide', function(event, ui) {
         $('#spinner_5').val(((ui.value/20)).toFixed(2));
          adjust_sliders(ui, 'slider', 5);
         fill_total_cost_column();
@@ -959,5 +967,24 @@ $(document).ready(function() {
     });
 
 
+
+
+    $('#player_cut_player_button').on('click', function() {
+        var out_player = $('#name_text').text();
+        console.log(out_player);
+        $.ajax({
+            url: '/save_data_cut_player',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                'player' : out_player,
+                'from' : 'player'
+            },
+            dataType: 'json',
+            success: function (data) {
+                location.href = '/confirm_cut_players';
+            }
+        });
+    });
 });
 

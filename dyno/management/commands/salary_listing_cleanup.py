@@ -29,7 +29,4 @@ class Command(BaseCommand):
         for x in unfound_list:
             print(x)
 
-        print(team_list)
-        print(player_list[0:5])
-
         self.stdout.write(self.style.SUCCESS('Successfully ran script'))

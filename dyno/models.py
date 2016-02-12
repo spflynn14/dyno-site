@@ -277,6 +277,10 @@ class Transaction(models.Model):
         team1 = old team
         team2 = new team
         var_i1 = pick used
+
+    Player Cut:
+        team2 = owner
+        var_i1 = id of Amnesty asset used (-1 if none)
     '''
 
     def __str__(self):
@@ -338,3 +342,20 @@ class Performance_Yr2(models.Model):
 
     def __str__(self):
         return self.player
+
+class Asset(models.Model):
+    team = models.CharField(max_length=20)
+    asset_type = models.CharField(max_length=40)
+    var_d1 = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    var_d2 = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    var_d3 = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    var_i1 = models.IntegerField(null=True, blank=True)
+    var_i2 = models.IntegerField(null=True, blank=True)
+    var_t1 = models.TextField(null=True, blank=True)
+    var_t2 = models.TextField(null=True, blank=True)
+    var_t3 = models.TextField(null=True, blank=True)
+    date = models.DateTimeField()
+
+    def __str__(self):
+        return_string = self.team + ' - ' + self.asset_type + ' - ' + str(self.date)
+        return return_string
