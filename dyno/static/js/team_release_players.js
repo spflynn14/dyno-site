@@ -222,6 +222,12 @@ $(document).ready(function() {
         $('#trr1_5-1').text('$'+temp_total_yr5.toFixed(2));
         $('#trr1_5-2').text('$'+temp_pen_yr5.toFixed(2));
         $('#trr1_5-3').text('$'+cap_saving_yr5.toFixed(2));
+
+        if (temp_total_yr1 == 0) {
+            $('#team_release_cut_player_button').hide();
+        } else {
+            $('#team_release_cut_player_button').show();
+        }
     }
 
     total_team();
@@ -235,5 +241,30 @@ $(document).ready(function() {
         total_team();
         total_space();
         fill_bottom_table();
+    });
+
+    $('#team_release_cut_player_button').on('click', function() {
+        var player_list = [];
+        $('.release_checkbox').each(function() {
+            var temp = $(this).prop('checked');
+
+            if (temp == true) {
+                var temp1 = $(this).parent().parent().next().next().text();
+                player_list.push(temp1);
+            }
+        });
+        $.ajax({
+            url: '/save_data_cut_player',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                'player_list' : player_list,
+                'from' : 'team'
+            },
+            dataType: 'json',
+            success: function (data) {
+                location.href = '/confirm_cut_players';
+            }
+        });
     });
 });

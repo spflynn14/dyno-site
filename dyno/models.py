@@ -228,6 +228,13 @@ class Transaction(models.Model):
         team2 = team bidding
         var_d1 = proxy bid
 
+    Auction End:
+        team2 = winning team
+        var_d1 = winning bid
+        var_d2 = proxy bid of winning team
+        var_t1 = status (pending if contract is not set, otherwise blank)
+        var_t2 = status (unconfirmed)
+
     Contract Set:
         team2 = owner
         var_d1 = total cost per year
@@ -281,6 +288,30 @@ class Transaction(models.Model):
     Player Cut:
         team2 = owner
         var_i1 = id of Amnesty asset used (-1 if none)
+        var_t1 = status (pending)
+        var_t2 = status (confirmed)
+
+    Player Cut Processed:
+        team2 = owner
+        var_i1 = id of Amnesty asset used (-1 if none)
+        var_t1 = cap penalty list per year (split by comma)
+
+    Trade Offer:
+        player = 'trade'
+        team1 = proposing team
+        team2 = opposing team
+        var_i1 = id of Trade object
+        var_t1 = status (pending, rejected, accepted, countered, withdrawn)
+
+    Trade Accepted:
+        player = 'trade'
+        team1 = proposing team
+        team2 = opposing team
+        var_i1 = id of Trade object
+        var_t1 = status (pending, rejected, accepted, countered, withdrawn)
+        var_t2 = pro team pieces
+        var_t3 = opp team pieces
+
     '''
 
     def __str__(self):
@@ -358,4 +389,56 @@ class Asset(models.Model):
 
     def __str__(self):
         return_string = self.team + ' - ' + self.asset_type + ' - ' + str(self.date)
+        return return_string
+
+class Draft_Pick(models.Model):
+    owner = models.CharField(max_length=20)
+    original_owner = models.CharField(max_length=20)
+    year = models.IntegerField(default=0)
+    round = models.IntegerField(default=0)
+    compensatory = models.CharField(max_length=20, default='none')
+    pick_in_round = models.IntegerField(default=0)
+    pick_overall = models.IntegerField(default=0)
+    yr1_sal = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    yr2_sal = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    yr3_sal = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    yr4_sal = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    player_selected = models.CharField(max_length=60, default='', blank=True)
+
+    def __str__(self):
+        return_string = self.owner + ' - ' + self.original_owner + ' - ' + str(self.pick_overall)
+        return return_string
+
+class Trade(models.Model):
+    team1 = models.CharField(max_length=20)
+    team2 = models.CharField(max_length=20)
+    trade_thread = models.IntegerField(default=0)
+    date = models.DateTimeField()
+    expiration_date = models.DateTimeField()
+    pro_players = models.TextField(blank=True, default='')
+    pro_picks = models.TextField(blank=True, default='')
+    pro_assets = models.TextField(blank=True, default='')
+    pro_cash = models.TextField(blank=True, default='')
+    opp_players = models.TextField(blank=True, default='')
+    opp_picks = models.TextField(blank=True, default='')
+    opp_assets = models.TextField(blank=True, default='')
+    opp_cash = models.TextField(blank=True, default='')
+    message = models.TextField(blank=True, default='')
+    status1 = models.TextField(blank=True, default='')
+    status2 = models.TextField(blank=True, default='')
+    status3 = models.TextField(blank=True, default='')
+
+    def __str__(self):
+        return_string = str(self.trade_thread) + ' - ' + self.team1 + ', ' + self.team2 + ' - ' + str(self.date)
+        return return_string
+
+class Cap_Penalty_Entry(models.Model):
+    team = models.CharField(max_length=20)
+    year = models.IntegerField(default=0)
+    penalty = models.DecimalField(max_digits=5, decimal_places=2, default=0.00, blank=True)
+    description = models.TextField(blank=True, default='')
+    date = models.DateTimeField()
+
+    def __str__(self):
+        return_string = self.team + ' - ' + str(self.year) + ' - ' + str(self.penalty) + ' - ' + self.description
         return return_string

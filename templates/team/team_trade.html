@@ -1,0 +1,337 @@
+{% extends 'team.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/team_trade.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="third_tab_area">
+        {% if request.path == '/team/pending_transactions' %}
+            <a href="/team/pending_transactions" class="third_tab_button_team" id="team_pending_transactions" style="background-color: #2d99d4; color: white">Pending Transactions</a>
+        {% else %}
+            <a href="/team/pending_transactions" class="third_tab_button_team" id="team_pending_transactions">Pending Transactions</a>
+        {% endif %}
+
+        {% if request.path == '/team/trade' %}
+            <a href="/team/trade" class="third_tab_button_team" id="team_level_cuts" style="background-color: #2d99d4; color: white">View Assets/Propose Trade</a>
+        {% else %}
+            <a href="/team/trade" class="third_tab_button_team" id="team_level_cuts">View Assets/Propose Trade</a>
+        {% endif %}
+
+        {% if request.path == '/team/trade_log' %}
+            <a href="/team/trade_log" class="third_tab_button_team" id="team_level_cuts" style="background-color: #2d99d4; color: white">Trade Log</a>
+        {% else %}
+            <a href="/team/trade_log" class="third_tab_button_team" id="team_level_cuts">Trade Log</a>
+        {% endif %}
+
+        {% if request.path == '/team/release_players' %}
+            <a href="/team/release_players" class="third_tab_button_team" id="team_level_cuts" style="background-color: #2d99d4; color: white">Release Players</a>
+        {% else %}
+            <a href="/team/release_players" class="third_tab_button_team" id="team_level_cuts">Release Players</a>
+        {% endif %}
+
+        {% if request.path == '/team/transactions' %}
+            <a href="/team/transactions" class="third_tab_button_team" id="team_transactions" style="background-color: #2d99d4; color: white">Transaction Log</a>
+        {% else %}
+            <a href="/team/transactions" class="third_tab_button_team" id="team_transactions">Transaction Log</a>
+        {% endif %}
+    </div>
+
+    <div id="display_area">
+        <div id="trade_top_area">
+            <div id='trade_year_cost_div' style="vertical-align: middle; display: inline-block;margin-top: 1%">Change Which Year's Cost To Show: &nbsp&nbsp&nbsp</div>
+            <select id='trade_year_cost_select' style="vertical-align: middle; display: inline-block;margin-top: 1%">
+                <option value="0">{{ year_list.0 }}</option>
+                <option value="1">{{ year_list.1 }}</option>
+                <option value="2">{{ year_list.2 }}</option>
+                <option value="3">{{ year_list.3 }}</option>
+                <option value="4">{{ year_list.4 }}</option>
+            </select>
+
+            <div id="trade_submit_button_area" style="display: inline-block; margin-left: 10%;">
+                <button id="trade_submit_button" type="submit" style="margin-top: 8%; color: red"> Proceed </button>
+            </div>
+            <div id="trade_rejection_message" style="display: inline-block; color: red"></div>
+
+            <div class="dropdown" id="team_selection_dropdown" style="display: inline-block">
+                <a href="#" class="dropdown-toggle_team" data-toggle="dropdown" style="color: black">Select Team To Trade With<b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    {% for x in team_list %}
+                        <li><a class="team_selection_link">{{ x }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div id="trade_opp_team_area" style="font-size: large; color: blue; display: inline-block; float: right; margin-right: 80px; margin-top: 1%">
+                ABCDEFGHIJKLMNOPQRSTUV
+            </div>
+        </div>
+
+        <div id="trade_left_area">
+            <div style="width: 62%; height: 100%; float: left; display: inline-block">
+                <div id="trade_left_players_area">
+                    <h4 style="text-decoration: underline">Players</h4>
+                    <table style="table-layout: fixed; width: 100%;">
+                        <thead>
+                            <tr style="height: 25px">
+                                <th style="width: 2%"></th>
+                                <th style="text-align: center; width: 15%; text-decoration: underline"></th>
+                                <th style="width: 38%; text-decoration: underline"></th>
+                                <th style="text-align: center; width: 15%; text-decoration: underline">Yrs Left</th>
+                                <th style="text-align: center; width: 15%; text-decoration: underline">Yrly Cost</th>
+                                <th id='trade_left_year_header' style="text-align: center; width: 15%; text-decoration: underline">{{ year_list.0 }} Cost</th>
+                            </tr>
+                        </thead>
+                        {% for player in player_list %}
+                            <tr style="height: 25px">
+                                <td>
+                                    {% if player.name in pro_players %}
+                                        <input type="checkbox" value="{{ player.name }}" checked>
+                                    {% else %}
+                                        <input type="checkbox" value="{{ player.name }}">
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: center">{{ player.position }}</td>
+                                <td>{{ player.name }}</td>
+                                <td style="text-align: center">{{ player.years_remaining }}</td>
+                                <td style="text-align: center">${{ player.average_yearly_cost|floatformat:2 }}</td>
+                                <td class='trade_left_cost_text' style="text-align: center">${{ player.current_year_cap_hit }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+
+                <div id="trade_left_cash_area">
+                    <h4 style="text-decoration: underline">Cash (Cap Space)</h4>
+                    <table>
+                        {% for year in cap_space %}
+                            <tr style="height: 30px">
+                                {% if forloop.counter0 == 0 %}
+                                    <td>
+                                        Enter Amount:&nbsp&nbsp
+                                        {% if year < 0 %}
+                                            <input type="text" size="4" disabled/>
+                                        {% else %}
+                                            {% if pro_cash.0 == '0' %}
+                                                <input type="text" size="4"/>
+                                            {% else %}
+                                                <input type="text" size="4" value="{{ pro_cash.0 }}"/>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                    <td>&nbsp&nbsp{{ year_list.0 }} Cash (${{ year }} available)</td>
+                                {% elif forloop.counter0 == 1 %}
+                                    <td>
+                                        Enter Amount:&nbsp&nbsp
+                                        {% if year < 0 %}
+                                            <input type="text" size="4" disabled/>
+                                        {% else %}
+                                            {% if pro_cash.1 == '0' %}
+                                                <input type="text" size="4"/>
+                                            {% else %}
+                                                <input type="text" size="4" value="{{ pro_cash.1 }}"/>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                    <td>&nbsp&nbsp{{ year_list.1 }} Cash (${{ year }} available)</td>
+                                {% elif forloop.counter0 == 2 %}
+                                    <td>
+                                        Enter Amount:&nbsp&nbsp
+                                        {% if year < 0 %}
+                                            <input type="text" size="4" disabled/>
+                                        {% else %}
+                                            {% if pro_cash.2 == '0' %}
+                                                <input type="text" size="4"/>
+                                            {% else %}
+                                                <input type="text" size="4" value="{{ pro_cash.2 }}"/>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                    <td>&nbsp&nbsp{{ year_list.2 }} Cash (${{ year }} available)</td>
+                                {% elif forloop.counter0 == 3 %}
+                                    <td>
+                                        Enter Amount:&nbsp&nbsp
+                                        {% if year < 0 %}
+                                            <input type="text" size="4" disabled/>
+                                        {% else %}
+                                            {% if pro_cash.3 == '0' %}
+                                                <input type="text" size="4"/>
+                                            {% else %}
+                                                <input type="text" size="4" value="{{ pro_cash.3 }}"/>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                    <td>&nbsp&nbsp{{ year_list.3 }} Cash (${{ year }} available)</td>
+                                {% elif forloop.counter0 == 4 %}
+                                    <td>
+                                        Enter Amount:&nbsp&nbsp
+                                        {% if year < 0 %}
+                                            <input type="text" size="4" disabled/>
+                                        {% else %}
+                                            {% if pro_cash.4 == '0' %}
+                                                <input type="text" size="4"/>
+                                            {% else %}
+                                                <input type="text" size="4" value="{{ pro_cash.4 }}"/>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                    <td>&nbsp&nbsp{{ year_list.4 }} Cash (${{ year }} available)</td>
+                                {% endif %}
+
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+
+            <div style="width: 38%; height: 100%; display: inline-block">
+                <div id="trade_left_picks_area">
+                    <h4 style="text-decoration: underline">Draft Picks</h4>
+                    <table>
+                        {% for pick in draft_picks %}
+                            <tr style="height: 25px">
+                                <td>
+                                    {% if pick.id|stringformat:'i' in pro_picks %}
+                                        <input type="checkbox" value="{{ pick.id }}" checked>
+                                    {% else %}
+                                        <input type="checkbox" value="{{ pick.id }}">
+                                    {% endif %}
+                                </td>
+                                {% if pick.pick_overall != 0 %}
+                                    {% if pick.pick_in_round > 9 %}
+                                        <td>&nbsp&nbsp&nbsp{{ pick.year }} {{ pick.round }}.{{ pick.pick_in_round }} pick</td>
+                                    {% else %}
+                                        <td>&nbsp&nbsp&nbsp{{ pick.year }} {{ pick.round }}.0{{ pick.pick_in_round }} pick</td>
+                                    {% endif %}
+                                {% else %}
+                                    {% if pick.original_owner != pick.owner %}
+                                        <td>&nbsp&nbsp&nbsp{{ pick.year }} round {{ pick.round }} pick ({{ pick.original_owner }})</td>
+                                    {% else %}
+                                        <td>&nbsp&nbsp&nbsp{{ pick.year }} round {{ pick.round }} pick</td>
+                                    {% endif %}
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+
+                <div id="trade_left_assets_area">
+                    <h4 style="text-decoration: underline">Awards/Exceptions</h4>
+                    <table>
+                        {% for asset in assets %}
+                            <tr style="height: 25px">
+                                <td>
+                                    {% if asset.id|stringformat:'i' in pro_assets %}
+                                        <input type="checkbox" value="{{ asset.id }}" checked>
+                                    {% else %}
+                                        <input type="checkbox" value="{{ asset.id }}">
+                                    {% endif %}
+                                </td>
+                                {% if asset.asset_type == 'Amnesty' %}
+                                    <td>&nbsp&nbsp&nbsp{{ asset.asset_type }} ({{ asset.var_i1 }}%)</td>
+                                {% elif asset.asset_type == 'Salary Cap Boon' %}
+                                    <td>&nbsp&nbsp&nbsp{{ asset.asset_type }} (${{ asset.var_d1 }})</td>
+                                {% else %}
+                                    <td>&nbsp&nbsp&nbsp{{ asset.asset_type }}</td>
+                                {% endif %}
+
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="trade_right_area">
+            <div style="width: 62%; height: 100%; float: left; display: inline-block">
+                <div id="trade_right_players_area">
+                    <h4 style="text-decoration: underline">Players</h4>
+                    <table style="table-layout: fixed; width: 100%;">
+                        <thead>
+                            <tr style="height: 25px">
+                                <th style="width: 2%"></th>
+                                <th style="text-align: center; width: 15%; text-decoration: underline"></th>
+                                <th style="width: 38%; text-decoration: underline"></th>
+                                <th style="text-align: center; width: 15%; text-decoration: underline">Yrs Left</th>
+                                <th style="text-align: center; width: 15%; text-decoration: underline">Yrly Cost</th>
+                                <th id='trade_right_year_header' style="text-align: center; width: 15%; text-decoration: underline">{{ year_list.0 }} Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trade_right_players_body">
+                        
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="trade_right_cash_area">
+                    <h4 style="text-decoration: underline">Cash (Cap Space)</h4>
+                    <table>
+                        <tbody id="trade_right_cash_body">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div style="width: 38%; height: 100%; display: inline-block">
+                <div id="trade_right_picks_area">
+                    <h4 style="text-decoration: underline">Draft Picks</h4>
+                    <table>
+                        <tbody id="trade_right_picks_body">
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="trade_right_assets_area">
+                    <h4 style="text-decoration: underline">Awards/Exceptions</h4>
+                    <table>
+                        <tbody id="trade_right_assets_body">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="vw_1" hidden>
+        <p id="vw_1-1">{{ year_list.0 }}</p>
+        <p id="vw_1-2">{{ year_list.1 }}</p>
+        <p id="vw_1-3">{{ year_list.2 }}</p>
+        <p id="vw_1-4">{{ year_list.3 }}</p>
+        <p id="vw_1-5">{{ year_list.4 }}</p>
+        <p id="vw_1-6">{{ opp_team }}</p>
+        <p id="vw_1-7">{{ opp_players }}</p>
+        <p id="vw_1-8">{{ opp_picks }}</p>
+        <p id="vw_1-9">{{ opp_assets }}</p>
+        <p id="vw_1-10">{{ opp_cash }}</p>
+        <p id="vw_1-11">{{ view_flag_text }}</p>
+        <p id="vw_1-12">{{ is_proposing_team }}</p>
+        <p id="vw_1-13">{{ view_flag_trade_id }}</p>
+    </div>
+
+    <div id="vw_2" hidden>
+        {% for x in player_list %}
+            <table>
+                <tr>
+                    <td id="vw_2-1">{{ x.name }}</td>
+                    <td id="vw_2-2">{{ x.yr1_salary }}</td>
+                    <td id="vw_2-3">{{ x.yr2_salary }}</td>
+                    <td id="vw_2-4">{{ x.yr3_salary }}</td>
+                    <td id="vw_2-5">{{ x.yr4_salary }}</td>
+                    <td id="vw_2-6">{{ x.yr5_salary }}</td>
+                    <td id="vw_2-7">{{ x.yr1_sb }}</td>
+                    <td id="vw_2-8">{{ x.yr2_sb }}</td>
+                    <td id="vw_2-9">{{ x.yr3_sb }}</td>
+                    <td id="vw_2-10">{{ x.yr4_sb }}</td>
+                    <td id="vw_2-11">{{ x.yr5_sb }}</td>
+                </tr>
+            </table>
+        {% endfor %}
+    </div>
+{% endblock %}

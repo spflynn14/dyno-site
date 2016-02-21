@@ -1,5 +1,8 @@
 $(document).ready(function() {
-    console.log('ready');
+    console.log('ready 2');
+
+    var $user_team = $('#vw_2-1').text();
+    $('#vw_2').remove();
 
     var num_buttons = 0;
 
@@ -24,8 +27,6 @@ $(document).ready(function() {
 
     fill_table();
 
-    console.log(num_buttons);
-
     function fill_table () {
         $.each($master, function (index, value) {
             var tr = $('<tr>');
@@ -38,15 +39,21 @@ $(document).ready(function() {
             var td_comments = $('<td>');
 
             td_date.text(value.date);
-            td_player.text(value.player);
+
+            if (value.player == 'trade') {
+                td_player.text('');
+            } else {
+                td_player.text(value.player);
+            }
+
             td_transtype.text(value.transaction_type);
             td_details.text(determine_details(value));
             var temp = determine_pending_time(value);
             var converted_time = convert_time(temp);
             td_pendingtime.text(converted_time);
             var actions = get_actions(value);
-            $.each(actions, function (index, value) {
-                var temp_button = make_button(value);
+            $.each(actions, function (index, action_value) {
+                var temp_button = make_button(action_value, value);
                 td_actions.append(temp_button);
             });
             var comments = get_comments(actions);
@@ -89,6 +96,22 @@ $(document).ready(function() {
             return_text = "You have submitted this player's Transition Tag. Waiting for commish's office to process.";
         } else if (data.transaction_type == 'Extension Submitted') {
             return_text = "You have submitted an extension for this player. Waiting for commish's office to process.";
+        } else if (data.transaction_type == 'Player Cut') {
+            return_text = "You have designated this player to be released. Waiting for commish's office to process.";
+        } else if (data.transaction_type == 'Trade Offer') {
+            if (data.team1 == $user_team) {
+                return_text = "You have sent a trade offer to " + data.team2 + ".";
+            } else {
+                return_text = data.team1 + " has sent a trade offer to you.";
+            }
+        } else if (data.transaction_type == 'Counter Offer') {
+            if (data.team1 == $user_team) {
+                return_text = "You have sent a counter offer to " + data.team2 + ".";
+            } else {
+                return_text = data.team1 + " has sent a counter offer to you.";
+            }
+        } else if (data.transaction_type == 'Trade Accepted') {
+            return_text = "You have agreed to a trade. Waiting for commish's office to process.";
         }
 
         return return_text;
@@ -129,6 +152,10 @@ $(document).ready(function() {
         var action_list = [];
         if (data.transaction_type == 'Auction End') {
             action_list.push('Set Contract Structure')
+        } else if (data.transaction_type == 'Trade Offer') {
+            action_list.push('Trade Offer');
+        } else if (data.transaction_type == 'Counter Offer') {
+            action_list.push('Counter Offer');
         }
 
         return action_list;
@@ -145,24 +172,36 @@ $(document).ready(function() {
         return comment_list;
     }
 
-    function make_button (data) {
+    function make_button (actions, data) {
         var button = $('<button>');
 
-        if (data == 'Set Contract Structure') {
+        if (actions == 'Set Contract Structure') {
             button.text('Set Contract Structure');
-            button.addClass('set_con_str')
+            button.addClass('set_con_str');
+            num_buttons = num_buttons + 1;
+        } else if (actions == 'Trade Offer') {
+            button.text('View / Respond');
+            button.addClass('trade_offer_button');
+            button.val(data.var_i1);
+            if (data.team2 == $user_team) {
+                num_buttons = num_buttons + 1;
+            }
+        } else if (actions == 'Counter Offer') {
+            button.text('View / Respond');
+            button.addClass('trade_offer_button');
+            button.val(data.var_i1);
+            if (data.team2 == $user_team) {
+                num_buttons = num_buttons + 1;
+            }
         }
-        num_buttons = num_buttons + 1;
         return button;
     }
 
 
-
-    $('.set_con_str').on('click', function() {
+    $(document).on('click', '.set_con_str', function() {
         $('button').prop('disabled', true);
         $('input').prop('disabled', true);
         var player_clicked = $(this).parent().prev().prev().prev().prev().text();
-        console.log(player_clicked);
 
         $.ajax({
             url: '/set_player_for_contract_structure',
@@ -174,6 +213,26 @@ $(document).ready(function() {
             dataType: 'json',
             success: function (data) {
                 location.href = '/set_contract_structure';
+            }
+        });
+    });
+
+    $(document).on('click', '.trade_offer_button', function() {
+        $('button').prop('disabled', true);
+        $('input').prop('disabled', true);
+        var trade_id = $(this).val();
+
+        $.ajax({
+            url: '/save_redirect_trade_data',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                'trade_id' : trade_id,
+                'from' : 'pending transaction'
+            },
+            dataType: 'json',
+            success: function (data) {
+                location.href = '/confirm_trade';
             }
         });
     });

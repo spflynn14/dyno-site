@@ -39,9 +39,13 @@
                     {% if user.is_authenticated %}
                         <li><a href="/team/tags">Waiver Extension and Tags</a></li>
                         <li class="divider"></li>
+                        <li><a href="/league/free_agents">Free Agent List</a></li>
                         <li><a href="/league/extensions">Extensions</a></li>
                         <li><a href="/team/pending_transactions">Pending Transactions</a></li>
                         <li><a href="/team/manage_alerts">Manage Alerts</a></li>
+                        <li class="divider"></li>
+                        <li><a href="/team/trade_log">Trade Log</a></li>
+                        <li><a href="/team/trade">View Assets/Propose Trade</a></li>
                         <li class="divider"></li>
                     {% endif %}
                     <li><a href="/feature_list">Feature List & Changelog</a></li>
@@ -90,16 +94,16 @@
                             <a href="/league/extensions" class="second_tab_button_league" id="extensions_button">Extensions</a>
                         {% endif %}
 
+                        {% if request.path == '/league/free_agents' %}
+                            <a href="/league/free_agents" class="second_tab_button_league" id="salary_lists_button " style="background-color: #2d99d4; color: white">Free Agent List</a>
+                        {% else %}
+                            <a href="/league/free_agents" class="second_tab_button_league" id="salary_lists_button">Free Agent List</a>
+                        {% endif %}
+
                         {% if request.path == '/league/salary_lists' %}
                             <a href="/league/salary_lists" class="second_tab_button_league" id="salary_lists_button " style="background-color: #2d99d4; color: white">Salary Lists</a>
                         {% else %}
                             <a href="/league/salary_lists" class="second_tab_button_league" id="salary_lists_button">Salary Lists</a>
-                        {% endif %}
-
-                        {% if request.path == '/league/future_draft_picks' %}
-                            <a href="/league/future_draft_picks" class="second_tab_button_league" id="future_draft_picks_button" style="background-color: #2d99d4; color: white">Future Draft Picks</a>
-                        {% else %}
-                            <a href="/league/future_draft_picks" class="second_tab_button_league" id="future_draft_picks_button">Future Draft Picks</a>
                         {% endif %}
 
                         {% if request.path == '/league/cap_summary' %}

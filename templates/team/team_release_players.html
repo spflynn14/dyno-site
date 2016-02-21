@@ -15,6 +15,18 @@
             <a href="/team/pending_transactions" class="third_tab_button_team" id="team_pending_transactions">Pending Transactions</a>
         {% endif %}
 
+        {% if request.path == '/team/trade' %}
+            <a href="/team/trade" class="third_tab_button_team" id="team_level_cuts" style="background-color: #2d99d4; color: white">View Assets/Propose Trade</a>
+        {% else %}
+            <a href="/team/trade" class="third_tab_button_team" id="team_level_cuts">View Assets/Propose Trade</a>
+        {% endif %}
+
+        {% if request.path == '/team/trade_log' %}
+            <a href="/team/trade_log" class="third_tab_button_team" id="team_level_cuts" style="background-color: #2d99d4; color: white">Trade Log</a>
+        {% else %}
+            <a href="/team/trade_log" class="third_tab_button_team" id="team_level_cuts">Trade Log</a>
+        {% endif %}
+
         {% if request.path == '/team/release_players' %}
             <a href="/team/release_players" class="third_tab_button_team" id="team_level_cuts" style="background-color: #2d99d4; color: white">Release Players</a>
         {% else %}
@@ -79,7 +91,7 @@
 
         <div id="team_release_right_area">
             <div id="team_release_button_area">
-
+                <div class="mini_tab_button_player" id="team_release_cut_player_button" style="font-size: smaller; float: right; margin-right: 20px; height: auto">Cut All Checked Players</div>
             </div>
 
             <div id="team_release_right_table_1_area">

@@ -18,33 +18,76 @@
     </div>
 
     <div id="display_area">
-        <div>
-            <h5 style="display: inline-block">Auction: Default Clock (hours) &nbsp&nbsp</h5>
-            <input type="text" id="auction_default_clock_input" style="display: inline-block" size="6" value="{{ default_auction_clock }}"/>
-            <button type="submit" id='auction_default_clock_submit' style="display: inline-block">Submit</button>
-            <p style="display: inline-block; color: blue" id='auction_default_clock_message'>Here</p>
+        <div id="commish_office_first_column">
+            <div>
+                <h5 style="display: inline-block">Auction: Default Clock (hours) &nbsp&nbsp</h5>
+                <input type="text" id="auction_default_clock_input" style="display: inline-block" size="6" value="{{ default_auction_clock }}"/>
+                <button type="submit" id='auction_default_clock_submit' style="display: inline-block">Submit</button>
+                <p style="display: inline-block; color: blue" id='auction_default_clock_message'>Here</p>
+            </div>
+            <br>
+            <div>
+                <h5 style="display: inline-block">New Auctions  &nbsp&nbsp</h5>
+                {% if new_auctions == 0 %}
+                    <input type="radio" style="display: inline-block" name="new_auctions-onoff" value="on"> &nbsp&nbspOn</td>
+                    <input type="radio" style="display: inline-block; margin-left: 20px" name="new_auctions-onoff" value="off" checked> &nbsp&nbspOff</td>
+                {% else %}
+                    <input type="radio" style="display: inline-block" name="new_auctions-onoff" value="on" checked> &nbsp&nbspOn</td>
+                    <input type="radio" style="display: inline-block; margin-left: 20px" name="new_auctions-onoff" value="off"> &nbsp&nbspOff</td>
+                {% endif %}
+            </div>
+            <br>
+            <div>
+                <h5 style="display: inline-block">Extensions  &nbsp&nbsp</h5>
+                {% if ext_switch == 1 %}
+                    <input type="radio" style="display: inline-block" name="extensions-onoff" value="on" checked> &nbsp&nbspOn</td>
+                    <input type="radio" style="display: inline-block; margin-left: 20px" name="extensions-onoff" value="off"> &nbsp&nbspOff</td>
+                {% else %}
+                    <input type="radio" style="display: inline-block" name="extensions-onoff" value="on"> &nbsp&nbspOn</td>
+                    <input type="radio" style="display: inline-block; margin-left: 20px" name="extensions-onoff" value="off" checked> &nbsp&nbspOff</td>
+                {% endif %}
+            </div>
+            <br>
+            <div>
+                <h5 style="display: inline-block">Commish Periodic Alerts  &nbsp&nbsp</h5>
+                {% if commish_periodic == 1 %}
+                    <input type="radio" style="display: inline-block" name="commish_periodic-onoff" value="on" checked> &nbsp&nbspOn</td>
+                    <input type="radio" style="display: inline-block; margin-left: 20px" name="commish_periodic-onoff" value="off"> &nbsp&nbspOff</td>
+                {% else %}
+                    <input type="radio" style="display: inline-block" name="commish_periodic-onoff" value="on"> &nbsp&nbspOn</td>
+                    <input type="radio" style="display: inline-block; margin-left: 20px" name="commish_periodic-onoff" value="off" checked> &nbsp&nbspOff</td>
+                {% endif %}
+            </div>
+            <br>
+            <div>
+                <h5 style="display: inline-block">Cut Season (Off or In-)  &nbsp&nbsp</h5>
+                {% if cut_season == 0 %}
+                    <input type="radio" style="display: inline-block" name="cut_season-onoff" value="off" checked> &nbsp&nbspOffseason</td>
+                    <input type="radio" style="display: inline-block; margin-left: 20px" name="cut_season-onoff" value="in"> &nbsp&nbspIn-Season</td>
+                {% else %}
+                    <input type="radio" style="display: inline-block" name="cut_season-onoff" value="off"> &nbsp&nbspOffseason</td>
+                    <input type="radio" style="display: inline-block; margin-left: 20px" name="cut_season-onoff" value="in" checked> &nbsp&nbspIn-Season</td>
+                {% endif %}
+            </div>
+            <br>
+            <div>
+                <h5 style="display: inline-block">Include Impending Free Agents in Free Agent List  &nbsp&nbsp</h5>
+                {% if include_impending == 1 %}
+                    <input type="radio" style="display: inline-block" name="include_impending-onoff" value="on" checked> &nbsp&nbspOn</td>
+                    <input type="radio" style="display: inline-block; margin-left: 20px" name="include_impending-onoff" value="off"> &nbsp&nbspOff</td>
+                {% else %}
+                    <input type="radio" style="display: inline-block" name="include_impending-onoff" value="on"> &nbsp&nbspOn</td>
+                    <input type="radio" style="display: inline-block; margin-left: 20px" name="include_impending-onoff" value="off" checked> &nbsp&nbspOff</td>
+                {% endif %}
+            </div>
         </div>
-        <br>
-        <div>
-            <h5 style="display: inline-block">Extensions  &nbsp&nbsp</h5>
-            {% if ext_switch == 1 %}
-                <input type="radio" style="display: inline-block" name="extensions-onoff" value="on" checked> &nbsp&nbspOn</td>
-                <input type="radio" style="display: inline-block; margin-left: 20px" name="extensions-onoff" value="off"> &nbsp&nbspOff</td>
-            {% else %}
-                <input type="radio" style="display: inline-block" name="extensions-onoff" value="on"> &nbsp&nbspOn</td>
-                <input type="radio" style="display: inline-block; margin-left: 20px" name="extensions-onoff" value="off" checked> &nbsp&nbspOff</td>
-            {% endif %}
+
+        <div id="commish_office_second_column">
+
         </div>
-        <br>
-        <div>
-            <h5 style="display: inline-block">Commish Periodic Alerts  &nbsp&nbsp</h5>
-            {% if commish_periodic == 1 %}
-                <input type="radio" style="display: inline-block" name="commish_periodic-onoff" value="on" checked> &nbsp&nbspOn</td>
-                <input type="radio" style="display: inline-block; margin-left: 20px" name="commish_periodic-onoff" value="off"> &nbsp&nbspOff</td>
-            {% else %}
-                <input type="radio" style="display: inline-block" name="commish_periodic-onoff" value="on"> &nbsp&nbspOn</td>
-                <input type="radio" style="display: inline-block; margin-left: 20px" name="commish_periodic-onoff" value="off" checked> &nbsp&nbspOff</td>
-            {% endif %}
+
+        <div id="commish_office_third_column">
+            <button type="button" id="configure_draft" style="font-size: small">Configure Rookie Draft</button>
         </div>
 
     </div>

@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from dyno.processing import auction_end_routine, periodic_alerts_routine, commish_pending_transactions_routine
+from dyno.processing import auction_end_routine, periodic_alerts_routine, commish_pending_transactions_routine, check_expired_trades
 from django.core.mail import send_mail
 
 debug = True
@@ -14,6 +14,7 @@ class Command(BaseCommand):
                 auction_end_routine()
                 periodic_alerts_routine()
                 commish_pending_transactions_routine()
+                check_expired_trades()
                 self.stdout.write(self.style.SUCCESS('Successfully ran script'))
             except:
                 target_email = 'spflynn0@gmail.com'
@@ -28,4 +29,5 @@ class Command(BaseCommand):
             auction_end_routine()
             periodic_alerts_routine()
             commish_pending_transactions_routine()
+            check_expired_trades()
             self.stdout.write(self.style.SUCCESS('Successfully ran script'))

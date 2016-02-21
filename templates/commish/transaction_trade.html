@@ -1,0 +1,186 @@
+{% extends 'admin/commish_office.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/transaction_trade.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+
+    <div class="tab_area" id="second_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        <div id="trans_trade_top_area">
+            <table style="width: 35%; table-layout: fixed; display: inline-block; float: left">
+                <thead style="height: 0px">
+                    <tr>
+                        <th style='width: 30%' >{{ trade_data.team1 }} gives up:</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="height: 10px"></tr>
+                    {% for x in pro_players %}
+                        <tr style="height: 30px">
+                            <td>{{ x }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for x in pro_picks %}
+                        <tr style="height: 30px">
+                            <td>{{ x }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for x in pro_assets %}
+                        <tr style="height: 30px">
+                            <td>{{ x }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for x in pro_cash %}
+                        <tr style="height: 30px">
+                            <td>{{ x }}</td>
+                        </tr>
+                    {% endfor %}
+                    <tr style="height: 30px">
+                        <td> Cap Pen: {{ pro_cap_pen.0 }}, {{ pro_cap_pen.1 }}, {{ pro_cap_pen.2 }}, {{ pro_cap_pen.3 }}, {{ pro_cap_pen.4 }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table style="width: 35%; table-layout: fixed; display: inline-block;">
+                <thead style="height: 30px">
+                    <tr>
+                        <th style='width: 30%' >{{ trade_data.team2 }} gives up:</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="height: 10px"></tr>
+                    {% for x in opp_players %}
+                        <tr style="height: 30px">
+                            <td>{{ x }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for x in opp_picks %}
+                        <tr style="height: 30px">
+                            <td>{{ x }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for x in opp_assets %}
+                        <tr style="height: 30px">
+                            <td>{{ x }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for x in opp_cash %}
+                        <tr style="height: 30px">
+                            <td>{{ x }}</td>
+                        </tr>
+                    {% endfor %}
+                    <tr style="height: 30px">
+                        <td> Cap Pen: {{ opp_cap_pen.0 }}, {{ opp_cap_pen.1 }}, {{ opp_cap_pen.2 }}, {{ opp_cap_pen.3 }}, {{ opp_cap_pen.4 }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="trans_trade_middle_area">
+            <table style="width: 35%; table-layout: fixed; display: inline-block; float: left">
+                <thead style="height: 0px">
+                    <tr>
+                        <th style="width: 80%">Player/Asset</th>
+                        <th style="width: 20%">Owner</th>
+                    </tr>
+                </thead>
+                <tbody id="pro_team_results_body">
+
+                </tbody>
+            </table>
+
+            <table style="width: 35%; table-layout: fixed; display: inline-block;">
+                <thead style="height: 30px">
+                    <tr>
+                        <th style="width: 80%">Player/Asset</th>
+                        <th style="width: 20%">Owner</th>
+                    </tr>
+                </thead>
+                <tbody id="opp_team_results_body">
+
+                </tbody>
+            </table>
+        </div>
+
+        <div id="submit_button_area">
+            <button type="button" id="trans_trade_submit_button" style="display: inline-block; margin-left: 40%">Submit</button>
+            <button type="button" id="trans_trade_proceed_button" style="display: inline-block" hidden>Proceed</button>
+        </div>
+
+        <div id="show_transaction_data_area">
+            <table style="table-layout: fixed">
+                <tbody>
+                    <tr>
+                        <th class="trans_single_table_header_cell">Player: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.player }}</td>
+                        <th class="trans_single_table_header_cell">Team1: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.team1 }}</td>
+                        <th class="trans_single_table_header_cell">Team2: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.team2 }}</td>
+                    </tr>
+                    <tr>
+                        <th class="trans_single_table_header_cell">Trans Type: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.transaction_type }}</td>
+                        <th class="trans_single_table_header_cell">Var_d1: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.var_d1 }}</td>
+                        <th class="trans_single_table_header_cell">Var_d2: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.var_d2 }}</td>
+                    </tr>
+                    <tr>
+                        <th class="trans_single_table_header_cell">Var_d3: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.var_d3 }}</td>
+                        <th class="trans_single_table_header_cell">Var_i1: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.var_i1 }}</td>
+                        <th class="trans_single_table_header_cell">Var_i2: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.var_i2 }}</td>
+                    </tr>
+                    <tr>
+                        <th class="trans_single_table_header_cell">Var_t1: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.var_t1 }}</td>
+                        <th class="trans_single_table_header_cell">Var_t2: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.var_t2 }}</td>
+                        <th class="trans_single_table_header_cell">Var_t3: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.var_t3 }}</td>
+                    </tr>
+                    <tr>
+                        <th class="trans_single_table_header_cell">Date: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.date }}</td>
+                        <th class="trans_single_table_header_cell">ID: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.id }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="vw_1" hidden>
+        <table>
+            <tr>
+                <td id="vw_1-1">{{ transaction.date }}</td>
+                <td id="vw_1-2">{{ transaction.player }}</td>
+                <td id="vw_1-3">{{ transaction.team1 }}</td>
+                <td id="vw_1-4">{{ transaction.team2 }}</td>
+                <td id="vw_1-5">{{ transaction.transaction_type }}</td>
+                <td id="vw_1-6">{{ transaction.var_d1 }}</td>
+                <td id="vw_1-7">{{ transaction.var_d2 }}</td>
+                <td id="vw_1-8">{{ transaction.var_d3 }}</td>
+                <td id="vw_1-9">{{ transaction.var_i1 }}</td>
+                <td id="vw_1-10">{{ transaction.var_i2 }}</td>
+                <td id="vw_1-11">{{ transaction.var_t1 }}</td>
+                <td id="vw_1-12">{{ transaction.var_t2 }}</td>
+                <td id="vw_1-13">{{ transaction.var_t3 }}</td>
+                <td id="vw_1-14">{{ transaction.date.isoformat }}</td>
+                <td id="vw_1-15">{{ transaction.id }}</td>
+            </tr>
+        </table>
+    </div>
+
+{% endblock %}

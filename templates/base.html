@@ -2,7 +2,7 @@
 
 {% load staticfiles %}
 
-<!-- List of html for which nav_bar must be copied: league, team, commish_office, batch, settings  -->
+<!-- List of html for which nav_bar must be copied: league, team, draft, commish_office, batch, settings  -->
 
 <html lang="en">
     <head>
@@ -42,9 +42,13 @@
                     {% if user.is_authenticated %}
                         <li><a href="/team/tags">Waiver Extension and Tags</a></li>
                         <li class="divider"></li>
+                        <li><a href="/league/free_agents">Free Agent List</a></li>
                         <li><a href="/league/extensions">Extensions</a></li>
                         <li><a href="/team/pending_transactions">Pending Transactions</a></li>
                         <li><a href="/team/manage_alerts">Manage Alerts</a></li>
+                        <li class="divider"></li>
+                        <li><a href="/team/trade_log">Trade Log</a></li>
+                        <li><a href="/team/trade">View Assets/Propose Trade</a></li>
                         <li class="divider"></li>
                     {% endif %}
                     <li><a href="/feature_list">Feature List & Changelog</a></li>

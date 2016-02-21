@@ -123,7 +123,6 @@ $(document).ready(function() {
                 } else {
                     $('#player_cut_player_button').show();
                 }
-                $('#player_cut_player_button').hide();
             }
         });
     }
@@ -971,7 +970,6 @@ $(document).ready(function() {
 
     $('#player_cut_player_button').on('click', function() {
         var out_player = $('#name_text').text();
-        console.log(out_player);
         $.ajax({
             url: '/save_data_cut_player',
             type: 'POST',

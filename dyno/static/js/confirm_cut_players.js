@@ -1,14 +1,15 @@
 $(document).ready(function() {
-    console.log('ready confirm 2');
+    console.log('ready confirm 4');
 
     var from_int = Number($('#vw_3-1').text());
+    var current_year = $('#vw_3-2').text();
     $('#vw_3').remove();
 
     var return_address = '';
     if (from_int == 0) {
         return_address = '/player';
     } else if (from_int == 1) {
-        return address = '/team/release_players'
+        return_address = '/team/release_players'
     }
 
     var selected_list = [];
@@ -30,9 +31,9 @@ $(document).ready(function() {
         $(this).remove();
     });
 
+    console.log(return_address);
     console.log($master);
     console.log($assets);
-    console.log(from_int, return_address);
 
     populate_table();
 
@@ -60,6 +61,8 @@ $(document).ready(function() {
                 }
             }
         });
+
+        console.log(current_selection, selected_list);
 
         return db;
     }
@@ -90,11 +93,14 @@ $(document).ready(function() {
         $('#confirm_cut_tbody').empty();
 
         $.each($master, function(index, value) {
-            var tr = $('<tr>');
+            var tr = $('<tr>').css({'height' : '40px'});
             var td_player = $('<td>').css({'width' : '30%'});
             var td_dropbox = $('<td>').css({'width' : '30%'});
             var td_message = $('<td>').css({'width' : '40%'});
 
+            if (current_year == '2015') {
+                $('#message_text').text('Old cut rules still apply, cap penalty is 25% of total cost each year of contract');
+            }
             td_player.text(value.name);
 
             var dropbox = populate_dropbox(value.current_selection);
@@ -113,7 +119,8 @@ $(document).ready(function() {
 
     $(document).on('change', 'select', function() {
         var select_val = Number($(this).val());
-        var player = $(this).parent().prev().text();
+        var t = $(this).parent().prev().text();
+        var player = t.split('(')[0].trim();
         var old_selected = 99;
         $.each($master, function(index, value) {
             if (value.name == player) {
@@ -147,7 +154,7 @@ $(document).ready(function() {
             },
             dataType: 'json',
             success: function (data) {
-                //location.href = return_address;
+                location.href = return_address;
             }
         });
     });

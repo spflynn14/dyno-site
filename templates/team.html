@@ -39,9 +39,13 @@
                     {% if user.is_authenticated %}
                         <li><a href="/team/tags">Waiver Extension and Tags</a></li>
                         <li class="divider"></li>
+                        <li><a href="/league/free_agents">Free Agent List</a></li>
                         <li><a href="/league/extensions">Extensions</a></li>
                         <li><a href="/team/pending_transactions">Pending Transactions</a></li>
                         <li><a href="/team/manage_alerts">Manage Alerts</a></li>
+                        <li class="divider"></li>
+                        <li><a href="/team/trade_log">Trade Log</a></li>
+                        <li><a href="/team/trade">View Assets/Propose Trade</a></li>
                         <li class="divider"></li>
                     {% endif %}
                     <li><a href="/feature_list">Feature List & Changelog</a></li>
@@ -64,7 +68,6 @@
                     <a href="/auction" class="tab_button" id="auction_button">Auction</a>
                     <a href="/draft" class="tab_button" id="draft_button">Draft</a>
                     <a href="/message_board" class="tab_button" id="message_board_button">Message Board</a>
-
                     <a href="/rules" class="tab_button" id="rules_button">Rules</a>
                 </div>
 
@@ -87,6 +90,10 @@
                         {% elif request.path == '/team/release_players' %}
                             <a href="/team/pending_transactions" class="second_tab_button_team" id="team_transactions" style="background-color: #2d99d4; color: white">Transactions</a>
                         {% elif request.path == '/team/transactions' %}
+                            <a href="/team/pending_transactions" class="second_tab_button_team" id="team_transactions" style="background-color: #2d99d4; color: white">Transactions</a>
+                        {% elif request.path == '/team/trade' %}
+                            <a href="/team/pending_transactions" class="second_tab_button_team" id="team_transactions" style="background-color: #2d99d4; color: white">Transactions</a>
+                        {% elif request.path == '/team/trade_log' %}
                             <a href="/team/pending_transactions" class="second_tab_button_team" id="team_transactions" style="background-color: #2d99d4; color: white">Transactions</a>
                         {% else %}
                             <a href="/team/pending_transactions" class="second_tab_button_team" id="team_transactions">Transactions</a>

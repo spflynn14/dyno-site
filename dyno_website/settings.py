@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+#import raven
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #'raven.contrib.django.raven_compat',
     'dyno'
 ]
 
@@ -138,3 +140,8 @@ SERVER_EMAIL = 'dynastyleague.space@gmail.com'
 ADMINS = (
     ('Sean Flynn', 'spflynn0@gmail.com'),
 )
+
+
+RAVEN_CONFIG = {
+    'dsn': 'https://2d2e5dff4bfc47c1911d4f14eb767c5c:6779043766fd40e5ae0ee471cf4cd03e@app.getsentry.com/67472',
+}

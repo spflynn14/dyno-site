@@ -65,6 +65,11 @@
                          {% csrf_token %}
                          Click To Reset Available Roles &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="submit" value="Submit">
                      </form>
+                     <br><br><br>
+                     <form method="post" action="/create_drafts" style="float: right">
+                         {% csrf_token %}
+                         Click To Create Drafts &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="submit" value="Submit">
+                     </form>
 
                      <form method="post" action="/create_team_variable">
                          {% csrf_token %}
@@ -98,7 +103,6 @@
                          <input type="submit" value="Submit">
                      </form>
                  </div>
-
             </div>
         </section>
     </body>

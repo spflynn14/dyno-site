@@ -106,6 +106,9 @@ $(document).ready(function() {
                 id = Number(value.id);
             }
         });
+
+        var trans_type = $(this).parent().next().next().text();
+
         $.ajax({
             url: '/get_data_for_transaction_single_player',
             type: 'POST',
@@ -115,7 +118,13 @@ $(document).ready(function() {
             },
             dataType: 'json',
             success: function (data) {
-                location.href = '/transaction_single_player';
+                if (trans_type == 'Player Cut') {
+                    location.href = '/transaction_cut';
+                } else if (trans_type == 'Trade Accepted') {
+                    location.href = '/transaction_trade';
+                } else {
+                    location.href = '/transaction_single_player';
+                }
             }
         });
     });

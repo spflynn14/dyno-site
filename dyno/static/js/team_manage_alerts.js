@@ -78,6 +78,18 @@ $(document).ready(function() {
          $("input[name='instant_auction-won_checkbox'][value='no']").prop('checked', true);
     }
 
+    if (instant_alerts_list[3] == '1') {
+        $("input[name='instant_player_cut_checkbox'][value='yes']").prop('checked', true);
+    } else {
+         $("input[name='instant_player_cut_checkbox'][value='no']").prop('checked', true);
+    }
+
+    if (instant_alerts_list[4] == '1') {
+        $("input[name='instant_trade_accepted_checkbox'][value='yes']").prop('checked', true);
+    } else {
+         $("input[name='instant_trade_accepted_checkbox'][value='no']").prop('checked', true);
+    }
+
 
     function save_changes() {
         console.log($master);
@@ -178,6 +190,19 @@ $(document).ready(function() {
         } else {
             instant_alerts_list[2] = '0'
         }
+
+        if ($("input[name='instant_player_cut_checkbox'][value='yes']").prop('checked') == true) {
+            instant_alerts_list[3] = '1'
+        } else {
+            instant_alerts_list[3] = '0'
+        }
+
+        if ($("input[name='instant_trade_accepted_checkbox'][value='yes']").prop('checked') == true) {
+            instant_alerts_list[4] = '1'
+        } else {
+            instant_alerts_list[4] = '0'
+        }
+
         save_changes();
     });
 });

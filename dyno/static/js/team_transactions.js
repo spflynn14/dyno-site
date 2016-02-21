@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    console.log('ready');
+    console.log('ready 2');
 
     var d = new Date();
     var today = format_date(d);
@@ -68,7 +68,13 @@ $(document).ready(function() {
             var td_details = $('<td>');
 
             td_date.text(value.date);
-            td_player.text(value.player);
+
+            if (value.player == 'trade') {
+                td_player.text('');
+            } else {
+                td_player.text(value.player);
+            }
+
             td_transtype.text(value.transaction_type);
             var temp = determine_details(value);
             td_details.text(temp);
@@ -138,7 +144,57 @@ $(document).ready(function() {
                 return_text = 'Extension submitted: ' + data.var_i1 + ' years, $' + data.var_d2 + ' signing bonus per year, salary structure = ' + fixed_string;
             }
         } else if (data.transaction_type == 'Expansion Draft Pick') {
-            return_text = "Expansion Draft Pick: taken by " + data.team2 + ' in round ' + data.var_i1 + '. Previously owned by ' + data.team1 + '.';
+            return_text = "Expansion Draft Pick: taken by " + data.team2 + ' with pick ' + data.var_i1 + '. Previously owned by ' + data.team1 + '.';
+        } else if (data.transaction_type == 'Player Cut') {
+            if (Number(data.var_i1) == -1) {
+                return_text = "Set to be released";
+            } else {
+                return_text = "Set to be released. Amnesty used.";
+            }
+        } else if (data.transaction_type == 'Player Cut Processed') {
+            var temp_list = data.var_t1.split(',');
+            var fixed_string = '';
+            $.each(temp_list, function(index, value) {
+                if (Number(value) != 0) {
+                    fixed_string = fixed_string + '$' + Number(value).toFixed(2) + ', ';
+                }
+            });
+            fixed_string = fixed_string.slice(0,-2);
+            if (Number(data.var_i1) == -1) {
+                return_text = "Player has been released. Cap Penalty by year: " + fixed_string;
+            } else {
+                return_text = "Player has been released. An Amnesty was used. Cap Penalty by year: " + fixed_string;
+            }
+        } else if (data.transaction_type == 'Trade Offer') {
+            if (data.var_t1 == 'Pending') {
+                return_text = data.team1 + " sent a trade offer to " + data.team2 + '. -- ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+            } else if (data.var_t1 == 'Rejected') {
+                return_text = data.team1 + " sent a trade offer to " + data.team2 + '. It was rejected by ' + data.team2 + '. -- ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+            } else if (data.var_t1 == 'Accepted') {
+                return_text = data.team1 + " sent a trade offer to " + data.team2 + '. It was accepted by ' + data.team2 + '.';
+            } else if (data.var_t1 == 'Withdrawn') {
+                return_text = data.team1 + " withdrew a trade offer sent to " + data.team2 + '. -- ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+            } else if (data.var_t1 == 'Expired') {
+                return_text = 'This trade offer expired: ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+            } else if (data.var_t1 == 'Invalid') {
+                return_text = 'This trade offer was made invalid because one of the pieces of this trade is no longer owned by the same team: ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+            }
+        } else if (data.transaction_type == 'Trade Accepted') {
+            return_text = data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+        } else if (data.transaction_type == 'Counter Offer') {
+            if (data.var_t1 == 'Pending') {
+                return_text = data.team1 + " sent a counter offer to " + data.team2 + '. -- ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+            } else if (data.var_t1 == 'Rejected') {
+                return_text = data.team1 + " sent a counter offer to " + data.team2 + '. It was rejected by ' + data.team2 + '. -- ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+            } else if (data.var_t1 == 'Accepted') {
+                return_text = data.team1 + " sent a counter offer to " + data.team2 + '. It was accepted by ' + data.team2 + '.';
+            } else if (data.var_t1 == 'Withdrawn') {
+                return_text = data.team1 + " withdrew a counter offer sent to " + data.team2 + '. -- ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+            } else if (data.var_t1 == 'Expired') {
+                return_text = 'This trade offer expired: ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+            } else if (data.var_t1 == 'Invalid') {
+                return_text = 'This trade offer was made invalid because one of the pieces of this trade is no longer owned by the same team: ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+            }
         } else {
             return_text = 'determine_details function is broke; report this bug'
         }

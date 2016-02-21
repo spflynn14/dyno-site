@@ -14,35 +14,40 @@
 
     <div id="display_area">
         <div id="start_new_auction_area">
-            <h4 id="show_hide_new_auction">Click Here To Start A New Auction</h4><br>
-            <div id="new_auction_interactive">
-                <table style="table-layout: fixed; width: 70%">
-                    <thead>
-                        <tr>
-                            <td style="width: 40%;">Select Player</td>
-                            <td style="width: 40%;">Enter Proxy Bid ($0.25 increments)</td>
-                            <td style="width: 20%;"></td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <select id="new_auction_player_select">
-                                    {% for x in new_auction_player_list %}
-                                        <option>{{ x }}</option>
-                                    {% endfor %}
-                                </select>
-                            </td>
-                            <td>
-                                <input id='new_auction_proxy_bid' type="text" />
-                            </td>
-                            <td>
-                                <button id='add_new_auction_button' style="display: inline-block" type="button">Begin Auction</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            {% if new_auctions == 1 %}
+                <h4 id="show_hide_new_auction">Click Here To Start A New Auction</h4><br>
+                <div id="new_auction_interactive">
+                    <table style="table-layout: fixed; width: 70%">
+                        <thead>
+                            <tr>
+                                <td style="width: 40%;">Select Player</td>
+                                <td style="width: 40%;">Enter Proxy Bid ($0.25 increments)</td>
+                                <td style="width: 20%;"></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <select id="new_auction_player_select">
+                                        {% for x in new_auction_player_list %}
+                                            <option>{{ x }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td>
+                                    <input id='new_auction_proxy_bid' type="text" />
+                                </td>
+                                <td>
+                                    <button id='add_new_auction_button' style="display: inline-block" type="button">Begin Auction</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <h4>You cannot create new auctions at this time. You may bid on any active auctions seen below.</h4><br>
+            {% endif %}
+
 
         </div>
 

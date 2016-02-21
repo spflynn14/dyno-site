@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/confirm_trade.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="second_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        <div style="margin-left: 50px; margin-top: 50px; margin-right: 50px; height: 100%; overflow-y: auto;">
+            {% if view_flag_text == 'trade log' or view_flag_text == 'pending transaction' %}
+                <h4>View trade proposal:</h4><br><br>
+            {% elif view_flag_text == 'counter offer' %}
+                <h4>Please review the counter proposal:</h4><br><br>
+            {% else %}
+                <h4>Please review the trade proposal:</h4><br><br>
+            {% endif %}
+            <table style="width: 35%; table-layout: fixed; display: inline-block; float: left">
+                <thead style="height: 0px">
+                    <tr>
+                        <th style='width: 30%' >{{ pro_team }} gives up:</th>
+                    </tr>
+                </thead>
+                <tbody id="confirm_trade_tbody">
+                    <tr style="height: 10px"></tr>
+                    {% for x in pro_players %}
+                        <tr style="height: 30px">
+                            <td>{{ x }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for x in pro_picks %}
+                        <tr style="height: 30px">
+                            <td>{{ x }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for x in pro_assets %}
+                        <tr style="height: 30px">
+                            <td>{{ x }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for x in pro_cash %}
+                        <tr style="height: 30px">
+                            <td>{{ x }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <table style="width: 35%; table-layout: fixed; display: inline-block;">
+                <thead style="height: 30px">
+                    <tr>
+                        <th style='width: 30%' >{{ opp_team }} gives up:</th>
+                    </tr>
+                </thead>
+                <tbody id="confirm_trade_tbody">
+                    <tr style="height: 10px"></tr>
+                    {% for x in opp_players %}
+                        <tr style="height: 30px">
+                            <td>{{ x }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for x in opp_picks %}
+                        <tr style="height: 30px">
+                            <td>{{ x }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for x in opp_assets %}
+                        <tr style="height: 30px">
+                            <td>{{ x }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% for x in opp_cash %}
+                        <tr style="height: 30px">
+                            <td>{{ x }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <br><br><br><br>
+
+            <table style="width: 70%; table-layout: fixed; display: inline-block; float: left; margin-top: 20px;">
+                <thead>
+                    <tr style="border-top: 1px solid #cdcdcd">
+                        <th colspan="6">Cap Implications Of Trade:</th>
+                    </tr>
+                    <tr>
+                        <td style="font-size: x-small" colspan="6">Includes player cost, draft pick cost <span style="color: red">(estimated)</span>, and cash; does NOT include awards/exceptions</td>
+                    </tr>
+                    <tr>
+                        <td style="font-size: x-small" colspan="6">If specific pick is known (i.e. pick 1.08) draft pick cost is yearly cost of that specific pick.</td>
+                    </tr>
+                    <tr>
+                        <td style="font-size: x-small" colspan="6">If specific pick is NOT known (i.e. round 3 pick) draft pick cost is the average yearly cost for picks in that round.</td>
+                    </tr>
+                    <tr style="height: 15px"></tr>
+                    <tr style="height: 30px">
+                        <th width="50%"></th>
+                        <th style="text-decoration: underline" width="10%">{{ year_list.0 }}</th>
+                        <th style="text-decoration: underline" width="10%">{{ year_list.1 }}</th>
+                        <th style="text-decoration: underline" width="10%">{{ year_list.2 }}</th>
+                        <th style="text-decoration: underline" width="10%">{{ year_list.3 }}</th>
+                        <th style="text-decoration: underline" width="10%">{{ year_list.4 }}</th>
+                    </tr>
+                </thead>
+                <tbody id="trade_bottom_tbody">
+                    <tr style="height: 30px">
+                        <td style="font-size: small">{{ pro_team }}</td>
+                        <td style="font-size: small">${{ pro_cap.0|floatformat:2 }}</td>
+                        <td style="font-size: small">${{ pro_cap.1|floatformat:2 }}</td>
+                        <td style="font-size: small">${{ pro_cap.2|floatformat:2 }}</td>
+                        <td style="font-size: small">${{ pro_cap.3|floatformat:2 }}</td>
+                        <td style="font-size: small">${{ pro_cap.4|floatformat:2 }}</td>
+                    </tr>
+                    <tr style="height: 30px">
+                        <td style="font-size: small">{{ opp_team }}</td>
+                        <td style="font-size: small">${{ opp_cap.0|floatformat:2 }}</td>
+                        <td style="font-size: small">${{ opp_cap.1|floatformat:2 }}</td>
+                        <td style="font-size: small">${{ opp_cap.2|floatformat:2 }}</td>
+                        <td style="font-size: small">${{ opp_cap.3|floatformat:2 }}</td>
+                        <td style="font-size: small">${{ opp_cap.4|floatformat:2 }}</td>
+                    </tr>
+                    <tr style="height: 30px">
+                        <td style="font-size: small">Cap Space <span style="color: green">Increase</span>/<span style="color: red">Decrease</span> for {{ pro_team }} (estimated) &nbsp&nbsp&nbsp</td>
+                        {% if diff_cap.0 >= 0 %}
+                            <td style="font-size: small; color: green">${{ diff_cap.0|floatformat:2 }}</td>
+                        {% else %}
+                            <td style="font-size: small; color: red">${{ diff_cap.0|floatformat:2 }}</td>
+                        {% endif %}
+
+                        {% if diff_cap.1 >= 0 %}
+                            <td style="font-size: small; color: green">${{ diff_cap.1|floatformat:2 }}</td>
+                        {% else %}
+                            <td style="font-size: small; color: red">${{ diff_cap.1|floatformat:2 }}</td>
+                        {% endif %}
+
+                        {% if diff_cap.2 >= 0 %}
+                            <td style="font-size: small; color: green">${{ diff_cap.2|floatformat:2 }}</td>
+                        {% else %}
+                            <td style="font-size: small; color: red">${{ diff_cap.2|floatformat:2 }}</td>
+                        {% endif %}
+
+                        {% if diff_cap.3 >= 0 %}
+                            <td style="font-size: small; color: green">${{ diff_cap.3|floatformat:2 }}</td>
+                        {% else %}
+                            <td style="font-size: small; color: red">${{ diff_cap.3|floatformat:2 }}</td>
+                        {% endif %}
+
+                        {% if diff_cap.4 >= 0 %}
+                            <td style="font-size: small; color: green">${{ diff_cap.4|floatformat:2 }}</td>
+                        {% else %}
+                            <td style="font-size: small; color: red">${{ diff_cap.4|floatformat:2 }}</td>
+                        {% endif %}
+                    </tr>
+                    <tr id="trade_button_row">
+                        <td colspan="5">
+                            <div style="margin-top: 50px; float: left;">
+                                {% if view_flag_text == 'trade log' or view_flag_text == 'pending transaction' %}
+                                    <button id='trade_go_back_button' type="button" style="color: blue">Go Back</button>
+                                    {% if is_proposing_team == 1 %}
+                                        <button id='trade_withdraw_button' type="button" style="color: red; margin-left: 40px;">Withdraw Trade Offer</button>
+                                    {% else %}
+                                        <button id='trade_reject_button' type="button" style="color: red; margin-left: 40px;">Reject</button>
+                                        <button id='trade_counter_button' type="button" style="color: #e68d00; margin-left: 20px;">Reject and Counter</button>
+                                        <button id='trade_accept_button' type="button" style="color: green; margin-left: 20px;">Accept</button>
+                                    {% endif %}
+                                {% else %}
+                                    <button id='trade_cancel_button' type="button" style="color: red">Cancel</button>
+                                    <button id='trade_confirm_button' type="button" style="color: blue">Confirm</button><br><br>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div id="message_text" style="color: red; margin-top: 5px"></div>
+                        </td>
+                    </tr>
+                    <tr id="secondary_bottom_row" hidden>
+                            <td>
+                                <textarea id="secondary_comments_text" rows="8" style="width: 90%;"></textarea>
+                            </td>
+                            <td>
+                                <button id='secondary_confirm_button' type="button">Submit</button>
+                            </td>
+                        </tr>
+                </tbody>
+            </table>
+            <div style="display: inline-block; width: 30%; float: right;">
+                <table>
+                    <tr style="height: 80px">
+                        {% if view_flag_text == 'trade log' or view_flag_text == 'pending transaction' %}
+                            <th style="vertical-align: top">Proposal Expiration: &nbsp&nbsp&nbsp</th>
+                            <td id="proposal_expiration_text"></td>
+                        {% else %}
+                            <th>Proposal Expires in... &nbsp&nbsp&nbsp</th>
+                            <td>
+                                <select id="trade_expiration_select">
+                                    <option value="1">1 day</option>
+                                    <option value="2">2 days</option>
+                                    <option value="3" selected>3 days</option>
+                                    <option value="4">4 days</option>
+                                    <option value="7">7 days</option>
+                                </select>
+                            </td>
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        <th style="vertical-align: top">Comments:</th>
+                        {% if view_flag_text == 'trade log' or view_flag_text == 'pending transaction' %}
+                            <td id="trade_comments_text_label"></td>
+                        {% else %}
+                            <td>
+                                <textarea id="trade_comments_text" rows="8"></textarea>
+                            </td>
+                        {% endif %}
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="vw_1" hidden>
+        {% for x in player_list %}
+            <table>
+                <tr>
+                    <td id="vw_1-1">{{ x.name }}</td>
+                    <td id="vw_1-2">{{ x.pos }}</td>
+                </tr>
+            </table>
+        {% endfor %}
+    </div>
+
+    <div id="vw_2" hidden>
+        {% for x in assets %}
+            <table>
+                <tr>
+                    <td id="vw_2-1">{{ x.asset_type }}</td>
+                    <td id="vw_2-2">{{ x.var_i1 }}</td>
+                    <td id="vw_2-3">{{ x.var_t1 }}</td>
+                    <td id="vw_2-4">{{ x.id }}</td>
+                </tr>
+            </table>
+        {% endfor %}
+    </div>
+
+    <div id="vw_3" hidden>
+        <p id="vw_3-1">{{ view_flag_text }}</p>
+        <p id="vw_3-2">{{ view_flag_trade_id }}</p>
+    </div>
+{% endblock %}

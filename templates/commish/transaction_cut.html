@@ -1,0 +1,235 @@
+{% extends 'admin/commish_office.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/transaction_cut.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+
+    <div class="tab_area" id="second_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        <div id="old_data_area">
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Position: </h5>
+                <p class="trans_single_text">{{ player.position }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Name: </h5>
+                <p class="trans_single_text">{{ player.name }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Team: </h5>
+                <p class="trans_single_text">{{ player.team }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Contract Type: </h5>
+                <p class="trans_single_text">{{ player.contract_type }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Total Value: </h5>
+                <p class="trans_single_text">{{ player.total_value }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Signing Bonus: </h5>
+                <p class="trans_single_text">{{ player.signing_bonus }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Salary: </h5>
+                <p class="trans_single_text">{{ player.salary }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr1 Salary: </h5>
+                <p class="trans_single_text">{{ player.yr1_salary }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr2 Salary: </h5>
+                <p class="trans_single_text">{{ player.yr2_salary }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr3 Salary: </h5>
+                <p class="trans_single_text">{{ player.yr3_salary }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr4 Salary: </h5>
+                <p class="trans_single_text">{{ player.yr4_salary }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr5 Salary: </h5>
+                <p class="trans_single_text">{{ player.yr5_salary }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr1 Signing Bonus: </h5>
+                <p class="trans_single_text">{{ player.yr1_sb }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr2 Signing Bonus: </h5>
+                <p class="trans_single_text">{{ player.yr2_sb }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr3 Signing Bonus: </h5>
+                <p class="trans_single_text">{{ player.yr3_sb }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr4 Signing Bonus: </h5>
+                <p class="trans_single_text">{{ player.yr4_sb }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr5 Signing Bonus: </h5>
+                <p class="trans_single_text">{{ player.yr5_sb }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Notes: </h5>
+                <p class="trans_single_text">{{ player.notes }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr1 Role: </h5>
+                <p class="trans_single_text">{{ player.yr1_role }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr2 Role: </h5>
+                <p class="trans_single_text">{{ player.yr2_role }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr3 Role: </h5>
+                <p class="trans_single_text">{{ player.yr3_role }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr4 Role: </h5>
+                <p class="trans_single_text">{{ player.yr4_role }}</p>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr5 Role: </h5>
+                <p class="trans_single_text">{{ player.yr5_role }}</p>
+            </div>
+        </div>
+
+        <div id="new_data_area">
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Type of Cut: </h5>
+                {% if type_of_cut == 0 %}
+                    <input type="radio" class="trans_single_text" name="type_cut" value="offseason" checked> &nbsp&nbspOffseason</td>
+                    <input type="radio" class="trans_single_text" name="type_cut" value="in-season"> &nbsp&nbspIn-Season</td>
+                {% else %}
+                    <input type="radio" class="trans_single_text" name="type_cut" value="offseason"> &nbsp&nbspOffseason</td>
+                    <input type="radio" class="trans_single_text" name="type_cut" value="in-season" checked> &nbsp&nbspIn-Season</td>
+                {% endif %}
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr1 Cap Penalty: </h5>
+                <input type="text" size='16' class="trans_single_text" id='input_1'/>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr2 Cap Penalty: </h5>
+                <input type="text" size='16' class="trans_single_text" id='input_2'/>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr3 Cap Penalty: </h5>
+                <input type="text" size='16' class="trans_single_text" id='input_3'/>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr4 Cap Penalty: </h5>
+                <input type="text" size='16' class="trans_single_text" id='input_4'/>
+            </div>
+            <div class="trans_single_row">
+                <h5 class="trans_single_header">Yr5 Cap Penalty: </h5>
+                <input type="text" size='16' class="trans_single_text" id='input_5'/>
+            </div>
+            <br><br><br>
+            <div>
+                <button type="button" id="amnesty_100_button" style="display: inline-block; margin-left: 100px">100% Amnesty</button>
+                <button type="button" id="amnesty_50_button" style="display: inline-block;">50% Amnesty</button>
+                <button type="button" id="amnesty_10_button" style="display: inline-block;">10% Amnesty</button>
+                <button type="button" id="amnesty_0_button" style="display: inline-block;">Reset</button>
+                <button type="button" id="amnesty_oldrules_button" style="display: inline-block;">Old Rules</button>
+            </div>
+        </div>
+
+        <div id="submit_button_area">
+            <button type="button" id="trans_cut_submit_button" style="display: inline-block; margin-left: 40%">Submit</button>
+        </div>
+
+        <div id="show_transaction_data_area">
+            <table style="table-layout: fixed">
+                <tbody>
+                    <tr>
+                        <th class="trans_single_table_header_cell">Player: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.player }}</td>
+                        <th class="trans_single_table_header_cell">Team1: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.team1 }}</td>
+                        <th class="trans_single_table_header_cell">Team2: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.team2 }}</td>
+                    </tr>
+                    <tr>
+                        <th class="trans_single_table_header_cell">Trans Type: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.transaction_type }}</td>
+                        <th class="trans_single_table_header_cell">Var_d1: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.var_d1 }}</td>
+                        <th class="trans_single_table_header_cell">Var_d2: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.var_d2 }}</td>
+                    </tr>
+                    <tr>
+                        <th class="trans_single_table_header_cell">Var_d3: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.var_d3 }}</td>
+                        <th class="trans_single_table_header_cell">Var_i1: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.var_i1 }}</td>
+                        <th class="trans_single_table_header_cell">Var_i2: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.var_i2 }}</td>
+                    </tr>
+                    <tr>
+                        <th class="trans_single_table_header_cell">Var_t1: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.var_t1 }}</td>
+                        <th class="trans_single_table_header_cell">Var_t2: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.var_t2 }}</td>
+                        <th class="trans_single_table_header_cell">Var_t3: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.var_t3 }}</td>
+                    </tr>
+                    <tr>
+                        <th class="trans_single_table_header_cell">Date: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.date }}</td>
+                        <th class="trans_single_table_header_cell">ID: </th>
+                        <td class="trans_single_table_text_cell">{{ transaction.id }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="vw_1" hidden>
+        <table>
+            <tr>
+                <td id="vw_1-1">{{ transaction.date }}</td>
+                <td id="vw_1-2">{{ transaction.player }}</td>
+                <td id="vw_1-3">{{ transaction.team1 }}</td>
+                <td id="vw_1-4">{{ transaction.team2 }}</td>
+                <td id="vw_1-5">{{ transaction.transaction_type }}</td>
+                <td id="vw_1-6">{{ transaction.var_d1 }}</td>
+                <td id="vw_1-7">{{ transaction.var_d2 }}</td>
+                <td id="vw_1-8">{{ transaction.var_d3 }}</td>
+                <td id="vw_1-9">{{ transaction.var_i1 }}</td>
+                <td id="vw_1-10">{{ transaction.var_i2 }}</td>
+                <td id="vw_1-11">{{ transaction.var_t1 }}</td>
+                <td id="vw_1-12">{{ transaction.var_t2 }}</td>
+                <td id="vw_1-13">{{ transaction.var_t3 }}</td>
+                <td id="vw_1-14">{{ transaction.date.isoformat }}</td>
+                <td id="vw_1-15">{{ transaction.id }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="vw_2" hidden>
+        <table>
+            <tr>
+                <td id="vw_2-0">{{ amnesty }}</td>
+                <td id="vw_2-1">{{ amnesty.id }}</td>
+                <td id="vw_2-2">{{ amnesty.var_i1 }}</td>
+            </tr>
+        </table>
+    </div>
+
+{% endblock %}

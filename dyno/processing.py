@@ -1,17 +1,119 @@
 import os, platform
 import sqlite3 as sql3
 from django.utils import timezone
+from django.db.models import Sum
 from decimal import *
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.core.mail import send_mail
+from django.core import serializers
 import datetime
 from .forms import *
-from .views import working_local, year_list
+from .views import working_local, year_list, draft_pick_salary_list, get_verbose_trade_info
 
+
+def check_trade_for_dup_assets(trade, pro_players, pro_picks, pro_assets, opp_players, opp_picks, opp_assets):
+        trade_invalid = False
+        
+        trade_pro_players = trade.pro_players.split(':')
+        trade_pro_picks = trade.pro_picks.split(':')
+        trade_pro_assets = trade.pro_assets.split(':')
+        trade_opp_players = trade.opp_players.split(':')
+        trade_opp_picks = trade.opp_picks.split(':')
+        trade_opp_assets = trade.opp_assets.split(':')
+
+        if trade_pro_players[0] == '':
+            trade_pro_players = []
+        if trade_opp_players[0] == '':
+            trade_opp_players = []
+        if trade_pro_picks[0] == '':
+            trade_pro_picks = []
+        if trade_opp_picks[0] == '':
+            trade_opp_picks = []
+        if trade_pro_assets[0] == '':
+            trade_pro_assets = []
+        if trade_opp_assets[0] == '':
+            trade_opp_assets = []
+
+        for x in trade_pro_players:
+            if x in pro_players:
+                trade_invalid = True
+                break
+        for x in trade_pro_picks:
+            if x in pro_picks:
+                trade_invalid = True
+                break
+        for x in trade_pro_assets:
+            if x in pro_assets:
+                trade_invalid = True
+                break
+        for x in trade_opp_players:
+            if x in opp_players:
+                trade_invalid = True
+                break
+        for x in trade_opp_picks:
+            if x in opp_picks:
+                trade_invalid = True
+                break
+        for x in trade_opp_assets:
+            if x in opp_assets:
+                trade_invalid = True
+                break
+
+        return trade_invalid
+
+def pull_strings_from_trade(trade_id):
+    a = Trade.objects.get(pk=trade_id)
+    pro_team = a.team1
+    pro_players = a.pro_players.strip().split(':')
+    pro_picks = a.pro_picks.strip().split(':')
+    pro_assets = a.pro_assets.strip().split(':')
+    pro_cash = a.pro_cash.strip().split(':')
+    opp_team = a.team2
+    opp_players = a.opp_players.strip().split(':')
+    opp_picks = a.opp_picks.strip().split(':')
+    opp_assets = a.opp_assets.strip().split(':')
+    opp_cash = a.opp_cash.strip().split(':')
+    if pro_players[0] == '':
+        pro_players = []
+    if opp_players[0] == '':
+        opp_players = []
+    if pro_picks[0] == '':
+        pro_picks = []
+    if opp_picks[0] == '':
+        opp_picks = []
+    if pro_assets[0] == '':
+        pro_assets = []
+    if opp_assets[0] == '':
+        opp_assets = []
+
+    pro_picks_verbose, pro_assets_verbose, pro_cash_verbose, opp_picks_verbose, opp_assets_verbose, opp_cash_verbose = get_verbose_trade_info(pro_picks, pro_assets, pro_cash, opp_picks, opp_assets, opp_cash)
+
+    pro_string = ''
+    for x in pro_players:
+        pro_string = pro_string + x + '\n'
+    for x in pro_picks_verbose:
+        pro_string = pro_string + x + '\n'
+    for x in pro_assets_verbose:
+        pro_string = pro_string + x + '\n'
+    for x in pro_cash_verbose:
+        pro_string = pro_string + x + '\n'
+
+    opp_string = ''
+    for x in opp_players:
+        opp_string = opp_string + x + '\n'
+    for x in opp_picks_verbose:
+        opp_string = opp_string + x + '\n'
+    for x in opp_assets_verbose:
+        opp_string = opp_string + x + '\n'
+    for x in opp_cash_verbose:
+        opp_string = opp_string + x + '\n'
+
+    return pro_team, opp_team, pro_string, opp_string
 
 def generate_alert_email_line(source_info, alert_type, var_list):
+
     if alert_type == 'Auction - New Auction':
         #var_list = player, team, bid
         if source_info == 'direct':
@@ -41,7 +143,55 @@ def generate_alert_email_line(source_info, alert_type, var_list):
         if source_info == 'direct':
             return var_list[0] + ' has been submitted to be released.'
         elif source_info == 'alert object':
-            return 'There is no email line for alert objects'
+            return var_list.var_t1 + ' has been submitted to be released.'
+    elif alert_type == 'Trade Offer':
+        #var_list = current_user, trade_id, comments
+        if source_info == 'direct':
+            pro_team, opp_team, pro_string, opp_string = pull_strings_from_trade(var_list[1])
+            return pro_team + ' has sent the following trade offer:\n\n\n\n' + pro_string + '\nfor\n\n' + opp_string + '\n\nComments: ' + var_list[2] + '\n\n\nPlease respond to all trade offers. You may view and act on trades by clicking on Trade Log under Quick Links'
+        elif source_info == 'alert object':
+            pro_team, opp_team, pro_string, opp_string = pull_strings_from_trade(var_list.var_i1)
+            return pro_team + ' sent a trade offer.'
+    elif alert_type == 'Counter Offer':
+        #var_list = current_user, trade_id, comments
+        if source_info == 'direct':
+            pro_team, opp_team, pro_string, opp_string = pull_strings_from_trade(var_list[1])
+            return pro_team + ' has sent the following counter offer:\n\n\n\n' + pro_string + '\nfor\n\n' + opp_string + '\n\nComments: ' + var_list[2] + '\n\n\nPlease respond to all trade offers. You may view and act on trades by clicking on Trade Log under Quick Links'
+        elif source_info == 'alert object':
+            pro_team, opp_team, pro_string, opp_string = pull_strings_from_trade(var_list.var_i1)
+            return pro_team + ' has sent a counter offer.'
+    elif alert_type == 'Trade Rejected':
+        #var_list = current_user, trade_id, comments
+        if source_info == 'direct':
+            pro_team, opp_team, pro_string, opp_string = pull_strings_from_trade(var_list[1])
+            return opp_team + ' has rejected the following trade:\n\n\n\n' + pro_string + '\nfor\n\n' + opp_string + '\n\nComments: ' + var_list[2]
+        elif source_info == 'alert object':
+            pro_team, opp_team, pro_string, opp_string = pull_strings_from_trade(var_list.var_i1)
+            return opp_team + ' has rejected a trade offer.'
+    elif alert_type == 'Trade Accepted':
+        #var_list = trade_id, comments
+        if source_info == 'direct':
+            pro_team, opp_team, pro_string, opp_string = pull_strings_from_trade(var_list[0])
+            return 'A trade has been agreed to between ' + pro_team + ' and ' + opp_team + '.\n\n\n\n' + pro_team + ' gives up: \n' + pro_string + '\n' + opp_team + ' gives up: \n' + opp_string + '\n\nComments: ' + var_list[1]
+        elif source_info == 'alert object':
+            pro_team, opp_team, pro_string, opp_string = pull_strings_from_trade(var_list.var_i1)
+            return 'A trade has been agreed to between ' + pro_team + ' and ' + opp_team + '.'
+    elif alert_type == 'Trade Processed':
+        #var_list = trade_id
+        if source_info == 'direct':
+            pro_team, opp_team, pro_string, opp_string = pull_strings_from_trade(var_list[0])
+            return 'The following trade has been processed:\n\n\n\n' + pro_team + ' gives up: \n' + pro_string + '\n' + opp_team + ' gives up: \n' + opp_string
+        elif source_info == 'alert object':
+            pro_team, opp_team, pro_string, opp_string = pull_strings_from_trade(var_list.var_i1)
+            return 'A trade between ' + pro_team + ' and ' + opp_team + ' has been processed.'
+    elif alert_type == 'Trade Withdrawn':
+        #var_list = current_user, trade_id
+        if source_info == 'direct':
+            pro_team, opp_team, pro_string, opp_string = pull_strings_from_trade(var_list[1])
+            return pro_team + ' has withdrawn the following trade:\n\n\n\n' + pro_string + '\nfor\n\n' + opp_string
+        elif source_info == 'alert object':
+            pro_team, opp_team, pro_string, opp_string = pull_strings_from_trade(var_list.var_i1)
+            return pro_team + ' has withdrawn their trade offer.'
 
 def send_instant_alert(alert_type, user, email, var_list):
     if user != 'commish':
@@ -57,7 +207,7 @@ def send_instant_alert(alert_type, user, email, var_list):
         #var_list = player, team, bid
         if instant_alerts[0] == '1':
             target_email = email
-            subject_line = '[Dynasty League] Alert - New Auction'
+            subject_line = '[Dynasty League] New Auction'
             email_body = generate_alert_email_line('direct', alert_type, var_list)
             send_mail(subject_line,
                       email_body + alert_settings_message + email_footer,
@@ -68,7 +218,7 @@ def send_instant_alert(alert_type, user, email, var_list):
         #var_list = old_team, new_team, player, current high bid
         if instant_alerts[1] == '1':
             target_email = email
-            subject_line = '[Dynasty League] Alert - You Have Been Outbid'
+            subject_line = '[Dynasty League] You Have Been Outbid'
             email_body = generate_alert_email_line('direct', alert_type, var_list)
             send_mail(subject_line,
                       email_body + alert_settings_message + email_footer,
@@ -79,7 +229,7 @@ def send_instant_alert(alert_type, user, email, var_list):
         #var_list = player, winning_team, winning_bid
         if instant_alerts[2] == '1':
             target_email = email
-            subject_line = '[Dynasty League] Alert - Auction Ended'
+            subject_line = '[Dynasty League] Auction Ended'
             email_body = generate_alert_email_line('direct', alert_type, var_list)
             send_mail(subject_line,
                       email_body + alert_settings_message + email_footer,
@@ -98,11 +248,93 @@ def send_instant_alert(alert_type, user, email, var_list):
                   fail_silently=False)
     elif alert_type == 'Player Cut':
         #var_list = player
+        if user == 'commish':
+            target_email = email
+            subject_line = '[Dynasty League] COMMISH ALERT - Player Cuts to Process'
+            email_body = generate_alert_email_line('direct', alert_type, var_list)
+            send_mail(subject_line,
+                      email_body + alert_settings_message + email_footer,
+                      '',
+                      [target_email],
+                      fail_silently=False)
+        else:
+            if instant_alerts[3] == '1':
+                target_email = email
+                subject_line = '[Dynasty League] Player Cut'
+                email_body = generate_alert_email_line('direct', alert_type, var_list)
+                send_mail(subject_line,
+                          email_body + alert_settings_message + email_footer,
+                          '',
+                          [target_email],
+                          fail_silently=False)
+    elif alert_type == 'Trade Offer':
+        #var_list = current_user, trade_id, comments
         target_email = email
-        subject_line = '[Dynasty League] COMMISH ALERT - Player Cuts to Process'
+        subject_line = '[Dynasty League] TRADE PROPOSAL'
         email_body = generate_alert_email_line('direct', alert_type, var_list)
         send_mail(subject_line,
-                  email_body + alert_settings_message + email_footer,
+                  email_body + email_footer,
+                  '',
+                  [target_email],
+                  fail_silently=False)
+    elif alert_type == 'Counter Offer':
+        #var_list = current_user, trade_id, comments
+        target_email = email
+        subject_line = '[Dynasty League] TRADE COUNTER OFFER'
+        email_body = generate_alert_email_line('direct', alert_type, var_list)
+        send_mail(subject_line,
+                  email_body + email_footer,
+                  '',
+                  [target_email],
+                  fail_silently=False)
+    elif alert_type == 'Trade Rejected':
+        #var_list = current_user, trade_id, comments
+        target_email = email
+        subject_line = '[Dynasty League] TRADE REJECTED'
+        email_body = generate_alert_email_line('direct', alert_type, var_list)
+        send_mail(subject_line,
+                  email_body + email_footer,
+                  '',
+                  [target_email],
+                  fail_silently=False)
+    elif alert_type == 'Trade Accepted':
+        #var_list = trade_id, comments
+        if user == 'commish':
+            target_email = email
+            subject_line = '[Dynasty League] COMMISH ALERT - Trade Accepted'
+            email_body = generate_alert_email_line('direct', alert_type, var_list)
+            send_mail(subject_line,
+                      email_body + email_footer,
+                      '',
+                      [target_email],
+                      fail_silently=False)
+        else:
+            if instant_alerts[4] == '1':
+                target_email = email
+                subject_line = '[Dynasty League] Trade Accepted'
+                email_body = generate_alert_email_line('direct', alert_type, var_list)
+                send_mail(subject_line,
+                          email_body + email_footer,
+                          '',
+                          [target_email],
+                          fail_silently=False)
+    elif alert_type == 'Trade Processed':
+        #var_list = trade_id
+        target_email = email
+        subject_line = '[Dynasty League] Trade Processed'
+        email_body = generate_alert_email_line('direct', alert_type, var_list)
+        send_mail(subject_line,
+                  email_body + email_footer,
+                  '',
+                  [target_email],
+                  fail_silently=False)
+    elif alert_type == 'Trade Withdrawn':
+        #var_list = current_user, trade_id
+        target_email = email
+        subject_line = '[Dynasty League] Trade Offer Withdrawn'
+        email_body = generate_alert_email_line('direct', alert_type, var_list)
+        send_mail(subject_line,
+                  email_body + email_footer,
                   '',
                   [target_email],
                   fail_silently=False)
@@ -160,6 +392,71 @@ def create_alerts(alert_type, current_user, var_list):
                              date=date_time,
                              var_t1=var_list[0])
         send_instant_alert(alert_type, 'commish', 'spflynn0@gmail.com', var_list)
+        c = Team.objects.all().exclude(user=current_user)
+        for x in c:
+            Alert.objects.create(user=x.user,
+                                 alert_type=alert_type,
+                                 date=date_time,
+                                 var_t1=var_list[0])
+            send_instant_alert(alert_type, x.user, x.email, var_list)
+    elif alert_type == 'Trade Offer' or alert_type == 'Counter Offer':
+        #var_list = opp_user, trade_id, comments
+        c = Team.objects.get(user=current_user)
+        Alert.objects.create(user=current_user,
+                             alert_type=alert_type,
+                             date=date_time,
+                             var_i1=var_list[1])
+
+        c = Team.objects.get(user=var_list[0])
+        Alert.objects.create(user=var_list[0],
+                             alert_type=alert_type,
+                             date=date_time,
+                             var_i1=var_list[1])
+        send_instant_alert(alert_type, current_user, c.email, [current_user, var_list[1], var_list[2]])
+    elif alert_type == 'Trade Rejected':
+        #var_list = opp_user, trade_id, comments
+        c = Team.objects.get(user=var_list[0])
+        Alert.objects.create(user=var_list[0],
+                             alert_type=alert_type,
+                             date=date_time,
+                             var_i1=var_list[1])
+        send_instant_alert(alert_type, current_user, c.email, [current_user, var_list[1], var_list[2]])
+    elif alert_type == 'Trade Accepted':
+        #var_list = trade_id, comments
+        a = Team.objects.all().exclude(user=current_user)
+        for x in a:
+            Alert.objects.create(user=x.user,
+                                 alert_type=alert_type,
+                                 date=date_time,
+                                 var_i1=var_list[0])
+            send_instant_alert(alert_type, x.user, x.email, var_list)
+        Alert.objects.create(user='commish',
+                             alert_type=alert_type,
+                             date=date_time,
+                             var_i1=var_list[0])
+        send_instant_alert(alert_type, 'commish', 'spflynn0@gmail.com', var_list)
+    elif alert_type == 'Trade Processed':
+        #var_list = opp_user, trade_id
+        a = Team.objects.get(user=current_user)
+        b = Team.objects.get(user=var_list[0])
+        Alert.objects.create(user=current_user,
+                             alert_type=alert_type,
+                             date=date_time,
+                             var_i1=var_list[1])
+        send_instant_alert(alert_type, current_user, a.email, [var_list[1]])
+        Alert.objects.create(user=var_list[0],
+                             alert_type=alert_type,
+                             date=date_time,
+                             var_i1=var_list[1])
+        send_instant_alert(alert_type, var_list[0], b.email, [var_list[1]])
+    elif alert_type == 'Trade Withdrawn':
+        #var_list = opp_user, trade_id
+        c = Team.objects.get(user=var_list[0])
+        Alert.objects.create(user=var_list[0],
+                             alert_type=alert_type,
+                             date=date_time,
+                             var_i1=var_list[1])
+        send_instant_alert(alert_type, current_user, c.email, [current_user, var_list[1]])
 
 
 def auction_end_routine():
@@ -242,10 +539,10 @@ def periodic_alerts_routine():
         if x.daily_emails == 1:
             #user gets daily emails
             daily_time = x.daily_emails_time
-            #check to see if time_now is between daily_time -1 and daily_time +10 min
+            #check to see if time_now is between daily_time -5 and daily_time +10 min
             d = datetime.datetime.today()
             full_daily = datetime.datetime.combine(d, daily_time)
-            d1 = full_daily - datetime.timedelta(minutes=1)
+            d1 = full_daily - datetime.timedelta(minutes=5)
             d2 = full_daily + datetime.timedelta(minutes=10)
             start = d1.time()
             end = d2.time()
@@ -266,7 +563,7 @@ def periodic_alerts_routine():
                 c = Team.objects.get(user=x.user)
 
                 if email_body == '':
-                    if x.blank_emails == '1':
+                    if x.blank_emails == 1:
                         email_body = 'You have no alerts.'
                         target_email = c.email
                         subject_line = '[Dynasty League] Daily Alerts - ' + today_string
@@ -347,7 +644,8 @@ def commish_pending_transactions_routine():
     alert_settings_message = '\n\n\n\nYou can change your alert settings under the Team->Alerts->Manage Alerts tab.'
     email_footer = "\n\n\n\n\n\n\n**This email was sent from an unmonitored account. Do not reply to this email.**\n" + str(date_time)
 
-    if c == 0 or c == 30:
+    time_list = [55,56,57,58,59,0,1,2,3,4,5,25,26,27,28,29,30,31,32,33,34,35]
+    if c in time_list:
         email_body = 'You have ' + str(num_trans) + ' pending transactions.'
         target_email = 'spflynn0@gmail.com'
         subject_line = '[Dynasty League] COMMISH ALERT - You have old pending transactions'
@@ -356,6 +654,20 @@ def commish_pending_transactions_routine():
                   '',
                   [target_email],
                   fail_silently=False)
+
+def check_expired_trades():
+    time_now = timezone.now()
+
+    a = Trade.objects.all()
+
+    for x in a:
+        if x.expiration_date < time_now and x.status3 != 'Closed':
+            x.status2 = 'Expired'
+            x.status3 = 'Closed'
+            x.save()
+            b = Transaction.objects.filter(player='trade').get(var_i1=x.id)
+            b.var_t1 = 'Expired'
+            b.save()
 
 
 
@@ -1102,6 +1414,140 @@ def save_transaction_single_player(request):
 
     return JsonResponse('done', safe=False)
 
+def save_transaction_cut(request):
+    yr1_pen = request.POST['yr1_pen']
+    yr2_pen = request.POST['yr2_pen']
+    yr3_pen = request.POST['yr3_pen']
+    yr4_pen = request.POST['yr4_pen']
+    yr5_pen = request.POST['yr5_pen']
+    cut_season = int(request.POST['cut_season'])
+    trans_id = int(request.POST['trans_id'])
+    amnesty_id = int(request.POST['amnesty_id'])
+    amnesty_percentage = int(request.POST['amnesty_percentage'])
+
+    a = Transaction.objects.get(pk=trans_id)
+    player = a.player
+    team = a.team2
+    a.var_t1 = ''
+    a.save()
+
+    date_time = timezone.now()
+
+    penalty_string = yr1_pen + ',' + yr2_pen + ',' + yr3_pen + ',' + yr4_pen + ',' + yr5_pen
+
+    Transaction.objects.create(player=player,
+                               date=date_time,
+                               team1=a.team1,
+                               team2=a.team2,
+                               transaction_type='Player Cut Processed',
+                               var_d1 = a.var_d1,
+                               var_d2 = a.var_d2,
+                               var_d3 = a.var_d3,
+                               var_i1 = a.var_i1,
+                               var_i2 = a.var_i2,
+                               var_t1 = penalty_string,
+                               var_t2 = '',
+                               var_t3 = '')
+
+    b = Player.objects.get(name=player)
+
+    b.team = 'Free Agent'
+    b.contract_type = 'none'
+    b.notes = ''
+    b.yr1_role = '--'
+    b.yr2_role = '--'
+    b.yr3_role = '--'
+    b.yr4_role = '--'
+    b.yr5_role = '--'
+
+    if cut_season == 0:
+        b.total_value = 0.00
+        b.signing_bonus = 0.00
+        b.salary = 0.00
+        b.yr1_salary = 0.00
+        b.yr2_salary = 0.00
+        b.yr3_salary = 0.00
+        b.yr4_salary = 0.00
+        b.yr5_salary = 0.00
+        b.yr1_sb = 0.00
+        b.yr2_sb = 0.00
+        b.yr3_sb = 0.00
+        b.yr4_sb = 0.00
+        b.yr5_sb = 0.00
+
+    b.save()
+
+    if amnesty_id != -1:
+        c = Asset.objects.get(id=amnesty_id)
+        c.delete()
+
+    d = Team.objects.get(internal_name=team)
+    try:
+        d.yr1_cap_penalty += Decimal(yr1_pen)
+    except:
+        d.yr1_cap_penalty = Decimal(yr1_pen)
+    try:
+        d.yr2_cap_penalty += Decimal(yr2_pen)
+    except:
+        d.yr2_cap_penalty = Decimal(yr2_pen)
+    try:
+        d.yr3_cap_penalty += Decimal(yr3_pen)
+    except:
+        d.yr3_cap_penalty = Decimal(yr3_pen)
+    try:
+        d.yr4_cap_penalty += Decimal(yr4_pen)
+    except:
+        d.yr4_cap_penalty = Decimal(yr4_pen)
+    try:
+        d.yr5_cap_penalty += Decimal(yr5_pen)
+    except:
+        d.yr5_cap_penalty = Decimal(yr5_pen)
+    d.save()
+
+    penalties = []
+    try:
+        penalties.append(Decimal(yr1_pen))
+    except:
+        penalties.append(Decimal(0))
+    try:
+        penalties.append(Decimal(yr2_pen))
+    except:
+        penalties.append(Decimal(0))
+    try:
+        penalties.append(Decimal(yr3_pen))
+    except:
+        penalties.append(Decimal(0))
+    try:
+        penalties.append(Decimal(yr4_pen))
+    except:
+        penalties.append(Decimal(0))
+    try:
+        penalties.append(Decimal(yr5_pen))
+    except:
+        penalties.append(Decimal(0))
+
+    for x in range(0,len(penalties)):
+        if penalties[x] != 0:
+            Cap_Penalty_Entry.objects.create(team=team,
+                                             year=year_list[x],
+                                             penalty=penalties[x],
+                                             description='Penalty for cutting ' + player,
+                                             date=timezone.now())
+
+    #need to check for traded player/assets in other deals and cancel them
+    f = Trade.objects.all().exclude(status3='Closed')
+    for x in f:
+        trade_invalid = check_trade_for_dup_assets(x, player, [], [], player, [], [])
+        if trade_invalid:
+            x.status3='Closed'
+            x.status2='Invalid'
+            x.save()
+            g = Transaction.objects.filter(player='trade').get(var_i1=x.id)
+            g.var_t1 = 'Invalid'
+            g.save()
+
+    return JsonResponse('done', safe=False)
+
 def send_test_email(request):
     u = request.user
     a = Team.objects.get(user=u)
@@ -1491,6 +1937,16 @@ def get_extension_info(request):
 
     return JsonResponse('test', safe=False)
 
+def save_new_auctions_switch(request):
+    new_auctions_switch_state = int(request.POST['new_auctions_switch_state'])
+
+    if new_auctions_switch_state != 99:
+        a = Variable.objects.get(name='New Auction Flag')
+        a.int_variable = new_auctions_switch_state
+        a.save()
+
+    return JsonResponse('test', safe=False)
+
 def save_extension_switch(request):
     ext_switch = int(request.POST['extension_switch_state'])
 
@@ -1511,14 +1967,47 @@ def save_commish_periodic(request):
 
     return JsonResponse('test', safe=False)
 
+def save_include_impending_flag(request):
+    include_impending = int(request.POST['include_impending'])
+
+    if include_impending != 99:
+        a = Variable.objects.get(name='Include Impending')
+        a.int_variable = include_impending
+        a.save()
+
+    return JsonResponse('test', safe=False)
+
+def save_cut_season(request):
+    cut_season = int(request.POST['cut_season'])
+
+    if cut_season != 99:
+        a = Variable.objects.get(name='Cut Season')
+        a.int_variable = cut_season
+        a.save()
+
+    return JsonResponse('test', safe=False)
+
 def save_data_cut_player(request):
-    player = request.POST['player']
+    try:
+        player = request.POST['player']
+    except:
+        player_list = request.POST.getlist('player_list[]')
     from_page = request.POST['from']
 
-    a = TeamVariable.objects.filter(name='PlayersForCut').get(user=request.user)
-    a.text_variable = player
-    a.int_variable = 0
-    a.save()
+    if from_page == 'player':
+        a = TeamVariable.objects.filter(name='PlayersForCut').get(user=request.user)
+        a.text_variable = player
+        a.int_variable = 0
+        a.save()
+    elif from_page == 'team':
+        a = TeamVariable.objects.filter(name='PlayersForCut').get(user=request.user)
+        list_string = ''
+        for x in player_list:
+            list_string = list_string + x + ':'
+        list_string = list_string[:-1]
+        a.text_variable = list_string
+        a.int_variable = 1
+        a.save()
 
     return JsonResponse('test', safe=False)
 
@@ -1538,12 +2027,963 @@ def process_cuts(request):
             pass
 
     for x in l:
-        a = Player.objects.get(name=x.player)
-        Transaction.objects.create(player=x.player,
+        a = Player.objects.get(name=x['player'])
+        Transaction.objects.create(player=x['player'],
                                    team2=a.team,
                                    transaction_type='Player Cut',
-                                   var_i1=x.current_selection,
+                                   var_i1=x['current_selection'],
+                                   var_t1 = 'Pending',
+                                   var_t2 = 'Confirmed',
                                    date=timezone.now())
-        create_alerts('Player Cut', request.user, [x.player])
+        create_alerts('Player Cut', request.user, [x['player']])
 
     return JsonResponse('test', safe=False)
+
+def create_drafts(request):
+    a = Team.objects.all()
+    for year in range(year_list[1],year_list[4]):
+        for round in range(1,6):
+            for x in a:
+                Draft_Pick.objects.create(owner=x.internal_name,
+                                          original_owner=x.internal_name,
+                                          year=year,
+                                          round=round)
+    return HttpResponseRedirect('/')
+
+def configure_draft(request):
+    num_teams = Team.objects.count()
+    a = Variable.objects.get(name='Draft Order')
+    draft_order = a.text_variable.strip().split(',')
+    b = Draft_Pick.objects.all()
+
+    pick_list = []
+    comp_list = []
+    for pick in b:
+        if pick.year == year_list[0]:
+            if pick.compensatory == 'none':
+                pick_list.append(pick)
+            else:
+                comp_list.append(pick)
+    if len(pick_list) == 0:
+        for pick in b:
+            if pick.year == year_list[1]:
+                if pick.compensatory == 'none':
+                    pick_list.append(pick)
+                else:
+                    comp_list.append(pick)
+
+    for pick in pick_list:
+        for o in draft_order:
+            if pick.original_owner == o:
+                pick.pick_in_round = draft_order.index(o) + 1
+        if pick.round <= 3:
+            pick.pick_overall = ((pick.round - 1) * num_teams) + pick.pick_in_round
+        else:
+            pick.pick_overall = ((pick.round - 1) * num_teams) + pick.pick_in_round + len(comp_list)
+        try:
+            sal_list = draft_pick_salary_list[pick.pick_overall]
+        except:
+            sal_list = [1.00, 1.50]
+        for x in range(0,len(sal_list)):
+            if x == 0:
+                pick.yr1_sal = sal_list[x]
+            elif x == 1:
+                pick.yr2_sal = sal_list[x]
+            elif x == 2:
+                pick.yr3_sal = sal_list[x]
+            elif x == 3:
+                pick.yr4_sal = sal_list[x]
+
+    franchise_comps = []
+    dues_comps = []
+    for pick in comp_list:
+        if pick.compensatory == 'franchise tag':
+            franchise_comps.append(pick)
+        elif pick.compensatory == 'league dues':
+            dues_comps.append(pick)
+
+    ordered_franchise_comps = []
+    ordered_dues_comps = []
+    for o in draft_order:
+        for pick in franchise_comps:
+            if o == pick.original_owner:
+                ordered_franchise_comps.append(pick)
+        for pick in dues_comps:
+            if o == pick.original_owner:
+                ordered_dues_comps.append(pick)
+
+    pick_index = 0
+    for pick in ordered_franchise_comps:
+        pick_index += 1
+        pick.round = 3
+        pick.pick_in_round = 12 + pick_index
+        pick.pick_overall = 24 + pick.pick_in_round
+        try:
+            sal_list = draft_pick_salary_list[pick.pick_overall]
+        except:
+            sal_list = [1.00, 1.50]
+        for x in range(0,len(sal_list)):
+            if x == 0:
+                pick.yr1_sal = sal_list[x]
+            elif x == 1:
+                pick.yr2_sal = sal_list[x]
+            elif x == 2:
+                pick.yr3_sal = sal_list[x]
+            elif x == 3:
+                pick.yr4_sal = sal_list[x]
+
+    pick_index = 0
+    for pick in ordered_dues_comps:
+        pick_index += 1
+        pick.round = 3
+        pick.pick_in_round = 12 + pick_index + len(ordered_franchise_comps)
+        pick.pick_overall = 24 + pick.pick_in_round
+        try:
+            sal_list = draft_pick_salary_list[pick.pick_overall]
+        except:
+            sal_list = [1.00, 1.50]
+        for x in range(0,len(sal_list)):
+            if x == 0:
+                pick.yr1_sal = sal_list[x]
+            elif x == 1:
+                pick.yr2_sal = sal_list[x]
+            elif x == 2:
+                pick.yr3_sal = sal_list[x]
+            elif x == 3:
+                pick.yr4_sal = sal_list[x]
+
+    for pick in pick_list:
+        for x in b:
+            if x.id == pick.id:
+                x.round = pick.round
+                x.pick_in_round = pick.pick_in_round
+                x.pick_overall = pick.pick_overall
+                x.yr1_sal = pick.yr1_sal
+                x.yr2_sal = pick.yr2_sal
+                x.yr3_sal = pick.yr3_sal
+                x.yr4_sal = pick.yr4_sal
+                x.save()
+
+    for pick in ordered_franchise_comps:
+        for x in b:
+            if x.id == pick.id:
+                x.round = pick.round
+                x.pick_in_round = pick.pick_in_round
+                x.pick_overall = pick.pick_overall
+                x.yr1_sal = pick.yr1_sal
+                x.yr2_sal = pick.yr2_sal
+                x.yr3_sal = pick.yr3_sal
+                x.yr4_sal = pick.yr4_sal
+                x.save()
+
+    for pick in ordered_dues_comps:
+        for x in b:
+            if x.id == pick.id:
+                x.round = pick.round
+                x.pick_in_round = pick.pick_in_round
+                x.pick_overall = pick.pick_overall
+                x.yr1_sal = pick.yr1_sal
+                x.yr2_sal = pick.yr2_sal
+                x.yr3_sal = pick.yr3_sal
+                x.yr4_sal = pick.yr4_sal
+                x.save()
+
+    return JsonResponse('test', safe=False)
+
+def load_trade_opp_data(request):
+    team = request.POST['team_selected']
+    a = Team.objects.get(internal_name=team)
+
+    yr1_salary = Player.objects.filter(team=team).aggregate(yr1_total=Sum('yr1_salary')+Sum('yr1_sb'))['yr1_total']
+    yr2_salary = Player.objects.filter(team=team).aggregate(yr1_total=Sum('yr2_salary')+Sum('yr2_sb'))['yr1_total']
+    yr3_salary = Player.objects.filter(team=team).aggregate(yr1_total=Sum('yr3_salary')+Sum('yr3_sb'))['yr1_total']
+    yr4_salary = Player.objects.filter(team=team).aggregate(yr1_total=Sum('yr4_salary')+Sum('yr4_sb'))['yr1_total']
+    yr5_salary = Player.objects.filter(team=team).aggregate(yr1_total=Sum('yr5_salary')+Sum('yr5_sb'))['yr1_total']
+
+    try:
+        yr1_cap_pen = Decimal(a.yr1_cap_penalty)
+    except:
+        yr1_cap_pen = Decimal(0)
+    try:
+        yr2_cap_pen = Decimal(a.yr2_cap_penalty)
+    except:
+        yr2_cap_pen = Decimal(0)
+    try:
+        yr3_cap_pen = Decimal(a.yr3_cap_penalty)
+    except:
+        yr3_cap_pen = Decimal(0)
+    try:
+        yr4_cap_pen = Decimal(a.yr4_cap_penalty)
+    except:
+        yr4_cap_pen = Decimal(0)
+    try:
+        yr5_cap_pen = Decimal(a.yr5_cap_penalty)
+    except:
+        yr5_cap_pen = Decimal(0)
+
+    cap_space = [Decimal(200) - yr1_cap_pen - yr1_salary,
+                 Decimal(200) - yr2_cap_pen - yr2_salary,
+                 Decimal(200) - yr3_cap_pen - yr3_salary,
+                 Decimal(200) - yr4_cap_pen - yr4_salary,
+                 Decimal(200) - yr5_cap_pen - yr5_salary,]
+
+    b = Draft_Pick.objects.filter(owner=team).order_by('year', 'round', 'pick_in_round')
+
+    c = Asset.objects.filter(team=team).order_by('asset_type', 'date')
+
+    d = Player.objects.filter(team=team).order_by('-total_value')
+    QB_list = []
+    RB_list = []
+    WR_list = []
+    TE_list = []
+    DEF_list = []
+    K_list = []
+
+    for player in d:
+        if player.position == 'QB':
+            QB_list.append(player)
+        elif player.position == 'RB':
+            RB_list.append(player)
+        elif player.position == 'WR':
+            WR_list.append(player)
+        elif player.position == 'TE':
+            TE_list.append(player)
+        elif player.position == 'DEF':
+            DEF_list.append(player)
+        else:
+            K_list.append(player)
+
+    player_list = []
+    for player in QB_list:
+        player_list.append(player)
+    for player in RB_list:
+        player_list.append(player)
+    for player in WR_list:
+        player_list.append(player)
+    for player in TE_list:
+        player_list.append(player)
+    for player in K_list:
+        player_list.append(player)
+    for player in DEF_list:
+        player_list.append(player)
+
+    return JsonResponse({'draft_picks': serializers.serialize('json', b),
+                         'assets' : serializers.serialize('json', c),
+                         'cap_space' : cap_space,
+                         'player_list' : serializers.serialize('json', player_list),
+                         },
+                         safe=False)
+
+def save_trade_data(request):
+    team_selected = request.POST['team_selected']
+    left_players = request.POST.getlist('left_players[]')
+    left_picks = request.POST.getlist('left_picks[]')
+    left_assets = request.POST.getlist('left_assets[]')
+    left_cash = request.POST.getlist('left_cash[]')
+    right_players = request.POST.getlist('right_players[]')
+    right_picks = request.POST.getlist('right_picks[]')
+    right_assets = request.POST.getlist('right_assets[]')
+    right_cash = request.POST.getlist('right_cash[]')
+    view_flag_text = request.POST['view_flag_text']
+    is_proposing_team = request.POST['is_proposing_team']
+    view_flag_trade_id = request.POST['view_flag_trade_id']
+
+    save_string = team_selected + '\n'
+
+    if len(left_players) == 0:
+        save_string = save_string + '\n'
+    else:
+        for x in left_players:
+            save_string = save_string + x + ':'
+        save_string = save_string[:-1] + '\n'
+
+    if len(left_picks) == 0:
+        save_string = save_string + '\n'
+    else:
+        for x in left_picks:
+            save_string = save_string + x + ':'
+        save_string = save_string[:-1] + '\n'
+
+    if len(left_assets) == 0:
+        save_string = save_string + '\n'
+    else:
+        for x in left_assets:
+            save_string = save_string + x + ':'
+        save_string = save_string[:-1] + '\n'
+
+    if len(left_cash) == 0:
+        save_string = save_string + '\n'
+    else:
+        for x in left_cash:
+            save_string = save_string + x + ':'
+        save_string = save_string[:-1] + '\n'
+
+    if len(right_players) == 0:
+        save_string = save_string + '\n'
+    else:
+        for x in right_players:
+            save_string = save_string + x + ':'
+        save_string = save_string[:-1] + '\n'
+
+    if len(right_picks) == 0:
+        save_string = save_string + '\n'
+    else:
+        for x in right_picks:
+            save_string = save_string + x + ':'
+        save_string = save_string[:-1] + '\n'
+
+    if len(right_assets) == 0:
+        save_string = save_string + '\n'
+    else:
+        for x in right_assets:
+            save_string = save_string + x + ':'
+        save_string = save_string[:-1] + '\n'
+
+    if len(right_cash) == 0:
+        save_string = save_string + '\n'
+    else:
+        for x in right_cash:
+            save_string = save_string + x + ':'
+        save_string = save_string[:-1]
+
+    a = TeamVariable.objects.filter(name='TradeData').get(user=request.user)
+    a.text_variable = save_string
+    a.save()
+
+    b = TeamVariable.objects.filter(name='TradeViewFlags').get(user=request.user)
+    b.text_variable = view_flag_text + ',' + is_proposing_team
+    b.int_variable = int(view_flag_trade_id)
+    b.save()
+    
+    return JsonResponse('test', safe=False)
+
+def create_trade_string_for_display(pro_players, pro_picks_verbose, pro_assets_verbose, pro_cash_verbose, opp_players, opp_picks_verbose, opp_assets_verbose, opp_cash_verbose):
+    pro_string = ''
+    for x in pro_players:
+        pro_string = pro_string + x + '; '
+    for x in pro_picks_verbose:
+        pro_string = pro_string + x + '; '
+    for x in pro_assets_verbose:
+        pro_string = pro_string + x + '; '
+    for x in pro_cash_verbose:
+        pro_string = pro_string + x + '; '
+    pro_string = pro_string[0:-1]
+
+    opp_string = ''
+    for x in opp_players:
+        opp_string = opp_string + x + '; '
+    for x in opp_picks_verbose:
+        opp_string = opp_string + x + '; '
+    for x in opp_assets_verbose:
+        opp_string = opp_string + x + '; '
+    for x in opp_cash_verbose:
+        opp_string = opp_string + x + '; '
+    opp_string = opp_string[0:-1]
+
+    return pro_string, opp_string
+
+def process_trade(request):
+    def confirm(request, is_counter):
+        expiration_time = request.POST['expiration_time']
+        comments = request.POST['comments']
+
+        a = TeamVariable.objects.filter(name='TradeData').get(user=request.user)
+        trade_data = a.text_variable
+        trade_thread = a.int_variable
+        a.text_variable = ''
+        a.int_variable = 999999
+        a.save()
+
+        temp1 = trade_data.split('\n')
+        opp_team = temp1[0]
+        pro_players = temp1[1]
+        pro_picks = temp1[2]
+        pro_assets = temp1[3]
+        pro_cash = temp1[4]
+        opp_players = temp1[5]
+        opp_picks = temp1[6]
+        opp_assets = temp1[7]
+        opp_cash = temp1[8]
+
+        b = Team.objects.get(user=request.user)
+        pro_team = b.internal_name
+
+        if trade_thread == 999999:
+            c = Trade.objects.all()
+            thread_list = []
+            for x in c:
+                thread_list.append(x.trade_thread)
+            try:
+                last_thread = sorted(thread_list)[-1]
+            except:
+                last_thread = 0
+
+            trade_thread = last_thread + 1
+
+        date_now = timezone.now()
+        expiration_date = date_now + timezone.timedelta(days=int(expiration_time))
+
+        if (is_counter == True):
+            trade_status = 'Counter'
+            trans_type = 'Counter Offer'
+        else:
+            trade_status = 'Offer'
+            trans_type = 'Trade Offer'
+
+        Trade.objects.create(team1=pro_team,
+                             team2=opp_team,
+                             trade_thread=trade_thread,
+                             date=date_now,
+                             expiration_date=expiration_date,
+                             pro_players=pro_players,
+                             pro_picks=pro_picks,
+                             pro_assets=pro_assets,
+                             pro_cash=pro_cash,
+                             opp_players=opp_players,
+                             opp_picks=opp_picks,
+                             opp_assets=opp_assets,
+                             opp_cash=opp_cash,
+                             message=comments,
+                             status1=trade_status)
+
+        pro_players = pro_players.split(':')
+        pro_picks = pro_picks.split(':')
+        pro_assets = pro_assets.split(':')
+        pro_cash = pro_cash.split(':')
+        opp_players = opp_players.split(':')
+        opp_picks = opp_picks.split(':')
+        opp_assets = opp_assets.split(':')
+        opp_cash = opp_cash.split(':')
+
+        if pro_players[0] == '':
+            pro_players = []
+        if opp_players[0] == '':
+            opp_players = []
+        if pro_picks[0] == '':
+            pro_picks = []
+        if opp_picks[0] == '':
+            opp_picks = []
+        if pro_assets[0] == '':
+            pro_assets = []
+        if opp_assets[0] == '':
+            opp_assets = []
+
+        pro_picks_verbose, pro_assets_verbose, pro_cash_verbose, opp_picks_verbose, opp_assets_verbose, opp_cash_verbose = get_verbose_trade_info(pro_picks, pro_assets, pro_cash, opp_picks, opp_assets, opp_cash)
+
+        pro_string, opp_string = create_trade_string_for_display(pro_players, pro_picks_verbose, pro_assets_verbose, pro_cash_verbose, opp_players, opp_picks_verbose, opp_assets_verbose, opp_cash_verbose)
+
+        d = Trade.objects.last()
+        last_id = d.id
+
+        Transaction.objects.create(player='trade',
+                                   team1=pro_team,
+                                   team2=opp_team,
+                                   transaction_type=trans_type,
+                                   var_i1=last_id,
+                                   var_t1='Pending',
+                                   var_t2=pro_string,
+                                   var_t3=opp_string,
+                                   date=date_now)
+
+        e = Team.objects.get(internal_name=opp_team)
+        opp_user = e.user
+
+        if (is_counter == True):
+            create_alerts('Counter Offer', request.user, [opp_user, last_id, comments])
+        else:
+            create_alerts('Trade Offer', request.user, [opp_user, last_id, comments])
+
+    def reject(request, comments):
+        trade_id = int(request.POST['trade_id'])
+        a = Transaction.objects.filter(player='trade').get(var_i1=trade_id)
+        a.var_t1 = 'Rejected'
+        a.save()
+        b = Trade.objects.get(pk=trade_id)
+        b.status3 = 'Closed'
+        b.save()
+        Trade.objects.create(team1=b.team1,
+                             team2=b.team2,
+                             trade_thread=b.trade_thread,
+                             date=timezone.now(),
+                             expiration_date=b.expiration_date,
+                             pro_players=b.pro_players,
+                             pro_picks=b.pro_picks,
+                             pro_assets=b.pro_assets,
+                             pro_cash=b.pro_cash,
+                             opp_players=b.opp_players,
+                             opp_picks=b.opp_picks,
+                             opp_assets=b.opp_assets,
+                             opp_cash=b.opp_cash,
+                             message=comments,
+                             status1='Rejection',
+                             status3='Closed')
+        e = Team.objects.get(internal_name=b.team1)
+        opp_user = e.user
+        create_alerts('Trade Rejected', request.user, [opp_user, b.id, comments])
+
+    def accept(request):
+        trade_id = int(request.POST['trade_id'])
+        comments = request.POST['comments']
+        
+        a = Transaction.objects.filter(player='trade').get(var_i1=trade_id)
+        a.var_t1 = 'Accepted'
+        a.save()
+        
+        b = Trade.objects.get(pk=trade_id)
+        b.status3 = 'Closed'
+        b.save()
+        
+        Trade.objects.create(team1=b.team1,
+                             team2=b.team2,
+                             trade_thread=b.trade_thread,
+                             date=timezone.now(),
+                             expiration_date=b.expiration_date,
+                             pro_players=b.pro_players,
+                             pro_picks=b.pro_picks,
+                             pro_assets=b.pro_assets,
+                             pro_cash=b.pro_cash,
+                             opp_players=b.opp_players,
+                             opp_picks=b.opp_picks,
+                             opp_assets=b.opp_assets,
+                             opp_cash=b.opp_cash,
+                             message=comments,
+                             status1='Accepted',
+                             status3='Closed')
+        
+        pro_players = b.pro_players.split(':')
+        pro_picks = b.pro_picks.split(':')
+        pro_assets = b.pro_assets.split(':')
+        pro_cash = b.pro_cash.split(':')
+        opp_players = b.opp_players.split(':')
+        opp_picks = b.opp_picks.split(':')
+        opp_assets = b.opp_assets.split(':')
+        opp_cash = b.opp_cash.split(':')
+    
+        if pro_players[0] == '':
+            pro_players = []
+        if opp_players[0] == '':
+            opp_players = []
+        if pro_picks[0] == '':
+            pro_picks = []
+        if opp_picks[0] == '':
+            opp_picks = []
+        if pro_assets[0] == '':
+            pro_assets = []
+        if opp_assets[0] == '':
+            opp_assets = []
+        
+        pro_picks_verbose, pro_assets_verbose, pro_cash_verbose, opp_picks_verbose, opp_assets_verbose, opp_cash_verbose = get_verbose_trade_info(pro_picks, pro_assets, pro_cash, opp_picks, opp_assets, opp_cash)
+        
+        pro_string, opp_string = create_trade_string_for_display(pro_players, pro_picks_verbose, pro_assets_verbose, pro_cash_verbose, opp_players, opp_picks_verbose, opp_assets_verbose, opp_cash_verbose)
+
+        d = Trade.objects.last()
+        last_id = d.id
+        
+        Transaction.objects.create(player='trade',
+                                   team1=b.team1,
+                                   team2=b.team2,
+                                   transaction_type='Trade Accepted',
+                                   var_i1=last_id,
+                                   var_t1='Pending',
+                                   var_t2=pro_string,
+                                   var_t3=opp_string,
+                                   date=timezone.now())
+        
+        e = Team.objects.get(internal_name=b.team1)
+        opp_user = e.user
+        
+        create_alerts('Trade Accepted', request.user, [trade_id, comments])
+
+    def withdraw(request):
+        trade_id = int(request.POST['trade_id'])
+        a = Transaction.objects.filter(player='trade').get(var_i1=trade_id)
+        a.var_t1 = 'Withdrawn'
+        a.save()
+        b = Trade.objects.get(pk=trade_id)
+        b.status2 = 'Withdrawn'
+        b.status3 = 'Closed'
+        b.save()
+        e = Team.objects.get(internal_name=b.team2)
+        opp_user = e.user
+        create_alerts('Trade Withdrawn', request.user, [opp_user, b.id])
+
+
+    #end functions
+    
+
+    process_instruction = request.POST['process_instruction']
+
+    if process_instruction == 'confirm initial offer':
+        confirm(request, False)
+    elif process_instruction == 'reject offer':
+        comments = request.POST['comments']
+        reject(request, comments)
+    elif process_instruction == 'accept offer':
+        accept(request)
+    elif process_instruction == 'counter offer':
+        trade_id = int(request.POST['trade_id'])
+        f = TeamVariable.objects.filter(name='TradeViewFlags').get(user=request.user)
+        f.text_variable = 'counter offer, 1'
+        f.int_variable = trade_id
+        f.save()
+    elif process_instruction == 'finish counter offer':
+        reject(request, '')
+        confirm(request, True)
+    elif process_instruction == 'withdraw':
+        withdraw(request)
+
+
+    return JsonResponse('test', safe=False)
+
+def get_trade_data_for_alerts(request):
+    trade_id = request.POST['trade_id']
+    a = Trade.objects.filter(pk=int(trade_id))
+
+    return JsonResponse({'trade_data': serializers.serialize('json', a)},
+                         safe=False)
+
+def get_verbose_trade_data(request):
+    trade_id = request.POST['trade_id']
+    a = Trade.objects.get(pk=int(trade_id))
+
+    pro_players = a.pro_players.split(':')
+    pro_picks = a.pro_picks.split(':')
+    pro_assets = a.pro_assets.split(':')
+    pro_cash = a.pro_cash.split(':')
+    opp_players = a.opp_players.split(':')
+    opp_picks = a.opp_picks.split(':')
+    opp_assets = a.opp_assets.split(':')
+    opp_cash = a.opp_cash.split(':')
+
+    if pro_players[0] == '':
+        pro_players = []
+    if opp_players[0] == '':
+        opp_players = []
+    if pro_picks[0] == '':
+        pro_picks = []
+    if opp_picks[0] == '':
+        opp_picks = []
+    if pro_assets[0] == '':
+        pro_assets = []
+    if opp_assets[0] == '':
+        opp_assets = []
+    
+    pro_picks_verbose, pro_assets_verbose, pro_cash_verbose, opp_picks_verbose, opp_assets_verbose, opp_cash_verbose = get_verbose_trade_info(pro_picks, pro_assets, pro_cash, opp_picks, opp_assets, opp_cash)
+
+    return JsonResponse({'pro_players' : pro_players,
+                         'pro_picks' : pro_picks_verbose,
+                         'pro_assets' : pro_assets_verbose,
+                         'pro_cash' : pro_cash_verbose,
+                         'opp_players' : opp_players,
+                         'opp_picks' : opp_picks_verbose,
+                         'opp_assets' : opp_assets_verbose,
+                         'opp_cash' : opp_cash_verbose,
+                         }, safe=False)
+
+def save_redirect_trade_data(request):
+    trade_id = request.POST['trade_id']
+    aa = Team.objects.get(user=request.user)
+    user_team = aa.internal_name
+
+    a = Trade.objects.get(pk=int(trade_id))
+
+    is_proposing_team = 1
+    if user_team == a.team1:
+        team_selected = a.team2
+        left_players = a.pro_players.split(':')
+        left_picks = a.pro_picks.split(':')
+        left_assets = a.pro_assets.split(':')
+        left_cash = a.pro_cash.split(':')
+        right_players = a.opp_players.split(':')
+        right_picks = a.opp_picks.split(':')
+        right_assets = a.opp_assets.split(':')
+        right_cash = a.opp_cash.split(':')
+    else:
+        team_selected = a.team1
+        left_players = a.opp_players.split(':')
+        left_picks = a.opp_picks.split(':')
+        left_assets = a.opp_assets.split(':')
+        left_cash = a.opp_cash.split(':')
+        right_players = a.pro_players.split(':')
+        right_picks = a.pro_picks.split(':')
+        right_assets = a.pro_assets.split(':')
+        right_cash = a.pro_cash.split(':')
+        is_proposing_team = 0
+
+    save_string = team_selected + '\n'
+
+    if len(left_players) == 0:
+        save_string = save_string + '\n'
+    else:
+        for x in left_players:
+            save_string = save_string + x + ':'
+        save_string = save_string[:-1] + '\n'
+
+    if len(left_picks) == 0:
+        save_string = save_string + '\n'
+    else:
+        for x in left_picks:
+            save_string = save_string + x + ':'
+        save_string = save_string[:-1] + '\n'
+
+    if len(left_assets) == 0:
+        save_string = save_string + '\n'
+    else:
+        for x in left_assets:
+            save_string = save_string + x + ':'
+        save_string = save_string[:-1] + '\n'
+
+    if len(left_cash) == 0:
+        save_string = save_string + '\n'
+    else:
+        for x in left_cash:
+            save_string = save_string + x + ':'
+        save_string = save_string[:-1] + '\n'
+
+    if len(right_players) == 0:
+        save_string = save_string + '\n'
+    else:
+        for x in right_players:
+            save_string = save_string + x + ':'
+        save_string = save_string[:-1] + '\n'
+
+    if len(right_picks) == 0:
+        save_string = save_string + '\n'
+    else:
+        for x in right_picks:
+            save_string = save_string + x + ':'
+        save_string = save_string[:-1] + '\n'
+
+    if len(right_assets) == 0:
+        save_string = save_string + '\n'
+    else:
+        for x in right_assets:
+            save_string = save_string + x + ':'
+        save_string = save_string[:-1] + '\n'
+
+    if len(right_cash) == 0:
+        save_string = save_string + '\n'
+    else:
+        for x in right_cash:
+            save_string = save_string + x + ':'
+        save_string = save_string[:-1]
+
+    b = TeamVariable.objects.filter(name='TradeData').get(user=request.user)
+    b.text_variable = save_string
+    b.int_variable = a.trade_thread
+    b.save()
+
+    redirect_from = request.POST['from']
+    c = TeamVariable.objects.filter(name='TradeViewFlags').get(user=request.user)
+    c.text_variable = redirect_from + ',' + str(is_proposing_team)
+    c.int_variable = a.id
+    c.save()
+
+    return JsonResponse('done', safe=False)
+
+def save_transaction_trade(request):
+    trade_id = int(request.POST['trade_id'])
+    trans_id = int(request.POST['trans_id'])
+    
+    a = Trade.objects.get(pk=trade_id)
+    pro_team = a.team1
+    pro_players = a.pro_players.strip().split(':')
+    pro_picks = a.pro_picks.strip().split(':')
+    pro_assets = a.pro_assets.strip().split(':')
+    pro_cash = a.pro_cash.strip().split(':')
+    opp_team = a.team2
+    opp_players = a.opp_players.strip().split(':')
+    opp_picks = a.opp_picks.strip().split(':')
+    opp_assets = a.opp_assets.strip().split(':')
+    opp_cash = a.opp_cash.strip().split(':')
+
+    if pro_players[0] == '':
+        pro_players = []
+    if opp_players[0] == '':
+        opp_players = []
+    if pro_picks[0] == '':
+        pro_picks = []
+    if opp_picks[0] == '':
+        opp_picks = []
+    if pro_assets[0] == '':
+        pro_assets = []
+    if opp_assets[0] == '':
+        opp_assets = []
+
+    for player in pro_players:
+        b = Player.objects.get(name=player)
+        b.team = opp_team
+        b.save()
+    for player in opp_players:
+        b = Player.objects.get(name=player)
+        b.team = pro_team
+        b.save()
+
+    for pick in pro_picks:
+        c = Draft_Pick.objects.get(pk=int(pick))
+        c.owner = opp_team
+        c.save()
+    for pick in opp_picks:
+        c = Draft_Pick.objects.get(pk=int(pick))
+        c.owner = pro_team
+        c.save()
+
+    for asset in pro_assets:
+        d = Asset.objects.get(pk=int(asset))
+        d.team = opp_team
+        d.save()
+    for asset in opp_assets:
+        d = Asset.objects.get(pk=int(asset))
+        d.team = pro_team
+        d.save()
+        
+    e = Team.objects.get(internal_name=pro_team)
+    e.yr1_cap_penalty = e.yr1_cap_penalty + Decimal(pro_cash[0]) - Decimal(opp_cash[0])
+    e.yr2_cap_penalty = e.yr2_cap_penalty + Decimal(pro_cash[1]) - Decimal(opp_cash[1])
+    e.yr3_cap_penalty = e.yr3_cap_penalty + Decimal(pro_cash[2]) - Decimal(opp_cash[2])
+    e.yr4_cap_penalty = e.yr4_cap_penalty + Decimal(pro_cash[3]) - Decimal(opp_cash[3])
+    e.yr5_cap_penalty = e.yr5_cap_penalty + Decimal(pro_cash[4]) - Decimal(opp_cash[4])
+    e.save()
+    
+    f = Team.objects.get(internal_name=opp_team)
+    f.yr1_cap_penalty = f.yr1_cap_penalty + Decimal(opp_cash[0]) - Decimal(pro_cash[0])
+    f.yr2_cap_penalty = f.yr2_cap_penalty + Decimal(opp_cash[1]) - Decimal(pro_cash[1])
+    f.yr3_cap_penalty = f.yr3_cap_penalty + Decimal(opp_cash[2]) - Decimal(pro_cash[2])
+    f.yr4_cap_penalty = f.yr4_cap_penalty + Decimal(opp_cash[3]) - Decimal(pro_cash[3])
+    f.yr5_cap_penalty = f.yr5_cap_penalty + Decimal(opp_cash[4]) - Decimal(pro_cash[4])
+    f.save()
+
+    for x in range(0,len(pro_cash)):
+        if Decimal(pro_cash[x]) != 0:
+            Cap_Penalty_Entry.objects.create(team=pro_team,
+                                             year=year_list[x],
+                                             penalty=Decimal(pro_cash[x]),
+                                             description='Cash traded to ' + opp_team,
+                                             date=timezone.now())
+            Cap_Penalty_Entry.objects.create(team=opp_team,
+                                             year=year_list[x],
+                                             penalty=Decimal(pro_cash[x]),
+                                             description='Cash acquired from ' + pro_team + ' in trade',
+                                             date=timezone.now())
+
+    for x in range(0,len(opp_cash)):
+        if Decimal(opp_cash[x]) != 0:
+            Cap_Penalty_Entry.objects.create(team=opp_team,
+                                             year=year_list[x],
+                                             penalty=Decimal(opp_cash[x]),
+                                             description='Cash traded to ' + pro_team,
+                                             date=timezone.now())
+            Cap_Penalty_Entry.objects.create(team=pro_team,
+                                             year=year_list[x],
+                                             penalty=Decimal(opp_cash[x]),
+                                             description='Cash acquired from ' + opp_team + ' in trade',
+                                             date=timezone.now())
+
+    h = Team.objects.get(internal_name=opp_team)
+    opp_user = h.user
+
+    create_alerts('Trade Processed', request.user, [opp_user, trade_id])
+
+    k = Transaction.objects.get(pk=trans_id)
+    k.var_t1 = ''
+    k.save()
+
+    #need to check for traded player/assets in other deals and cancel them
+    i = Trade.objects.all().exclude(status3='Closed')
+    for x in i:
+        trade_invalid = check_trade_for_dup_assets(x, pro_players, pro_picks, pro_assets, opp_players, opp_picks, opp_assets)
+        if trade_invalid == False:
+            trade_invalid = check_trade_for_dup_assets(x, opp_players, opp_picks, opp_assets, pro_players, pro_picks, pro_assets)
+        if trade_invalid:
+            x.status3='Closed'
+            x.status2='Invalid'
+            x.save()
+            j = Transaction.objects.filter(player='trade').get(var_i1=x.id)
+            j.var_t1='Invalid'
+            j.save()
+    
+    return JsonResponse('done', safe=False)
+
+def retrieve_ownership_info_trade_transaction(request):
+    trade_id = int(request.POST['trade_id'])
+
+    a = Trade.objects.get(pk=trade_id)
+    pro_team = a.team1
+    pro_players = a.pro_players.strip().split(':')
+    pro_picks = a.pro_picks.strip().split(':')
+    pro_assets = a.pro_assets.strip().split(':')
+    pro_cash = a.pro_cash.strip().split(':')
+    opp_team = a.team2
+    opp_players = a.opp_players.strip().split(':')
+    opp_picks = a.opp_picks.strip().split(':')
+    opp_assets = a.opp_assets.strip().split(':')
+    opp_cash = a.opp_cash.strip().split(':')
+
+    if pro_players[0] == '':
+        pro_players = []
+    if opp_players[0] == '':
+        opp_players = []
+    if pro_picks[0] == '':
+        pro_picks = []
+    if opp_picks[0] == '':
+        opp_picks = []
+    if pro_assets[0] == '':
+        pro_assets = []
+    if opp_assets[0] == '':
+        opp_assets = []
+
+
+    team1_players = []
+    team1_picks = []
+    team1_assets = []
+    team1_cap_pen = [0,0,0,0,0]
+    team2_players = []
+    team2_picks = []
+    team2_assets = []
+    team2_cap_pen = [0,0,0,0,0]
+
+    for player in pro_players:
+        b = Player.objects.get(name=player)
+        team1_players.append({'player' : player, 'owner' : b.team})
+    for pick in pro_picks:
+        c = Draft_Pick.objects.get(pk=int(pick))
+        team1_picks.append({'pick' : pick, 'owner' : c.owner})
+    for asset in pro_assets:
+        d = Asset.objects.get(pk=int(asset))
+        team1_assets.append({'asset' : asset, 'owner' : d.team})
+        
+    for player in opp_players:
+        b = Player.objects.get(name=player)
+        team2_players.append({'player' : player, 'owner' : b.team})
+    for pick in opp_picks:
+        c = Draft_Pick.objects.get(pk=int(pick))
+        team2_picks.append({'pick' : pick, 'owner' : c.owner})
+    for asset in opp_assets:
+        d = Asset.objects.get(pk=int(asset))
+        team2_assets.append({'asset' : asset, 'owner' : d.team})
+        
+    e = Team.objects.get(internal_name=pro_team)
+    team1_cap_pen[0] = e.yr1_cap_penalty
+    team1_cap_pen[1] = e.yr2_cap_penalty
+    team1_cap_pen[2] = e.yr3_cap_penalty
+    team1_cap_pen[3] = e.yr4_cap_penalty
+    team1_cap_pen[4] = e.yr5_cap_penalty
+    
+    f = Team.objects.get(internal_name=opp_team)
+    team2_cap_pen[0] = f.yr1_cap_penalty
+    team2_cap_pen[1] = f.yr2_cap_penalty
+    team2_cap_pen[2] = f.yr3_cap_penalty
+    team2_cap_pen[3] = f.yr4_cap_penalty
+    team2_cap_pen[4] = f.yr5_cap_penalty
+    
+
+    return JsonResponse({'team1_players': team1_players,
+                         'team1_picks': team1_picks,
+                         'team1_assets': team1_assets,
+                         'team1_cap_pen': team1_cap_pen,
+                         'team2_players': team2_players,
+                         'team2_picks': team2_picks,
+                         'team2_assets': team2_assets,
+                         'team2_cap_pen': team2_cap_pen,
+                         },
+                         safe=False)

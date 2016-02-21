@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    console.log('ready');
+    console.log('ready 2');
 
     var d = new Date();
     var today = format_date(d);
@@ -66,8 +66,31 @@ $(document).ready(function() {
 
             td_date.text(value.date);
             td_alert_type.text(value.alert_type);
-            var temp = determine_details(value);
-            td_details.text(temp);
+            if (value.alert_type == 'Trade Offer') {
+                $.when(get_trade_data(value)).done(function(a1) {
+                    var trade_data = JSON.parse(a1.trade_data);
+                    td_details.text(trade_data[0].fields.team1 + ' sent a trade offer to ' + trade_data[0].fields.team2 + '. See Trade tab for more information.');
+                });
+            } else if (value.alert_type == 'Trade Rejected') {
+                $.when(get_trade_data(value)).done(function(a1) {
+                    var trade_data = JSON.parse(a1.trade_data);
+                    td_details.text(trade_data[0].fields.team2 + ' rejected the trade offer sent by ' + trade_data[0].fields.team1 + '.');
+                });
+            } else if (value.alert_type == 'Trade Accepted') {
+                $.when(get_trade_data(value)).done(function(a1) {
+                    var trade_data = JSON.parse(a1.trade_data);
+                    td_details.text(trade_data[0].fields.team1 + ' and ' + trade_data[0].fields.team2 + ' agreed on a trade.');
+                });
+            } else if (value.alert_type == 'Trade Withdrawn') {
+                $.when(get_trade_data(value)).done(function(a1) {
+                    var trade_data = JSON.parse(a1.trade_data);
+                    td_details.text(trade_data[0].fields.team1 + ' withdrew the trade offer sent to ' + trade_data[0].fields.team2 + '.');
+                });
+            } else {
+                var temp = determine_details(value);
+                td_details.text(temp);
+            }
+
 
             tr.append(td_date);
             tr.append(td_alert_type);
@@ -82,13 +105,31 @@ $(document).ready(function() {
 
         if (data.alert_type == 'Auction - New Auction') {
             return_text = data.var_t1 + ' - started by ' + data.var_t2;
+            return return_text;
         } else if (data.alert_type == 'Auction - Outbid') {
             return_text = data.var_t2 + ' - you were outbid by ' + data.var_t1 + '. New high bid is $' + data.var_d1 + '.';
+            return return_text;
         } else if (data.alert_type == 'Auction - Won') {
             return_text = data.var_t1 + ' - auction was won by ' + data.var_t2 + ' with a bid of $' + data.var_d1 + '.';
+            return return_text;
         }
 
-        return return_text;
+        return 'none';
+    }
+
+    function get_trade_data (data) {
+        return $.ajax({
+            url: '/get_trade_data_for_alerts',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                'trade_id' : data.var_i1
+            },
+            dataType: 'json',
+            success: function (return_data) {
+                //do nothing
+            }
+        });
     }
 
     function filter_by_date (data) {

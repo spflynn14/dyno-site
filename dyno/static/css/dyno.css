@@ -1247,7 +1247,7 @@
 
 #commish_trans_cat_filters_area {
     width: 20%;
-    height: 95%;
+    height: 90%;
     display: inline-block;
     float: right;
     margin-top: 50px;
@@ -1533,6 +1533,27 @@
 
 
 
+/* TRANSACTION - TRADE */
+
+#trans_trade_top_area {
+    height: 40%;
+    width: 100%;
+    float: left;
+    overflow-y: auto;
+}
+
+#trans_trade_middle_area {
+    height: 35%;
+    width: 100%;
+    float: left;
+    overflow-y: auto;
+}
+
+/* END: TRANSACTION - TRADE */
+
+
+
+
 
 /* TEAM: MANAGE ALERTS */
 
@@ -1664,6 +1685,7 @@
     width: 100%;
     table-layout: fixed;
 }
+
 .team_transactions_datagrid {
     width: 80%;
     padding-top: 10px;
@@ -2175,3 +2197,283 @@
 }
 
 /* END: EXTENSIONS */
+
+
+
+
+/* COMMISH OFFICE */
+
+#commish_office_first_column  {
+    display: inline-block;
+    float: left;
+    width: 45%;
+    height: 100%;
+}
+
+#commish_office_second_column {
+    display: inline-block;
+    float: left;
+    width: 45%;
+    height: 100%;
+}
+
+#commish_office_third_column {
+    display: inline-block;
+    float: left;
+    width: 10%;
+    height: 100%;
+ }
+
+
+/* END: COMMISH OFFICE */
+
+
+
+
+/* TRADE */
+
+#trade_top_area {
+    width: 100%;
+    height: 8%;
+    float: left;
+}
+
+#trade_left_area {
+    width: 49%;
+    height: 90%;
+    float: left;
+}
+
+#trade_right_area {
+    width: 49%;
+    height: 90%;
+    float: right;
+}
+
+#trade_left_players_area {
+    border: 1px solid #dcdcdc;
+    padding-left: 5px;
+    margin-bottom: 15px;
+    display: inline-block;
+    width: 95%;
+    height: 80%;
+    float: left;
+    overflow-y: auto;
+}
+
+#trade_left_players_area table td {
+    font-size: small;
+}
+
+#trade_left_players_area table th {
+    font-size: small;
+}
+
+#trade_left_picks_area {
+    border: 1px solid #dcdcdc;
+    padding-left: 5px;
+    margin-bottom: 15px;
+    display: inline-block;
+    width: 100%;
+    height: 60%;
+    float: left;
+    overflow-y: auto;
+}
+
+#trade_left_picks_area table td {
+    font-size: small;
+}
+
+#trade_left_assets_area {
+    border: 1px solid #dcdcdc;
+    padding-left: 5px;
+    padding-top: 5px;
+    display: inline-block;
+    width: 100%;
+    height: 40%;
+    float: left;
+    overflow-y: auto;
+}
+
+#trade_left_assets_area table td {
+    font-size: small;
+}
+
+#trade_left_cash_area {
+    border: 1px solid #dcdcdc;
+    padding-left: 5px;
+    padding-top: 5px;
+    display: inline-block;
+    width: 95%;
+    height: 20%;
+    float: left;
+    overflow-y: auto;
+}
+
+#trade_left_cash_area table td {
+    font-size: small;
+}
+
+.dropdown-menu li:hover {
+    text-decoration: underline;
+    cursor: pointer;
+    color: #2c609b;
+}
+
+#trade_right_players_area {
+    border: 1px solid #dcdcdc;
+    padding-left: 5px;
+    margin-bottom: 15px;
+    display: inline-block;
+    width: 95%;
+    height: 80%;
+    float: left;
+    overflow-y: auto;
+}
+
+#trade_right_players_area table td {
+    font-size: small;
+}
+
+#trade_right_players_area table th {
+    font-size: small;
+}
+
+#trade_right_picks_area {
+    border: 1px solid #dcdcdc;
+    padding-left: 5px;
+    margin-bottom: 15px;
+    display: inline-block;
+    width: 100%;
+    height: 60%;
+    float: left;
+    overflow-y: auto;
+}
+
+#trade_right_picks_area table td {
+    font-size: small;
+}
+
+#trade_right_assets_area {
+    border: 1px solid #dcdcdc;
+    padding-left: 5px;
+    padding-top: 5px;
+    display: inline-block;
+    width: 100%;
+    height: 40%;
+    float: left;
+    overflow-y: auto;
+}
+
+#trade_right_assets_area table td {
+    font-size: small;
+}
+
+#trade_right_cash_area {
+    border: 1px solid #dcdcdc;
+    padding-left: 5px;
+    padding-top: 5px;
+    display: inline-block;
+    width: 95%;
+    height: 20%;
+    float: left;
+    overflow-y: auto;
+}
+
+#trade_right_cash_area table td {
+    font-size: small;
+}
+
+/* END: TRADE */
+
+
+/* TEAM TRADE LOG PAGE */
+
+#team_trade_log_date_filters_area {
+    width: 100%;
+    height: 10%;
+    float: left;
+}
+
+.team_trade_log_date_button {
+    display: inline-block;
+    margin-top: 15px;
+}
+
+#team_trade_log_details_area {
+    border: 1px solid green;
+    height: 50%;
+    width: 100%;
+    float: left;
+}
+
+.team_trade_log_datagrid table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.team_trade_log_datagrid {
+    width: 100%;
+    height: 90%;
+    padding-top: 10px;
+    background: #fff;
+    font-size: 0.75em;
+    overflow-y: auto;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.team_trade_log_datagrid table td, .team_trade_log_datagrid table th {
+    padding: 4px 4px;
+}
+.team_trade_log_datagrid table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-weight: bold;
+    border-left: 1px solid #cccccc;
+}
+.team_trade_log_datagrid table thead th:first-child {
+    border: none;
+}
+.team_trade_log_datagrid table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 1em;
+    font-weight: normal;
+    overflow-x: hidden;
+}
+
+.team_trade_log_datagrid table tbody td:first-child {
+    border-left: none;
+}
+.team_trade_log_datagrid table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.team_trade_log_datagrid tbody tr:nth-child(even) {
+    background-color: #dcdcdc;
+}
+
+.team_trade_log_datagrid th:hover {
+    cursor: pointer;
+}
+
+/* END: TEAM TRADE LOG PAGE */
+
+
+
+
+/* FREE AGENT LIST */
+
+#free_agent_list_table th:hover {
+    cursor: pointer;
+}
+
+#free_agent_list_table tbody tr:nth-child(even) {
+    background-color: #dcdcdc;
+}
+
+/* END: FREE AGENT LIST */

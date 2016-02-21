@@ -4,13 +4,63 @@ from decimal import *
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, HttpResponse
-from django.db.models import Q
+from django.db.models import Q, Sum
 from .forms import *
 from .models import *
 
 working_local = True
 current_league_year = 2015
 year_list = [current_league_year, current_league_year + 1, current_league_year + 2, current_league_year + 3, current_league_year + 4]
+
+draft_pick_salary_list = {1 : [9.00, 10.80, 12.95, 15.55],
+                           2 : [8.50, 10.20, 12.25, 14.70],
+                           3 : [8.00, 9.60, 11.50, 13.80],
+                           4 : [7.50, 9.00, 10.80, 12.95],
+                           5 : [7.05, 8.45, 10.15, 12.20],
+                           6 : [6.65, 8.00, 9.60, 11.50],
+                           7 : [6.25, 7.50, 9.00, 10.80],
+                           8 : [5.85, 7.00, 8.40, 10.10],
+                           9 : [5.50, 6.60, 7.90, 9.50],
+                           10 : [5.15, 6.20, 7.40, 8.90],
+                           11 : [4.85, 5.80, 7.00, 8.40],
+                           12 : [4.60, 5.50, 6.60, 7.95],
+                           13 : [4.30, 5.15, 6.20],
+                           14 : [4.05, 4.85, 5.85],
+                           15 : [3.80, 4.55, 5.50],
+                           16 : [3.55, 4.25, 5.10],
+                           17 : [3.35, 4.00, 4.80],
+                           18 : [3.15, 3.80, 4.55],
+                           19 : [2.95, 3.55, 4.25],
+                           20 : [2.80, 3.35, 4.00],
+                           21 : [2.60, 3.10, 3.75],
+                           22 : [2.45, 2.95, 3.50],
+                           23 : [2.30, 2.75, 3.30],
+                           24 : [2.15, 2.60, 3.10],
+                           25 : [2.00, 2.50],
+                           26 : [2.00, 2.50],
+                           27 : [2.00, 2.50],
+                           28 : [2.00, 2.50],
+                           29 : [2.00, 2.50],
+                           30 : [2.00, 2.50],
+                           31 : [2.00, 2.50],
+                           32 : [2.00, 2.50],
+                           33 : [2.00, 2.50],
+                           34 : [2.00, 2.50],
+                           35 : [2.00, 2.50],
+                           36 : [2.00, 2.50],
+                           37 : [1.50, 2.00],
+                           38 : [1.50, 2.00],
+                           39 : [1.50, 2.00],
+                           40 : [1.50, 2.00],
+                           41 : [1.50, 2.00],
+                           42 : [1.50, 2.00],
+                           43 : [1.50, 2.00],
+                           44 : [1.50, 2.00],
+                           45 : [1.50, 2.00],
+                           46 : [1.50, 2.00],
+                           47 : [1.50, 2.00],
+                           48 : [1.50, 2.00],
+                           }
 
 
 
@@ -315,9 +365,13 @@ def auctionpage(request):
     d.text_variable = ''
     d.save()
 
+    e = Variable.objects.get(name='New Auction Flag')
+    new_auctions = e.int_variable
+
     return render(request, 'auction.html', {'new_auction_player_list' : new_auction_player_list,
                                             'auctions' : b,
-                                            'current_team' : current_team})
+                                            'current_team' : current_team,
+                                            'new_auctions' : new_auctions})
 
 def auctionbidconfirmationpage(request):
     a = Variable.objects.get(name='New Auction Info')
@@ -627,6 +681,32 @@ def leagueextensions(request):
                                                              'ext_switch' : ext_switch,
                                                              'submitted_extensions_list' : g})
 
+def leaguefreeagents(request):
+    aa = Variable.objects.get(name='Include Impending')
+    include_impending = aa.int_variable
+
+    if include_impending == 0:
+        a = Player.objects.filter(team='Free Agent').order_by('position', 'name')
+    else:
+        a = Player.objects.filter(Q(team='Free Agent') | Q(yr2_salary=0)).order_by('position', 'name')
+
+    free_agent_list = []
+
+    for x in a:
+        try:
+            b = Performance_Yr1.objects.get(player=x.name)
+            points = b.points
+        except:
+            points = 0
+        free_agent_list.append({'pos' : x.position,
+                                'player' : x.name,
+                                'team' : x.team,
+                                'salary' : x.yr1_salary + x.yr1_sb,
+                                'perf' : points})
+
+    return render(request, 'league/league_free_agents.html', {'free_agents' : free_agent_list,
+                                                              'year_list' : year_list})
+
 def leaguesalarylists(request):
     #todo: change to sql pull to speed up
     qb_contents = SalaryListing.objects.filter(position='QB').order_by('position', '-yearly_cost')
@@ -807,7 +887,7 @@ def performancepage(request):
                                                               'k_yr2_list' : k_yr2_list})
 
 def leaguefuturedraftpicks(request):
-    return render(request, 'league/league_future_draft_picks.html', {})
+    return render(request, 'draft/league_future_draft_picks.html', {})
 
 def leaguecapsummary(request):
     a = Player.objects.all()
@@ -1304,8 +1384,9 @@ def teamsettingspage(request):
 def teampendingtransactionspage(request):
     a = Team.objects.get(user=request.user)
     team = a.internal_name
-    b = Transaction.objects.filter(var_t1='Pending').filter(team2=team)
-    return render(request, 'team/team_pending_transactions.html', {'transactions' : b})
+    b = Transaction.objects.filter(var_t1='Pending').filter(Q(team1=team) | Q(team2=team)).order_by('date')
+    return render(request, 'team/team_pending_transactions.html', {'transactions' : b,
+                                                                   'user_team_2' : team})
 
 def teamtransactionspage(request):
     #a = Transaction.objects.filter().order_by('-date')
@@ -1431,7 +1512,8 @@ def teamreleaseplayerspage(request):
                                                               'years_list' : year_list})
 
 def teamalertspage(request):
-    type_list = ['Auction - Outbid', 'Auction - New Auction', 'Auction - Won']
+    type_list = ['Auction - Outbid', 'Auction - New Auction', 'Auction - Won', 'Trade Offer', 'Trade Rejected', 'Trade Accepted',
+                 'Trade Withdrawn']
     a = Alert.objects.filter(user=request.user).order_by('-date')
     b = []
     for x in a:
@@ -1443,6 +1525,160 @@ def teamalertspage(request):
 def teammanagealerts(request):
     a = AlertSetting.objects.get(user=request.user)
     return render(request, 'team/team_manage_alerts.html', {'alert_settings' : a})
+
+def teamtrades(request):
+    opp_team = ''
+    pro_players = []
+    pro_picks = []
+    pro_assets = []
+    pro_cash = []
+    opp_players = []
+    opp_picks = []
+    opp_assets = []
+    opp_cash = []
+
+    var_test = TeamVariable.objects.filter(name='TradeData').get(user=request.user)
+    temp = var_test.text_variable
+    if temp != '' and temp is not None:
+        temp1 = temp.split('\n')
+        opp_team = temp1[0]
+        pro_players = temp1[1].strip().split(':')
+        pro_picks = temp1[2].strip().split(':')
+        pro_assets = temp1[3].strip().split(':')
+        pro_cash = temp1[4].strip().split(':')
+        opp_players = temp1[5]
+        opp_picks = temp1[6]
+        opp_assets = temp1[7]
+        opp_cash = temp1[8]
+
+        try:
+            if pro_players[0] == '':
+                pro_players = []
+        except:
+            pro_players = []
+        try:
+            if opp_players[0] == '':
+                opp_players = []
+        except:
+            opp_players = []
+
+        var_test.text_variable = ''
+        var_test.save()
+
+    a = Team.objects.get(user=request.user)
+    team = a.internal_name
+    aa = Team.objects.all().exclude(user=request.user)
+    team_list = []
+    for x in aa:
+        team_list.append(x.internal_name)
+
+    yr1_salary = Player.objects.filter(team=team).aggregate(yr1_total=Sum('yr1_salary')+Sum('yr1_sb'))['yr1_total']
+    yr2_salary = Player.objects.filter(team=team).aggregate(yr1_total=Sum('yr2_salary')+Sum('yr2_sb'))['yr1_total']
+    yr3_salary = Player.objects.filter(team=team).aggregate(yr1_total=Sum('yr3_salary')+Sum('yr3_sb'))['yr1_total']
+    yr4_salary = Player.objects.filter(team=team).aggregate(yr1_total=Sum('yr4_salary')+Sum('yr4_sb'))['yr1_total']
+    yr5_salary = Player.objects.filter(team=team).aggregate(yr1_total=Sum('yr5_salary')+Sum('yr5_sb'))['yr1_total']
+
+    try:
+        yr1_cap_pen = Decimal(a.yr1_cap_penalty)
+    except:
+        yr1_cap_pen = Decimal(0)
+    try:
+        yr2_cap_pen = Decimal(a.yr2_cap_penalty)
+    except:
+        yr2_cap_pen = Decimal(0)
+    try:
+        yr3_cap_pen = Decimal(a.yr3_cap_penalty)
+    except:
+        yr3_cap_pen = Decimal(0)
+    try:
+        yr4_cap_pen = Decimal(a.yr4_cap_penalty)
+    except:
+        yr4_cap_pen = Decimal(0)
+    try:
+        yr5_cap_pen = Decimal(a.yr5_cap_penalty)
+    except:
+        yr5_cap_pen = Decimal(0)
+
+    cap_space = [Decimal(200) - yr1_cap_pen - yr1_salary,
+                 Decimal(200) - yr2_cap_pen - yr2_salary,
+                 Decimal(200) - yr3_cap_pen - yr3_salary,
+                 Decimal(200) - yr4_cap_pen - yr4_salary,
+                 Decimal(200) - yr5_cap_pen - yr5_salary,]
+
+    b = Draft_Pick.objects.filter(owner=team).order_by('year', 'round', 'pick_in_round')
+
+    c = Asset.objects.filter(team=team).order_by('asset_type', 'date')
+
+    d = Player.objects.filter(team=team).order_by('-total_value')
+    QB_list = []
+    RB_list = []
+    WR_list = []
+    TE_list = []
+    DEF_list = []
+    K_list = []
+
+    for player in d:
+        if player.position == 'QB':
+            QB_list.append(player)
+        elif player.position == 'RB':
+            RB_list.append(player)
+        elif player.position == 'WR':
+            WR_list.append(player)
+        elif player.position == 'TE':
+            TE_list.append(player)
+        elif player.position == 'DEF':
+            DEF_list.append(player)
+        else:
+            K_list.append(player)
+
+    player_list = []
+    for player in QB_list:
+        player_list.append(player)
+    for player in RB_list:
+        player_list.append(player)
+    for player in WR_list:
+        player_list.append(player)
+    for player in TE_list:
+        player_list.append(player)
+    for player in K_list:
+        player_list.append(player)
+    for player in DEF_list:
+        player_list.append(player)
+
+    e = TeamVariable.objects.filter(name='TradeViewFlags').get(user=request.user)
+    try:
+        temp2 = e.text_variable.split(',')
+        view_flag_text = temp2[0]
+    except:
+        view_flag_text = ''
+    try:
+        is_proposing_team = int(temp2[1])
+    except:
+        is_proposing_team = 999999
+    view_flag_trade_id = e.int_variable
+    e.text_variable = ''
+    e.int_variable = 999999
+    e.save()
+
+
+    return render(request, 'team/team_trade.html', {'year_list' : year_list,
+                                                    'draft_picks' : b,
+                                                    'assets' : c,
+                                                    'cap_space' : cap_space,
+                                                    'team_list' : team_list,
+                                                    'player_list' : player_list,
+                                                    'opp_team' : opp_team,
+                                                    'pro_players' : pro_players,
+                                                    'pro_picks' : pro_picks,
+                                                    'pro_assets' : pro_assets,
+                                                    'pro_cash' : pro_cash,
+                                                    'opp_players' : opp_players,
+                                                    'opp_picks' : opp_picks,
+                                                    'opp_assets' : opp_assets,
+                                                    'opp_cash' : opp_cash,
+                                                    'view_flag_text' : view_flag_text,
+                                                    'is_proposing_team' : is_proposing_team,
+                                                    'view_flag_trade_id' : view_flag_trade_id})
 
 def playerpage(request):
     a = TeamVariable.objects.filter(user=request.user).get(name='PlayerForPlayerPage')
@@ -1743,9 +1979,21 @@ def commishofficepage(request):
     c = Variable.objects.get(name='CommishPeriodicState')
     commish_periodic = int(c.int_variable)
 
+    d = Variable.objects.get(name='Cut Season')
+    cut_season = int(d.int_variable)
+
+    e = Variable.objects.get(name='New Auction Flag')
+    new_auctions = int(e.int_variable)
+
+    f = Variable.objects.get(name='Include Impending')
+    include_impending = int(f.int_variable)
+
     return render(request, 'admin/settings.html', {'default_auction_clock' : default_auction_clock,
                                                    'ext_switch' : ext_switch,
-                                                   'commish_periodic' : commish_periodic})
+                                                   'commish_periodic' : commish_periodic,
+                                                   'cut_season' : cut_season,
+                                                   'new_auctions' : new_auctions,
+                                                   'include_impending' : include_impending})
 
 def commishviewmodel(request):
     a = Player.objects.all().order_by('name')
@@ -1781,7 +2029,7 @@ def commishtransactionpage(request):
                                                                  'type_list' : trans_list})
 
 def commishpendingtransactionspage(request):
-    b = Transaction.objects.filter(var_t1='Pending').filter(var_t2='Confirmed')
+    b = Transaction.objects.filter(var_t1='Pending').filter(Q(var_t2='Confirmed') | Q(player='trade')).exclude(Q(transaction_type='Trade Offer') | Q(transaction_type='Counter Offer'))
     return render(request, 'commish/commish_pending_transactions.html', {'transactions' : b})
 
 def commishpendingalerts(request):
@@ -1946,6 +2194,94 @@ def transactionsingleplayer(request):
 
     return render(request, 'commish/transaction_single_player.html', {'transaction' : b,
                                                                       'player' : c})
+
+def transactioncut(request):
+    a = Variable.objects.get(name='player selected')
+    id_selected = a.int_variable
+    a.int_variable = 0
+    a.save()
+
+    b = Transaction.objects.get(pk=id_selected)
+    player = b.player
+
+    c = Player.objects.get(name=player)
+
+    d = Variable.objects.get(name='Cut Season')
+    type_of_cut = int(d.int_variable)
+
+    if int(b.var_i1) != -1:
+        e = Asset.objects.get(id=int(b.var_i1))
+    else:
+        e = 'none'
+
+    return render(request, 'commish/transaction_cut.html', {'transaction' : b,
+                                                            'player' : c,
+                                                            'type_of_cut' : type_of_cut,
+                                                            'amnesty' : e})
+
+def transactiontrade(request):
+    a = Variable.objects.get(name='player selected')
+    id_selected = a.int_variable
+    a.int_variable = 0
+    a.save()
+
+    b = Transaction.objects.get(pk=id_selected)
+    
+    c = Trade.objects.get(pk=int(b.var_i1))
+    pro_team = c.team1
+    pro_players = c.pro_players.strip().split(':')
+    pro_picks = c.pro_picks.strip().split(':')
+    pro_assets = c.pro_assets.strip().split(':')
+    pro_cash = c.pro_cash.strip().split(':')
+    opp_team = c.team2
+    opp_players = c.opp_players.strip().split(':')
+    opp_picks = c.opp_picks.strip().split(':')
+    opp_assets = c.opp_assets.strip().split(':')
+    opp_cash = c.opp_cash.strip().split(':')
+    if pro_players[0] == '':
+        pro_players = []
+    if opp_players[0] == '':
+        opp_players = []
+    if pro_picks[0] == '':
+        pro_picks = []
+    if opp_picks[0] == '':
+        opp_picks = []
+    if pro_assets[0] == '':
+        pro_assets = []
+    if opp_assets[0] == '':
+        opp_assets = []
+
+    pro_picks_verbose, pro_assets_verbose, pro_cash_verbose, opp_picks_verbose, opp_assets_verbose, opp_cash_verbose = get_verbose_trade_info(pro_picks, pro_assets, pro_cash, opp_picks, opp_assets, opp_cash)
+
+    pro_cap_pen = [0,0,0,0,0]
+    opp_cap_pen = [0,0,0,0,0]
+    
+    d = Team.objects.get(internal_name=pro_team)
+    pro_cap_pen[0] = d.yr1_cap_penalty
+    pro_cap_pen[1] = d.yr2_cap_penalty
+    pro_cap_pen[2] = d.yr3_cap_penalty
+    pro_cap_pen[3] = d.yr4_cap_penalty
+    pro_cap_pen[4] = d.yr5_cap_penalty
+    
+    e = Team.objects.get(internal_name=opp_team)
+    opp_cap_pen[0] = e.yr1_cap_penalty
+    opp_cap_pen[1] = e.yr2_cap_penalty
+    opp_cap_pen[2] = e.yr3_cap_penalty
+    opp_cap_pen[3] = e.yr4_cap_penalty
+    opp_cap_pen[4] = e.yr5_cap_penalty
+
+    return render(request, 'commish/transaction_trade.html', {'transaction' : b,
+                                                              'trade_data' : c,
+                                                              'pro_players' : pro_players,
+                                                              'pro_picks' : pro_picks_verbose,
+                                                              'pro_assets' : pro_assets_verbose,
+                                                              'pro_cash' : pro_cash_verbose,
+                                                              'opp_players' : opp_players,
+                                                              'opp_picks' : opp_picks_verbose,
+                                                              'opp_assets' : opp_assets_verbose,
+                                                              'opp_cash' : opp_cash_verbose,
+                                                              'pro_cap_pen' : pro_cap_pen,
+                                                              'opp_cap_pen' : opp_cap_pen})
 
 def tagspage(request):
     aa = Team.objects.get(user=request.user)
@@ -2316,7 +2652,7 @@ def confirmcutplayers(request):
     if from_int == 0:
         player_list = [temp]
     elif from_int == 1:
-        player_list = temp.strip().split(',')
+        player_list = temp.strip().split(':')
 
     player_dict = []
 
@@ -2333,4 +2669,289 @@ def confirmcutplayers(request):
 
     return render(request, 'team/confirm_cut_players.html', {'player_list' : player_dict,
                                                              'from_int' : from_int,
-                                                             'assets' : d})
+                                                             'assets' : d,
+                                                             'current_year' : current_league_year})
+
+def get_verbose_trade_info(pro_picks, pro_assets, pro_cash, opp_picks, opp_assets, opp_cash):
+
+    pro_picks_verbose = []
+    for pick in pro_picks:
+        try:
+            c = Draft_Pick.objects.get(pk=int(pick))
+            if c.pick_overall == 0:
+                if c.original_owner != c.owner:
+                    pro_picks_verbose.append(str(c.year) + ' round ' + str(c.round) + ' pick (' + c.original_owner + ')')
+                else:
+                    pro_picks_verbose.append(str(c.year) + ' round ' + str(c.round) + ' pick')
+            elif c.pick_in_round > 9:
+                pro_picks_verbose.append(str(c.year) + ' ' + str(c.round) + '.' + str(c.pick_in_round) + ' pick')
+            else:
+                pro_picks_verbose.append(str(c.year) + ' ' + str(c.round) + '.0' + str(c.pick_in_round) + ' pick')
+        except:
+            pass
+
+    pro_assets_verbose = []
+    for asset in pro_assets:
+        try:
+            d = Asset.objects.get(pk=int(asset))
+            if d.asset_type == 'Amnesty':
+                pro_assets_verbose.append(d.asset_type + ' (' + str(d.var_i1) + '%)')
+            elif d.asset_type == 'Salary Cap Boon':
+                pro_assets_verbose.append(d.asset_type + ' ($' + str(d.var_d1) + ')')
+        except:
+            pass
+
+    pro_cash_verbose = []
+    for x in range(0,len(pro_cash)):
+        if float(pro_cash[x]) != 0:
+            pro_cash_verbose.append(str(year_list[x]) + ' cash: $%.2f' % float(pro_cash[x]))
+
+    opp_picks_verbose = []
+    for pick in opp_picks:
+        try:
+            c = Draft_Pick.objects.get(pk=int(pick))
+            if c.pick_overall == 0:
+                if c.original_owner != c.owner:
+                    opp_picks_verbose.append(str(c.year) + ' round ' + str(c.round) + ' pick (' + c.original_owner + ')')
+                else:
+                    opp_picks_verbose.append(str(c.year) + ' round ' + str(c.round) + ' pick')
+            elif c.pick_in_round > 9:
+                opp_picks_verbose.append(str(c.year) + ' ' + str(c.round) + '.' + str(c.pick_in_round) + ' pick')
+            else:
+                opp_picks_verbose.append(str(c.year) + ' ' + str(c.round) + '.0' + str(c.pick_in_round) + ' pick')
+        except:
+            pass
+
+    opp_assets_verbose = []
+    for asset in opp_assets:
+        try:
+            d = Asset.objects.get(pk=int(asset))
+            if d.asset_type == 'Amnesty':
+                opp_assets_verbose.append(d.asset_type + ' (' + str(d.var_i1) + '%)')
+            elif d.asset_type == 'Salary Cap Boon':
+                opp_assets_verbose.append(d.asset_type + ' ($' + str(d.var_d1) + ')')
+        except:
+            pass
+
+    opp_cash_verbose = []
+    for x in range(0,len(opp_cash)):
+        if float(opp_cash[x]) != 0:
+            opp_cash_verbose.append(str(year_list[x]) + ' cash: $%.2f' % float(opp_cash[x]))
+
+    return pro_picks_verbose, pro_assets_verbose, pro_cash_verbose, opp_picks_verbose, opp_assets_verbose, opp_cash_verbose
+
+
+def confirmtradepage(request):
+    a = TeamVariable.objects.filter(name='TradeData').get(user=request.user)
+    temp = a.text_variable
+    
+    temp1 = temp.split('\n')
+    opp_team = temp1[0]
+    pro_players = temp1[1].strip().split(':')
+    pro_picks = temp1[2].strip().split(':')
+    pro_assets = temp1[3].strip().split(':')
+    pro_cash = temp1[4].strip().split(':')
+    opp_players = temp1[5].strip().split(':')
+    opp_picks = temp1[6].strip().split(':')
+    opp_assets = temp1[7].strip().split(':')
+    opp_cash = temp1[8].strip().split(':')
+
+    if pro_players[0] == '':
+        pro_players = []
+    if opp_players[0] == '':
+        opp_players = []
+    if pro_picks[0] == '':
+        pro_picks = []
+    if opp_picks[0] == '':
+        opp_picks = []
+    if pro_assets[0] == '':
+        pro_assets = []
+    if opp_assets[0] == '':
+        opp_assets = []
+
+    b = Team.objects.get(user=request.user)
+    pro_team = b.internal_name
+
+    pro_picks_verbose, pro_assets_verbose, pro_cash_verbose, opp_picks_verbose, opp_assets_verbose, opp_cash_verbose = get_verbose_trade_info(pro_picks, pro_assets, pro_cash, opp_picks, opp_assets, opp_cash)
+
+    pro_cap = [0,0,0,0,0]
+    opp_cap = [0,0,0,0,0]
+    diff_cap = [0,0,0,0,0]
+
+    for player in pro_players:
+        try:
+            e = Player.objects.get(name=player)
+            pro_cap[0] += float(e.yr1_salary) + float(e.yr1_sb)
+            pro_cap[1] += float(e.yr2_salary) + float(e.yr2_sb)
+            pro_cap[2] += float(e.yr3_salary) + float(e.yr3_sb)
+            pro_cap[3] += float(e.yr4_salary) + float(e.yr4_sb)
+            pro_cap[4] += float(e.yr5_salary) + float(e.yr5_sb)
+        except:
+            pass
+
+    for player in opp_players:
+        try:
+            e = Player.objects.get(name=player)
+            opp_cap[0] += float(e.yr1_salary) + float(e.yr1_sb)
+            opp_cap[1] += float(e.yr2_salary) + float(e.yr2_sb)
+            opp_cap[2] += float(e.yr3_salary) + float(e.yr3_sb)
+            opp_cap[3] += float(e.yr4_salary) + float(e.yr4_sb)
+            opp_cap[4] += float(e.yr5_salary) + float(e.yr5_sb)
+        except:
+            pass
+
+    num_teams = Team.objects.all().count()
+
+    for pick in pro_picks:
+        try:
+            f = Draft_Pick.objects.get(pk=int(pick))
+            start_year = year_list.index(f.year)
+
+            if f.pick_overall == 0:
+                start_pick = ((f.round - 1) * num_teams) + 1
+                yr1_total = 0
+                yr2_total = 0
+                yr3_total = 0
+                yr4_total = 0
+                for x in range(start_pick, start_pick + 12):
+                    yr1_total += draft_pick_salary_list[x][0]
+                    yr2_total += draft_pick_salary_list[x][1]
+                    try:
+                        yr3_total += draft_pick_salary_list[x][2]
+                    except:
+                        pass
+                    try:
+                        yr4_total += draft_pick_salary_list[x][3]
+                    except:
+                        pass
+                yr1_avg = yr1_total / num_teams
+                yr2_avg = yr2_total / num_teams
+                yr3_avg = yr3_total / num_teams
+                yr4_avg = yr4_total / num_teams
+            else:
+                yr1_avg = float(f.yr1_sal)
+                yr2_avg = float(f.yr2_sal)
+                yr3_avg = float(f.yr3_sal)
+                yr4_avg = float(f.yr4_sal)
+
+            pro_cap[start_year] += yr1_avg
+            try:
+                pro_cap[start_year+1] += yr2_avg
+            except:
+                pass
+            try:
+                pro_cap[start_year+2] += yr3_avg
+            except:
+                pass
+            try:
+                pro_cap[start_year+3] += yr4_avg
+            except:
+                pass
+        except:
+            pass
+
+    for pick in opp_picks:
+        try:
+            f = Draft_Pick.objects.get(pk=int(pick))
+            start_year = year_list.index(f.year)
+
+            if f.pick_overall == 0:
+                start_pick = ((f.round - 1) * num_teams) + 1
+                yr1_total = 0
+                yr2_total = 0
+                yr3_total = 0
+                yr4_total = 0
+                for x in range(start_pick, start_pick + 12):
+                    yr1_total += draft_pick_salary_list[x][0]
+                    yr2_total += draft_pick_salary_list[x][1]
+                    try:
+                        yr3_total += draft_pick_salary_list[x][2]
+                    except:
+                        pass
+                    try:
+                        yr4_total += draft_pick_salary_list[x][3]
+                    except:
+                        pass
+                yr1_avg = yr1_total / num_teams
+                yr2_avg = yr2_total / num_teams
+                yr3_avg = yr3_total / num_teams
+                yr4_avg = yr4_total / num_teams
+            else:
+                yr1_avg = float(f.yr1_sal)
+                yr2_avg = float(f.yr2_sal)
+                yr3_avg = float(f.yr3_sal)
+                yr4_avg = float(f.yr4_sal)
+
+            opp_cap[start_year] += yr1_avg
+            try:
+                opp_cap[start_year+1] += yr2_avg
+            except:
+                pass
+            try:
+                opp_cap[start_year+2] += yr3_avg
+            except:
+                pass
+            try:
+                opp_cap[start_year+3] += yr4_avg
+            except:
+                pass
+        except:
+            pass
+
+    for x in range(0,len(pro_cap)):
+        pro_cap[x] -= float(pro_cash[x])
+
+    for x in range(0,len(opp_cap)):
+        opp_cap[x] -= float(opp_cash[x])
+
+    for x in range(0,len(diff_cap)):
+        diff_cap[x] = pro_cap[x] - opp_cap[x]
+
+    g = TeamVariable.objects.filter(name='TradeViewFlags').get(user=request.user)
+    try:
+        temp2 = g.text_variable.split(',')
+        view_flag_text = temp2[0]
+    except:
+        view_flag_text = ''
+    try:
+        is_proposing_team = int(temp2[1])
+    except:
+        is_proposing_team = 999999
+    view_flag_trade_id = g.int_variable
+
+    return render (request, 'team/confirm_trade.html', {'year_list' : year_list,
+                                                        'pro_team' : pro_team,
+                                                        'opp_team' : opp_team,
+                                                        'pro_players' : pro_players,
+                                                        'pro_picks' : pro_picks_verbose,
+                                                        'pro_assets' : pro_assets_verbose,
+                                                        'pro_cash' : pro_cash_verbose,
+                                                        'opp_players' : opp_players,
+                                                        'opp_picks' : opp_picks_verbose,
+                                                        'opp_assets' : opp_assets_verbose,
+                                                        'opp_cash' : opp_cash_verbose,
+                                                        'pro_cap' : pro_cap,
+                                                        'opp_cap' : opp_cap,
+                                                        'diff_cap' : diff_cap,
+                                                        'view_flag_text' : view_flag_text,
+                                                        'view_flag_trade_id' : view_flag_trade_id,
+                                                        'is_proposing_team' : is_proposing_team})
+
+def teamtradelogpage(request):
+    a = Team.objects.get(user=request.user)
+    team = a.internal_name
+
+    b = Trade.objects.filter(Q(team1=team) | Q(team2=team)).order_by('-date')
+
+    c = TeamVariable.objects.filter(name='TradeData').get(user=request.user)
+    c.text_variable = ''
+    c.int_variable = 999999
+    c.save()
+
+    d = TeamVariable.objects.filter(name='TradeViewFlags').get(user=request.user)
+    d.text_variable = ''
+    d.int_variable = 999999
+    d.save()
+
+    return render (request, 'team/team_trade_log.html', {'trade_list' : b,
+                                                         'user_team_2' : team})
