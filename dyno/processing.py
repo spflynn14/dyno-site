@@ -3,9 +3,9 @@ import sqlite3 as sql3
 from django.utils import timezone
 from django.db.models import Sum
 from decimal import *
-from django.http import HttpResponseRedirect, JsonResponse
+from django.contrib.auth import authenticate, login
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
 from django.core.mail import send_mail
 from django.core import serializers
 import datetime
@@ -123,15 +123,15 @@ def generate_alert_email_line(source_info, alert_type, var_list):
     elif alert_type == 'Auction - Outbid':
         #var_list = old_team, new_team, player, current high bid
         if source_info == 'direct':
-            return 'You have been outbid:  ' + var_list[2] + ' by ' + var_list[1] + '. New high bid is $' + str(var_list[3]) + '.'
+            return 'You have been outbid:  ' + var_list[2] + ' by ' + var_list[1] + '. New high bid was $' + str(var_list[3]) + '.'
         elif source_info == 'alert object':
-            return 'You have been outbid:  ' + var_list.var_t2 + ' by ' + var_list.var_t1 + '. New high bid is $' + str(var_list.var_d1) + '.'
+            return 'You have been outbid:  ' + var_list.var_t2 + ' by ' + var_list.var_t1 + '. New high bid was $' + str(var_list.var_d1) + '.'
     elif alert_type == 'Auction - Won':
         #var_list = player, winning_team, winning_bid
         if source_info == 'direct':
-            return 'An auction has ended:  ' + var_list[0] + ' has been won by ' + var_list[1] + '. The winning bid is $' + str(var_list[2]) + '.'
+            return 'An auction has ended:  ' + var_list[0] + ' has been won by ' + var_list[1] + '. The winning bid was $' + str(var_list[2]) + '.'
         elif source_info == 'alert object':
-            return 'An auction has ended:  ' + var_list.var_t1 + ' has been won by ' + var_list.var_t2 + '. The winning bid is $' + str(var_list.var_d1) + '.'
+            return 'An auction has ended:  ' + var_list.var_t1 + ' has been won by ' + var_list.var_t2 + '. The winning bid was $' + str(var_list.var_d1) + '.'
     elif alert_type == 'Contract Submitted For Approval':
         #var_list = player, team
         if source_info == 'direct':
@@ -141,9 +141,9 @@ def generate_alert_email_line(source_info, alert_type, var_list):
     elif alert_type == 'Player Cut':
         #var_list = player
         if source_info == 'direct':
-            return var_list[0] + ' has been submitted to be released.'
+            return var_list[0] + ' has been released.'
         elif source_info == 'alert object':
-            return var_list.var_t1 + ' has been submitted to be released.'
+            return var_list.var_t1 + ' has been released.'
     elif alert_type == 'Trade Offer':
         #var_list = current_user, trade_id, comments
         if source_info == 'direct':
@@ -613,7 +613,7 @@ def periodic_alerts_routine():
                         if x.blank_emails == '1':
                             email_body = 'You have no alerts.'
                             target_email = c.email
-                            subject_line = '[Dynasty League] Weekly Alerts - '
+                            subject_line = '[Dynasty League] Weekly Alerts'
                             send_mail(subject_line,
                                       email_body + alert_settings_message + email_footer,
                                       '',
@@ -862,6 +862,212 @@ def player_processing_3(request):
     return JsonResponse(player_dict)
 
 
+def loginView(request):
+    username = request.POST['username']
+    password = request.POST['password']
+    redirect = request.POST['redirect']
+    if len(redirect) == 0:
+        redirect = '/'
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        if user.is_active:
+            login(request, user)
+            a = Variable.objects.get(name='team selected')
+            try:
+                b = Team.objects.get(user=user)
+                team_name = b.internal_name
+            except:
+                team_name = ''
+
+            a.text_variable = team_name
+            a.save()
+            return HttpResponseRedirect(redirect)
+        else:
+            return HttpResponse('Your account is disabled. Please contact the administrator')
+    else:
+        return HttpResponseRedirect('/login_failed')
+
+def processplayercontractsbatch(request):
+    c = request.POST['player_contract_text']
+    if c == '':
+        return HttpResponseRedirect('/batch')
+    c_list = c.strip().split('\r\n')
+    for x in range(len(c_list)):
+        c_list[x] = c_list[x].strip().split(':')
+
+    for x in range(len(c_list)):
+        c_list[x][4] = Decimal(c_list[x][4])
+        try:
+            c_list[x][5] = Decimal(c_list[x][5])
+        except:
+            c_list[x][5] = 0
+        try:
+            c_list[x][6] = Decimal(c_list[x][6])
+        except:
+            c_list[x][6] = 0
+        try:
+            c_list[x][7] = Decimal(c_list[x][7])
+        except:
+            c_list[x][7] = 0
+        try:
+            c_list[x][8] = Decimal(c_list[x][8])
+        except:
+            c_list[x][8] = 0
+        contract_length = 0
+        for y in range(4,9):
+            if c_list[x][y] == 0:
+                pass
+            else:
+                contract_length += 1
+        position = c_list[x][0]
+        name = c_list[x][1]
+        team = c_list[x][2]
+        contract_type = c_list[x][3]
+        total_value = c_list[x][4]+c_list[x][5]+c_list[x][6]+c_list[x][7]+c_list[x][8]
+        signing_bonus = round((c_list[x][5]+c_list[x][6]+c_list[x][7]+c_list[x][8])*Decimal(0.4),1)
+        salary = total_value - signing_bonus
+        yr1_sal = c_list[x][4]
+        try:
+            yr2_sal = ((c_list[x][5])/(total_value-yr1_sal))*(salary-yr1_sal)
+        except:
+            yr2_sal = 0
+        try:
+            yr3_sal = ((c_list[x][6])/(total_value-yr1_sal))*(salary-yr1_sal)
+        except:
+            yr3_sal = 0
+        try:
+            yr4_sal = ((c_list[x][7])/(total_value-yr1_sal))*(salary-yr1_sal)
+        except:
+            yr4_sal = 0
+        try:
+            yr5_sal = ((c_list[x][8])/(total_value-yr1_sal))*(salary-yr1_sal)
+        except:
+            yr5_sal = 0
+        yr1_sb = 0
+        if yr2_sal == 0:
+            yr2_sb = 0
+        else:
+            yr2_sb = signing_bonus / (contract_length-1)
+        if yr3_sal == 0:
+            yr3_sb = 0
+        else:
+            yr3_sb = signing_bonus / (contract_length-1)
+        if yr4_sal == 0:
+            yr4_sb = 0
+        else:
+            yr4_sb = signing_bonus / (contract_length-1)
+        if yr5_sal == 0:
+            yr5_sb = 0
+        else:
+            yr5_sb = signing_bonus / (contract_length-1)
+        notes = c_list[x][9]
+        Player.objects.create(position=position,
+                              name=name,
+                              team=team,
+                              contract_type=contract_type,
+                              total_value=total_value,
+                              signing_bonus=signing_bonus,
+                              salary=salary,
+                              yr1_salary=yr1_sal,
+                              yr2_salary=yr2_sal,
+                              yr3_salary=yr3_sal,
+                              yr4_salary=yr4_sal,
+                              yr5_salary=yr5_sal,
+                              yr1_sb=yr1_sb,
+                              yr2_sb=yr2_sb,
+                              yr3_sb=yr3_sb,
+                              yr4_sb=yr4_sb,
+                              yr5_sb=yr5_sb,
+                              notes=notes,
+                              yr1_role='--',
+                              yr2_role='--',
+                              yr3_role='--',
+                              yr4_role='--',
+                              yr5_role='--',)
+        print(x)
+    return HttpResponseRedirect('/batch')
+
+def processsalarylistsbatch(request):
+    c = request.POST['salary_lists_text']
+    if c == '':
+        return HttpResponseRedirect('/batch')
+    c_list = c.strip().split('\r\n')
+    for x in range(len(c_list)):
+        c_list[x] = c_list[x].strip().split(':')
+    print(c_list)
+    for x in range(len(c_list)):
+        c_list[x][2] = Decimal(c_list[x][2])
+        position = c_list[x][0]
+        name = c_list[x][1]
+        salary = c_list[x][2]
+        SalaryListing.objects.create(position=position,
+                                     name=name,
+                                     yearly_cost=salary)
+        print(x)
+    return HttpResponseRedirect('/batch')
+
+def resetallroles(request):
+    a = Player.objects.all()
+    count = 0
+    for x in a:
+        count += 1
+        x.yr1_role = '--'
+        x.yr2_role = '--'
+        x.yr3_role = '--'
+        x.yr4_role = '--'
+        x.yr5_role = '--'
+        x.save()
+        print(count)
+
+    return HttpResponseRedirect('/')
+
+def resetavailableroles(request):
+    AvailableRole.objects.all().delete()
+    #fields = role, description, applies_to_QB, applies_to_RB, applies_to_WR, applies_to_TE, applies_to_DEF, applies_to_K, unique_role
+    default_roles = [['--','no role', True, True, True, True, True, True, False],
+                     ['QB 1','', True, False, False, False, False, False, True],
+                     ['QB 2','', True, False, False, False, False, False, True],
+                     ['QB 3','', True, False, False, False, False, False, True],
+                     ['D-QB','Developmental QB', True, False, False, False, False, False, False],
+                     ['RB 1','', False, True, False, False, False, False, True],
+                     ['RB 2','', False, True, False, False, False, False, True],
+                     ['RB 3','', False, True, False, False, False, False, True],
+                     ['RB 4','', False, True, False, False, False, False, True],
+                     ['RB 5','', False, True, False, False, False, False, True],
+                     ['RB 6','', False, True, False, False, False, False, True],
+                     ['D-RB','Developmental RB', False, True, False, False, False, False, False],
+                     ['WR 1','', False, False, True, False, False, False, True],
+                     ['WR 2','', False, False, True, False, False, False, True],
+                     ['WR 3','', False, False, True, False, False, False, True],
+                     ['WR 4','', False, False, True, False, False, False, True],
+                     ['WR 5','', False, False, True, False, False, False, True],
+                     ['WR 6','', False, False, True, False, False, False, True],
+                     ['D-WR','Developmental WR', False, False, True, False, False, False, False],
+                     ['TE 1','', False, False, False, True, False, False, True],
+                     ['TE 2','', False, False, False, True, False, False, True],
+                     ['TE 3','', False, False, False, True, False, False, True],
+                     ['D-TE','Developmental TE', False, False, False, True, False, False, False],
+                     ['IR','Player on Injured Reserve', True, True, True, True, True, True, False],
+                     ['Trade','Player to be traded', True, True, True, True, True, True, False],
+                     ['Release','Player to be released', True, True, True, True, True, True, False]]
+    a = Team.objects.all()
+
+    for x in a:
+        count = -1
+        for y in default_roles:
+            count += 1
+            AvailableRole.objects.create(user=x.user,
+                                         role=y[0],
+                                         description=y[1],
+                                         applies_to_QB=y[2],
+                                         applies_to_RB=y[3],
+                                         applies_to_WR=y[4],
+                                         applies_to_TE=y[5],
+                                         applies_to_DEF=y[6],
+                                         applies_to_K=y[7],
+                                         unique_role=y[8])
+    return HttpResponseRedirect('/')
+
 def team_org_processing_save_flex(request):
     which_flex = request.POST['which']
     new_flex = request.POST['flex']
@@ -993,6 +1199,16 @@ def verify_username_change(request):
     d = AlertSetting.objects.get(user=old_username)
     d.user = new_username
     d.save()
+
+    e = TeamVariable.objects.filter(user=old_username)
+    for x in e:
+        x.user = new_username
+        x.save()
+
+    f = Alert.objects.filter(user=old_username)
+    for x in f:
+        x.user = new_username
+        x.save()
 
     return JsonResponse('test', safe=False)
 
@@ -1615,6 +1831,10 @@ def change_team_name(request):
     c = Team.objects.get(internal_name=old_name)
     d = Transaction.objects.filter(team1=old_name)
     e = Transaction.objects.filter(team2=old_name)
+    f = Asset.objects.filter(team=old_name)
+    g = Trade.objects.filter(team1=old_name)
+    h = Trade.objects.filter(team2=old_name)
+    i = Cap_Penalty_Entry.objects.filter(team=old_name)
 
     for x in a:
         x.team = new_name
@@ -1633,6 +1853,22 @@ def change_team_name(request):
 
     for x in e:
         x.team2 = new_name
+        x.save()
+
+    for x in f:
+        x.team = new_name
+        x.save()
+
+    for x in g:
+        x.team1 = new_name
+        x.save()
+
+    for x in h:
+        x.team2 = new_name
+        x.save()
+
+    for x in i:
+        x.team = new_name
         x.save()
 
     return HttpResponseRedirect('/')
@@ -2987,3 +3223,61 @@ def retrieve_ownership_info_trade_transaction(request):
                          'team2_cap_pen': team2_cap_pen,
                          },
                          safe=False)
+
+def league_year_transition(request):
+    a = Player.objects.all()
+
+    for x in a:
+        if x.total_value != 0:
+            x.yr1_salary = x.yr2_salary
+            x.yr2_salary = x.yr3_salary
+            x.yr3_salary = x.yr4_salary
+            x.yr4_salary = x.yr5_salary
+            x.yr5_salary = 0
+            x.salary = x.yr1_salary + x.yr2_salary + x.yr3_salary + x.yr4_salary
+
+            x.yr1_sb = x.yr2_sb
+            x.yr2_sb = x.yr3_sb
+            x.yr3_sb = x.yr4_sb
+            x.yr4_sb = x.yr5_sb
+            x.yr5_sb = 0
+            x.signing_bonus = x.yr1_sb + x.yr2_sb + x.yr3_sb + x.yr4_sb
+            x.total_value = x.salary + x.signing_bonus
+
+            if x.total_value == 0:
+                x.team = 'Free Agent'
+                x.contract_type = 'none'
+                x.yr1_role = '--'
+                x.yr2_role = '--'
+                x.yr3_role = '--'
+                x.yr4_role = '--'
+                x.yr5_role = '--'
+            else:
+                x.yr1_role = x.yr2_role
+                x.yr2_role = x.yr3_role
+                x.yr3_role = x.yr4_role
+                x.yr4_role = x.yr5_role
+                x.yr5_role = '--'
+
+            x.save()
+
+    b = Team.objects.all()
+
+    for x in b:
+        x.yr1_cap_penalty = x.yr2_cap_penalty
+        x.yr2_cap_penalty = x.yr3_cap_penalty
+        x.yr3_cap_penalty = x.yr4_cap_penalty
+        x.yr4_cap_penalty = x.yr5_cap_penalty
+        x.yr5_cap_penalty = 0
+
+        x.yr1_balance = x.yr2_balance
+        x.yr2_balance = x.yr3_balance
+        x.yr3_balance = 60.00
+
+        x.yr1_bonuses = x.yr2_bonuses
+        x.yr2_bonuses = x.yr3_bonuses
+        x.yr3_bonuses = '0,0'
+
+        x.save()
+
+    return HttpResponseRedirect('/')

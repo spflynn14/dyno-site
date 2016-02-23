@@ -1,6 +1,8 @@
 $(document).ready(function() {
     console.log('ready 2');
 
+    var pathname = $(location).attr('pathname');
+
     var d = new Date();
     var today = format_date(d);
     var filtered_data = [];
@@ -16,10 +18,21 @@ $(document).ready(function() {
     $('#datepicker_end').val(today);
     var end_date = new Date(Date.parse($('#datepicker_end').val()));
     var tempd = new Date(end_date);
-    tempd.setDate(tempd.getDate() - 1);
+
+    if (pathname == '/league/league_transaction_log') {
+        tempd.setDate(tempd.getDate() - 7);
+    } else {
+        tempd.setDate(tempd.getDate() - 1);
+    }
+
     var temp1 = format_date(tempd);
     $('#datepicker_start').val(temp1);
-    $('#filter_24_hours_div').css({'border' : '2px dashed #2d99d4'});
+
+    if (pathname == '/league/league_transaction_log') {
+        $('#filter_week_div').css({'border' : '2px dashed #2d99d4'});
+    } else {
+        $('#filter_24_hours_div').css({'border' : '2px dashed #2d99d4'});
+    }
 
     var $master = [];
     $('#vw_1').find('tr').each(function() {
@@ -82,6 +95,32 @@ $(document).ready(function() {
             tr.append(td_date);
             tr.append(td_player);
             tr.append(td_transtype);
+
+            if (pathname == '/league/league_transaction_log') {
+                var td_team1 = $('<td>');
+                var two_teams = false;
+
+                var team1 = '';
+                var team2 = '';
+                if (value.team1.length == 0) {
+                    two_teams = false;
+                } else if (value.team1 != 'None') {
+                    team1 = value.team1;
+                    two_teams = true;
+                }
+                if (value.team2 != 'None') {
+                    team2 = value.team2;
+                }
+
+                if (two_teams == true) {
+                    td_team1.text(team1 + ' / ' + team2);
+                } else {
+                    td_team1.text(team2);
+                }
+
+                tr.append(td_team1);
+            }
+
             tr.append(td_details);
             tr.appendTo('#team_transactions_body');
         });
@@ -96,7 +135,11 @@ $(document).ready(function() {
         } else if (data.transaction_type == 'Auction Created') {
             return_text = 'Your proxy bid at creation was $' + data.var_d1;
         } else if (data.transaction_type == 'Auction End') {
-            return_text = 'You won this auction at $' + data.var_d1 + '. Your max bid was $' + data.var_d2 + '.';
+            if (pathname == '/league/league_transaction_log') {
+                return_text = 'Auction ended at $' + data.var_d1 + '.';
+            } else {
+                return_text = 'You won this auction at $' + data.var_d1 + '. Your max bid was $' + data.var_d2 + '.';
+            }
         } else if (data.transaction_type == 'Contract Processed') {
             if (data.var_t1 == 'Waiver Extension') {
                 return_text = 'Waiver Extension was granted this player. His contract has been updated.';
@@ -167,33 +210,33 @@ $(document).ready(function() {
             }
         } else if (data.transaction_type == 'Trade Offer') {
             if (data.var_t1 == 'Pending') {
-                return_text = data.team1 + " sent a trade offer to " + data.team2 + '. -- ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+                return_text = data.team1 + " sent a trade offer to " + data.team2 + '. -- ' + data.team1 + " gives up: " + data.var_t2 + '  ' + data.team2 + ' gives up: ' + data.var_t3;
             } else if (data.var_t1 == 'Rejected') {
-                return_text = data.team1 + " sent a trade offer to " + data.team2 + '. It was rejected by ' + data.team2 + '. -- ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+                return_text = data.team1 + " sent a trade offer to " + data.team2 + '. It was rejected by ' + data.team2 + '. -- ' + data.team1 + " gives up: " + data.var_t2 + '  ' + data.team2 + ' gives up: ' + data.var_t3;
             } else if (data.var_t1 == 'Accepted') {
                 return_text = data.team1 + " sent a trade offer to " + data.team2 + '. It was accepted by ' + data.team2 + '.';
             } else if (data.var_t1 == 'Withdrawn') {
-                return_text = data.team1 + " withdrew a trade offer sent to " + data.team2 + '. -- ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+                return_text = data.team1 + " withdrew a trade offer sent to " + data.team2 + '. -- ' + data.team1 + " gives up: " + data.var_t2 + '  ' + data.team2 + ' gives up: ' + data.var_t3;
             } else if (data.var_t1 == 'Expired') {
-                return_text = 'This trade offer expired: ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+                return_text = 'This trade offer expired: ' + data.team1 + " gives up: " + data.var_t2 + '  ' + data.team2 + ' gives up: ' + data.var_t3;
             } else if (data.var_t1 == 'Invalid') {
-                return_text = 'This trade offer was made invalid because one of the pieces of this trade is no longer owned by the same team: ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+                return_text = 'This trade offer was made invalid because one of the pieces of this trade is no longer owned by the same team: ' + data.team1 + " gives up: " + data.var_t2 + '  ' + data.team2 + ' gives up: ' + data.var_t3;
             }
         } else if (data.transaction_type == 'Trade Accepted') {
-            return_text = data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+            return_text = data.team1 + " gives up: " + data.var_t2 + '  ' + data.team2 + ' gives up: ' + data.var_t3;
         } else if (data.transaction_type == 'Counter Offer') {
             if (data.var_t1 == 'Pending') {
-                return_text = data.team1 + " sent a counter offer to " + data.team2 + '. -- ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+                return_text = data.team1 + " sent a counter offer to " + data.team2 + '. -- ' + data.team1 + " gives up: " + data.var_t2 + '  ' + data.team2 + ' gives up: ' + data.var_t3;
             } else if (data.var_t1 == 'Rejected') {
-                return_text = data.team1 + " sent a counter offer to " + data.team2 + '. It was rejected by ' + data.team2 + '. -- ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+                return_text = data.team1 + " sent a counter offer to " + data.team2 + '. It was rejected by ' + data.team2 + '. -- ' + data.team1 + " gives up: " + data.var_t2 + '  ' + data.team2 + ' gives up: ' + data.var_t3;
             } else if (data.var_t1 == 'Accepted') {
                 return_text = data.team1 + " sent a counter offer to " + data.team2 + '. It was accepted by ' + data.team2 + '.';
             } else if (data.var_t1 == 'Withdrawn') {
-                return_text = data.team1 + " withdrew a counter offer sent to " + data.team2 + '. -- ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+                return_text = data.team1 + " withdrew a counter offer sent to " + data.team2 + '. -- ' + data.team1 + " gives up: " + data.var_t2 + '  ' + data.team2 + ' gives up: ' + data.var_t3;
             } else if (data.var_t1 == 'Expired') {
-                return_text = 'This trade offer expired: ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+                return_text = 'This trade offer expired: ' + data.team1 + " gives up: " + data.var_t2 + '  ' + data.team2 + ' gives up: ' + data.var_t3;
             } else if (data.var_t1 == 'Invalid') {
-                return_text = 'This trade offer was made invalid because one of the pieces of this trade is no longer owned by the same team: ' + data.team1 + " gives up: " + data.var_t2 + '. ' + data.team2 + ' gives up: ' + data.var_t3 + '.';
+                return_text = 'This trade offer was made invalid because one of the pieces of this trade is no longer owned by the same team: ' + data.team1 + " gives up: " + data.var_t2 + '  ' + data.team2 + ' gives up: ' + data.var_t3;
             }
         } else {
             return_text = 'determine_details function is broke; report this bug'
@@ -237,6 +280,24 @@ $(document).ready(function() {
         return f_data;
     }
 
+    function filter_by_team (data) {
+        //valid for league transaction log only
+        var team_selected = $('#league_trans_log_team_select').val();
+        console.log(team_selected);
+        if (team_selected == 'All Teams') {
+            return data;
+        }
+        var output = [];
+        $.each(data, function(index, value) {
+            if (value.team1 == team_selected) {
+                output.push(value);
+            } else if (value.team2 == team_selected) {
+                output.push(value);
+            }
+        });
+        return output;
+    }
+
 
 
 
@@ -252,7 +313,14 @@ $(document).ready(function() {
         $('#filter_week_div').css({'border' : '2px dashed white'});
         $('#filter_month_div').css({'border' : '2px dashed white'});
         var output1 = filter_by_date($master);
-        filtered_data = filter_by_cat(output1);
+
+        if (pathname == '/league/league_transaction_log') {
+            var output2 = filter_by_team(output1);
+            filtered_data = filter_by_cat(output2);
+        } else {
+            filtered_data = filter_by_cat(output1);
+        }
+
         fill_table(filtered_data);
     });
 
@@ -268,7 +336,14 @@ $(document).ready(function() {
         $('#filter_week_div').css({'border' : '2px dashed white'});
         $('#filter_month_div').css({'border' : '2px dashed white'});
         var output1 = filter_by_date($master);
-        filtered_data = filter_by_cat(output1);
+
+        if (pathname == '/league/league_transaction_log') {
+            var output2 = filter_by_team(output1);
+            filtered_data = filter_by_cat(output2);
+        } else {
+            filtered_data = filter_by_cat(output1);
+        }
+
         fill_table(filtered_data);
     });
 
@@ -284,7 +359,14 @@ $(document).ready(function() {
         $('#filter_week_div').css({'border' : '2px dashed white'});
         $('#filter_month_div').css({'border' : '2px dashed white'});
         var output1 = filter_by_date($master);
-        filtered_data = filter_by_cat(output1);
+
+        if (pathname == '/league/league_transaction_log') {
+            var output2 = filter_by_team(output1);
+            filtered_data = filter_by_cat(output2);
+        } else {
+            filtered_data = filter_by_cat(output1);
+        }
+
         fill_table(filtered_data);
     });
 
@@ -300,7 +382,14 @@ $(document).ready(function() {
         $('#filter_week_div').css({'border' : '2px dashed #2d99d4'});
         $('#filter_month_div').css({'border' : '2px dashed white'});
         var output1 = filter_by_date($master);
-        filtered_data = filter_by_cat(output1);
+
+        if (pathname == '/league/league_transaction_log') {
+            var output2 = filter_by_team(output1);
+            filtered_data = filter_by_cat(output2);
+        } else {
+            filtered_data = filter_by_cat(output1);
+        }
+
         fill_table(filtered_data);
     });
 
@@ -323,7 +412,14 @@ $(document).ready(function() {
         $('#filter_week_div').css({'border' : '2px dashed white'});
         $('#filter_month_div').css({'border' : '2px dashed #2d99d4'});
         var output1 = filter_by_date($master);
-        filtered_data = filter_by_cat(output1);
+
+        if (pathname == '/league/league_transaction_log') {
+            var output2 = filter_by_team(output1);
+            filtered_data = filter_by_cat(output2);
+        } else {
+            filtered_data = filter_by_cat(output1);
+        }
+
         fill_table(filtered_data);
     });
 
@@ -334,7 +430,14 @@ $(document).ready(function() {
         $('#filter_week_div').css({'border' : '2px dashed white'});
         $('#filter_month_div').css({'border' : '2px dashed white'});
         var output1 = filter_by_date($master);
-        filtered_data = filter_by_cat(output1);
+
+        if (pathname == '/league/league_transaction_log') {
+            var output2 = filter_by_team(output1);
+            filtered_data = filter_by_cat(output2);
+        } else {
+            filtered_data = filter_by_cat(output1);
+        }
+
         fill_table(filtered_data);
     });
 
@@ -345,7 +448,14 @@ $(document).ready(function() {
         $('#filter_week_div').css({'border' : '2px dashed white'});
         $('#filter_month_div').css({'border' : '2px dashed white'});
         var output1 = filter_by_date($master);
-        filtered_data = filter_by_cat(output1);
+
+        if (pathname == '/league/league_transaction_log') {
+            var output2 = filter_by_team(output1);
+            filtered_data = filter_by_cat(output2);
+        } else {
+            filtered_data = filter_by_cat(output1);
+        }
+
         fill_table(filtered_data);
     });
 
@@ -365,7 +475,22 @@ $(document).ready(function() {
         }
 
         var output1 = filter_by_date($master);
-        filtered_data = filter_by_cat(output1);
+
+        if (pathname == '/league/league_transaction_log') {
+            var output2 = filter_by_team(output1);
+            filtered_data = filter_by_cat(output2);
+        } else {
+            filtered_data = filter_by_cat(output1);
+        }
+
+        fill_table(filtered_data);
+    });
+
+    $('#league_trans_log_team_select').on('change', function() {
+        //valid for league transaction log only
+        var output1 = filter_by_date($master);
+        var output2 = filter_by_team(output1);
+        filtered_data = filter_by_cat(output2);
         fill_table(filtered_data);
     });
 });

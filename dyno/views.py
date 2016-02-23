@@ -2,14 +2,14 @@ import os
 import sqlite3 as sql3
 from decimal import *
 from django.shortcuts import render
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import logout
 from django.http import HttpResponseRedirect, HttpResponse
 from django.db.models import Q, Sum
 from .forms import *
 from .models import *
 
 working_local = True
-current_league_year = 2015
+current_league_year = 2016
 year_list = [current_league_year, current_league_year + 1, current_league_year + 2, current_league_year + 3, current_league_year + 4]
 
 draft_pick_salary_list = {1 : [9.00, 10.80, 12.95, 15.55],
@@ -297,6 +297,78 @@ def extension_calc(x,
 
     return base_extension, avg_yearly, num_years
 
+def get_verbose_trade_info(pro_picks, pro_assets, pro_cash, opp_picks, opp_assets, opp_cash):
+
+    pro_picks_verbose = []
+    for pick in pro_picks:
+        try:
+            c = Draft_Pick.objects.get(pk=int(pick))
+            if c.pick_overall == 0:
+                if c.original_owner != c.owner:
+                    pro_picks_verbose.append(str(c.year) + ' round ' + str(c.round) + ' pick (' + c.original_owner + ')')
+                else:
+                    pro_picks_verbose.append(str(c.year) + ' round ' + str(c.round) + ' pick')
+            elif c.pick_in_round > 9:
+                pro_picks_verbose.append(str(c.year) + ' ' + str(c.round) + '.' + str(c.pick_in_round) + ' pick')
+            else:
+                pro_picks_verbose.append(str(c.year) + ' ' + str(c.round) + '.0' + str(c.pick_in_round) + ' pick')
+        except:
+            pass
+
+    pro_assets_verbose = []
+    for asset in pro_assets:
+        try:
+            d = Asset.objects.get(pk=int(asset))
+            if d.asset_type == 'Amnesty':
+                pro_assets_verbose.append(d.asset_type + ' (' + str(d.var_i1) + '%)')
+            elif d.asset_type == 'Salary Cap Boon':
+                pro_assets_verbose.append(d.asset_type + ' ($' + str(d.var_d1) + ')')
+        except:
+            pass
+
+    pro_cash_verbose = []
+    for x in range(0,len(pro_cash)):
+        if float(pro_cash[x]) != 0:
+            pro_cash_verbose.append(str(year_list[x]) + ' cash: $%.2f' % float(pro_cash[x]))
+
+    opp_picks_verbose = []
+    for pick in opp_picks:
+        try:
+            c = Draft_Pick.objects.get(pk=int(pick))
+            if c.pick_overall == 0:
+                if c.original_owner != c.owner:
+                    opp_picks_verbose.append(str(c.year) + ' round ' + str(c.round) + ' pick (' + c.original_owner + ')')
+                else:
+                    opp_picks_verbose.append(str(c.year) + ' round ' + str(c.round) + ' pick')
+            elif c.pick_in_round > 9:
+                opp_picks_verbose.append(str(c.year) + ' ' + str(c.round) + '.' + str(c.pick_in_round) + ' pick')
+            else:
+                opp_picks_verbose.append(str(c.year) + ' ' + str(c.round) + '.0' + str(c.pick_in_round) + ' pick')
+        except:
+            pass
+
+    opp_assets_verbose = []
+    for asset in opp_assets:
+        try:
+            d = Asset.objects.get(pk=int(asset))
+            if d.asset_type == 'Amnesty':
+                opp_assets_verbose.append(d.asset_type + ' (' + str(d.var_i1) + '%)')
+            elif d.asset_type == 'Salary Cap Boon':
+                opp_assets_verbose.append(d.asset_type + ' ($' + str(d.var_d1) + ')')
+        except:
+            pass
+
+    opp_cash_verbose = []
+    for x in range(0,len(opp_cash)):
+        if float(opp_cash[x]) != 0:
+            opp_cash_verbose.append(str(year_list[x]) + ' cash: $%.2f' % float(opp_cash[x]))
+
+    return pro_picks_verbose, pro_assets_verbose, pro_cash_verbose, opp_picks_verbose, opp_assets_verbose, opp_cash_verbose
+
+def login_redirect(request):
+    if request.user.is_anonymous():
+        return 'redirect'
+
 
 
 def homepage(request):
@@ -304,28 +376,6 @@ def homepage(request):
 
 def loginpage(request):
     return render(request, 'login.html', {'failed_login': False})
-
-def loginView(request):
-    username = request.POST['username']
-    password = request.POST['password']
-    user = authenticate(username=username, password=password)
-    if user is not None:
-        if user.is_active:
-            login(request, user)
-            a = Variable.objects.get(name='team selected')
-            try:
-                b = Team.objects.get(user=user)
-                team_name = b.internal_name
-            except:
-                team_name = ''
-
-            a.text_variable = team_name
-            a.save()
-            return HttpResponseRedirect('/')
-        else:
-            return HttpResponse('Your account is disabled. Please contact the administrator')
-    else:
-        return HttpResponseRedirect('/login_failed')
 
 def loginfailed(request):
     return render(request, 'login.html', {'failed_login': True})
@@ -345,12 +395,36 @@ def rulespage(request):
     return render(request, 'rules.html', {'rules_text': rules_text})
 
 def messageboardpage(request):
+    if login_redirect(request) == 'redirect':
+        return render(request, 'login.html', {'failed_login': False,
+                                              'redirect' : '/message_board'})
+
     return render(request, 'message_board.html', {})
 
 def draftpage(request):
+    if login_redirect(request) == 'redirect':
+        return render(request, 'login.html', {'failed_login': False,
+                                              'redirect' : '/draft'})
+
     return render(request, 'draft.html', {})
 
+def draftinfoandsettings(request):
+    if login_redirect(request) == 'redirect':
+        return render(request, 'login.html', {'failed_login': False,
+                                              'redirect' : '/draft/settings'})
+
+    a = Draft_Pick.objects.filter(year='2016').order_by('pick_overall')
+
+    b = Team.objects.all()
+
+    return render(request, 'draft/draft_info_settings.html', {'draft_picks' : a,
+                                                              'team_list' : b})
+
 def auctionpage(request):
+    if login_redirect(request) == 'redirect':
+        return render(request, 'login.html', {'failed_login': False,
+                                              'redirect' : '/auction'})
+
     a = Player.objects.filter(team='Free Agent').order_by('name')
     new_auction_player_list = []
     for x in a:
@@ -409,6 +483,10 @@ def leagueallplayerspage(request):
                                                               'year_list' : year_list})
 
 def leagueextensions(request):
+    if login_redirect(request) == 'redirect':
+        return render(request, 'login.html', {'failed_login': False,
+                                              'redirect' : '/league/extensions'})
+
     a = Player.objects.all()
     b = ADP.objects.all().order_by('rank')
     c = Performance_Yr1.objects.all().order_by('rank')
@@ -681,7 +759,30 @@ def leagueextensions(request):
                                                              'ext_switch' : ext_switch,
                                                              'submitted_extensions_list' : g})
 
+def leaguetransactionlog(request):
+    if login_redirect(request) == 'redirect':
+        return render(request, 'login.html', {'failed_login': False,
+                                              'redirect' : '/league/league_transaction_log'})
+
+    type_list = ['Auction End', 'Waiver Extension', 'Franchise Tag', 'Transition Tag', 'Extension Submitted', 'Expansion Draft Pick',
+                 'Player Cut', 'Trade Accepted']
+    a = Transaction.objects.all().order_by('-date')
+    b = []
+    for x in a:
+        if x.transaction_type in type_list:
+            b.append(x)
+
+    c = Team.objects.all()
+
+    return render(request, 'league/league_transaction_log.html', {'transactions' : b,
+                                                                  'trans_list' : sorted(type_list),
+                                                                  'team_list' : c})
+
 def leaguefreeagents(request):
+    if login_redirect(request) == 'redirect':
+        return render(request, 'login.html', {'failed_login': False,
+                                              'redirect' : '/league/free_agents'})
+
     aa = Variable.objects.get(name='Include Impending')
     include_impending = aa.int_variable
 
@@ -708,6 +809,10 @@ def leaguefreeagents(request):
                                                               'year_list' : year_list})
 
 def leaguesalarylists(request):
+    if login_redirect(request) == 'redirect':
+        return render(request, 'login.html', {'failed_login': False,
+                                              'redirect' : '/league/salary_lists'})
+
     #todo: change to sql pull to speed up
     qb_contents = SalaryListing.objects.filter(position='QB').order_by('position', '-yearly_cost')
     qb_first = (qb_contents[0].yearly_cost)*Decimal(1.05)
@@ -926,6 +1031,10 @@ def leaguecapsummary(request):
     return render(request, 'league/league_cap_summary.html', {'summary_data' : summary_data})
 
 def teamorganizationpage(request):
+    if login_redirect(request) == 'redirect':
+        return render(request, 'login.html', {'failed_login': False,
+                                              'redirect' : '/team/organization'})
+
     def years_remaining(yr1_salary, yr2_salary, yr3_salary, yr4_salary, yr5_salary):
         year_count = 0
         if yr1_salary == 0:
@@ -1162,6 +1271,10 @@ def teamorganizationpage(request):
                                                            'filtered_tags' : filtered_tags})
 
 def teamcapsituationpage(request):
+    if login_redirect(request) == 'redirect':
+        return render(request, 'login.html', {'failed_login': False,
+                                              'redirect' : '/team/cap_situation'})
+
     def avail_roles(con, cur, team, position, name, which_year):
 
         avail_roles = []
@@ -1348,6 +1461,10 @@ def teamcapsituationpage(request):
                                                             'year_list' : year_list})
 
 def teamsettingspage(request):
+    if login_redirect(request) == 'redirect':
+        return render(request, 'login.html', {'failed_login': False,
+                                              'redirect' : '/team/team_settings'})
+
     a = Team.objects.get(user=request.user)
 
     team_name = a.nickname
@@ -1379,9 +1496,14 @@ def teamsettingspage(request):
                                                        'yr3_bonuses' : yr3_bonuses,
                                                        'current_balance' : current_balance,
                                                        'filtered_tags' : filtered_tags,
-                                                       'role_list' : roles_list})
+                                                       'role_list' : roles_list,
+                                                       'year_list' : year_list})
 
 def teampendingtransactionspage(request):
+    if login_redirect(request) == 'redirect':
+        return render(request, 'login.html', {'failed_login': False,
+                                              'redirect' : '/team/pending_transactions'})
+
     a = Team.objects.get(user=request.user)
     team = a.internal_name
     b = Transaction.objects.filter(var_t1='Pending').filter(Q(team1=team) | Q(team2=team)).order_by('date')
@@ -1389,6 +1511,10 @@ def teampendingtransactionspage(request):
                                                                    'user_team_2' : team})
 
 def teamtransactionspage(request):
+    if login_redirect(request) == 'redirect':
+        return render(request, 'login.html', {'failed_login': False,
+                                              'redirect' : '/team/transactions'})
+
     #a = Transaction.objects.filter().order_by('-date')
     team = Team.objects.get(user=request.user)
     a = Transaction.objects.filter(Q(team1=team) | Q(team2=team)).order_by('-date')
@@ -1512,6 +1638,10 @@ def teamreleaseplayerspage(request):
                                                               'years_list' : year_list})
 
 def teamalertspage(request):
+    if login_redirect(request) == 'redirect':
+        return render(request, 'login.html', {'failed_login': False,
+                                              'redirect' : '/team/alerts'})
+
     type_list = ['Auction - Outbid', 'Auction - New Auction', 'Auction - Won', 'Trade Offer', 'Trade Rejected', 'Trade Accepted',
                  'Trade Withdrawn']
     a = Alert.objects.filter(user=request.user).order_by('-date')
@@ -1523,10 +1653,18 @@ def teamalertspage(request):
                                                      'alerts' : b})
 
 def teammanagealerts(request):
+    if login_redirect(request) == 'redirect':
+        return render(request, 'login.html', {'failed_login': False,
+                                              'redirect' : '/team/manage_alerts'})
+
     a = AlertSetting.objects.get(user=request.user)
     return render(request, 'team/team_manage_alerts.html', {'alert_settings' : a})
 
 def teamtrades(request):
+    if login_redirect(request) == 'redirect':
+        return render(request, 'login.html', {'failed_login': False,
+                                              'redirect' : '/team/trade'})
+
     opp_team = ''
     pro_players = []
     pro_picks = []
@@ -1681,6 +1819,10 @@ def teamtrades(request):
                                                     'view_flag_trade_id' : view_flag_trade_id})
 
 def playerpage(request):
+    if login_redirect(request) == 'redirect':
+        return render(request, 'login.html', {'failed_login': False,
+                                              'redirect' : '/player'})
+
     a = TeamVariable.objects.filter(user=request.user).get(name='PlayerForPlayerPage')
     player_selected = a.text_variable
     a.text_variable = ''
@@ -1707,187 +1849,6 @@ def settingspage(request):
 
 def batchpage(request):
     return render(request, 'admin/batch.html', {})
-
-def processplayercontractsbatch(request):
-    c = request.POST['player_contract_text']
-    if c == '':
-        return HttpResponseRedirect('/batch')
-    c_list = c.strip().split('\r\n')
-    for x in range(len(c_list)):
-        c_list[x] = c_list[x].strip().split(':')
-
-    for x in range(len(c_list)):
-        c_list[x][4] = Decimal(c_list[x][4])
-        try:
-            c_list[x][5] = Decimal(c_list[x][5])
-        except:
-            c_list[x][5] = 0
-        try:
-            c_list[x][6] = Decimal(c_list[x][6])
-        except:
-            c_list[x][6] = 0
-        try:
-            c_list[x][7] = Decimal(c_list[x][7])
-        except:
-            c_list[x][7] = 0
-        try:
-            c_list[x][8] = Decimal(c_list[x][8])
-        except:
-            c_list[x][8] = 0
-        contract_length = 0
-        for y in range(4,9):
-            if c_list[x][y] == 0:
-                pass
-            else:
-                contract_length += 1
-        position = c_list[x][0]
-        name = c_list[x][1]
-        team = c_list[x][2]
-        contract_type = c_list[x][3]
-        total_value = c_list[x][4]+c_list[x][5]+c_list[x][6]+c_list[x][7]+c_list[x][8]
-        signing_bonus = round((c_list[x][5]+c_list[x][6]+c_list[x][7]+c_list[x][8])*Decimal(0.4),1)
-        salary = total_value - signing_bonus
-        yr1_sal = c_list[x][4]
-        try:
-            yr2_sal = ((c_list[x][5])/(total_value-yr1_sal))*(salary-yr1_sal)
-        except:
-            yr2_sal = 0
-        try:
-            yr3_sal = ((c_list[x][6])/(total_value-yr1_sal))*(salary-yr1_sal)
-        except:
-            yr3_sal = 0
-        try:
-            yr4_sal = ((c_list[x][7])/(total_value-yr1_sal))*(salary-yr1_sal)
-        except:
-            yr4_sal = 0
-        try:
-            yr5_sal = ((c_list[x][8])/(total_value-yr1_sal))*(salary-yr1_sal)
-        except:
-            yr5_sal = 0
-        yr1_sb = 0
-        if yr2_sal == 0:
-            yr2_sb = 0
-        else:
-            yr2_sb = signing_bonus / (contract_length-1)
-        if yr3_sal == 0:
-            yr3_sb = 0
-        else:
-            yr3_sb = signing_bonus / (contract_length-1)
-        if yr4_sal == 0:
-            yr4_sb = 0
-        else:
-            yr4_sb = signing_bonus / (contract_length-1)
-        if yr5_sal == 0:
-            yr5_sb = 0
-        else:
-            yr5_sb = signing_bonus / (contract_length-1)
-        notes = c_list[x][9]
-        Player.objects.create(position=position,
-                              name=name,
-                              team=team,
-                              contract_type=contract_type,
-                              total_value=total_value,
-                              signing_bonus=signing_bonus,
-                              salary=salary,
-                              yr1_salary=yr1_sal,
-                              yr2_salary=yr2_sal,
-                              yr3_salary=yr3_sal,
-                              yr4_salary=yr4_sal,
-                              yr5_salary=yr5_sal,
-                              yr1_sb=yr1_sb,
-                              yr2_sb=yr2_sb,
-                              yr3_sb=yr3_sb,
-                              yr4_sb=yr4_sb,
-                              yr5_sb=yr5_sb,
-                              notes=notes,
-                              yr1_role='--',
-                              yr2_role='--',
-                              yr3_role='--',
-                              yr4_role='--',
-                              yr5_role='--',)
-        print(x)
-    return HttpResponseRedirect('/batch')
-
-def processsalarylistsbatch(request):
-    c = request.POST['salary_lists_text']
-    if c == '':
-        return HttpResponseRedirect('/batch')
-    c_list = c.strip().split('\r\n')
-    for x in range(len(c_list)):
-        c_list[x] = c_list[x].strip().split(':')
-    print(c_list)
-    for x in range(len(c_list)):
-        c_list[x][2] = Decimal(c_list[x][2])
-        position = c_list[x][0]
-        name = c_list[x][1]
-        salary = c_list[x][2]
-        SalaryListing.objects.create(position=position,
-                                     name=name,
-                                     yearly_cost=salary)
-        print(x)
-    return HttpResponseRedirect('/batch')
-
-def resetallroles(request):
-    a = Player.objects.all()
-    count = 0
-    for x in a:
-        count += 1
-        x.yr1_role = '--'
-        x.yr2_role = '--'
-        x.yr3_role = '--'
-        x.yr4_role = '--'
-        x.yr5_role = '--'
-        x.save()
-        print(count)
-
-    return HttpResponseRedirect('/')
-
-def resetavailableroles(request):
-    AvailableRole.objects.all().delete()
-    #fields = role, description, applies_to_QB, applies_to_RB, applies_to_WR, applies_to_TE, applies_to_DEF, applies_to_K, unique_role
-    default_roles = [['--','no role', True, True, True, True, True, True, False],
-                     ['QB 1','', True, False, False, False, False, False, True],
-                     ['QB 2','', True, False, False, False, False, False, True],
-                     ['QB 3','', True, False, False, False, False, False, True],
-                     ['D-QB','Developmental QB', True, False, False, False, False, False, False],
-                     ['RB 1','', False, True, False, False, False, False, True],
-                     ['RB 2','', False, True, False, False, False, False, True],
-                     ['RB 3','', False, True, False, False, False, False, True],
-                     ['RB 4','', False, True, False, False, False, False, True],
-                     ['RB 5','', False, True, False, False, False, False, True],
-                     ['RB 6','', False, True, False, False, False, False, True],
-                     ['D-RB','Developmental RB', False, True, False, False, False, False, False],
-                     ['WR 1','', False, False, True, False, False, False, True],
-                     ['WR 2','', False, False, True, False, False, False, True],
-                     ['WR 3','', False, False, True, False, False, False, True],
-                     ['WR 4','', False, False, True, False, False, False, True],
-                     ['WR 5','', False, False, True, False, False, False, True],
-                     ['WR 6','', False, False, True, False, False, False, True],
-                     ['D-WR','Developmental WR', False, False, True, False, False, False, False],
-                     ['TE 1','', False, False, False, True, False, False, True],
-                     ['TE 2','', False, False, False, True, False, False, True],
-                     ['TE 3','', False, False, False, True, False, False, True],
-                     ['D-TE','Developmental TE', False, False, False, True, False, False, False],
-                     ['IR','Player on Injured Reserve', True, True, True, True, True, True, False],
-                     ['Trade','Player to be traded', True, True, True, True, True, True, False],
-                     ['Release','Player to be released', True, True, True, True, True, True, False]]
-    a = Team.objects.all()
-
-    for x in a:
-        count = -1
-        for y in default_roles:
-            count += 1
-            AvailableRole.objects.create(user=x.user,
-                                         role=y[0],
-                                         description=y[1],
-                                         applies_to_QB=y[2],
-                                         applies_to_RB=y[3],
-                                         applies_to_WR=y[4],
-                                         applies_to_TE=y[5],
-                                         applies_to_DEF=y[6],
-                                         applies_to_K=y[7],
-                                         unique_role=y[8])
-    return HttpResponseRedirect('/')
 
 def testview(request):
     b = Player.objects.order_by('name')
@@ -2284,6 +2245,10 @@ def transactiontrade(request):
                                                               'opp_cap_pen' : opp_cap_pen})
 
 def tagspage(request):
+    if login_redirect(request) == 'redirect':
+        return render(request, 'login.html', {'failed_login': False,
+                                              'redirect' : '/team/tags'})
+
     aa = Team.objects.get(user=request.user)
     team = aa.internal_name
     waiver_extension_flag = aa.yr1_bonuses.strip().split(',')[1]
@@ -2672,75 +2637,6 @@ def confirmcutplayers(request):
                                                              'assets' : d,
                                                              'current_year' : current_league_year})
 
-def get_verbose_trade_info(pro_picks, pro_assets, pro_cash, opp_picks, opp_assets, opp_cash):
-
-    pro_picks_verbose = []
-    for pick in pro_picks:
-        try:
-            c = Draft_Pick.objects.get(pk=int(pick))
-            if c.pick_overall == 0:
-                if c.original_owner != c.owner:
-                    pro_picks_verbose.append(str(c.year) + ' round ' + str(c.round) + ' pick (' + c.original_owner + ')')
-                else:
-                    pro_picks_verbose.append(str(c.year) + ' round ' + str(c.round) + ' pick')
-            elif c.pick_in_round > 9:
-                pro_picks_verbose.append(str(c.year) + ' ' + str(c.round) + '.' + str(c.pick_in_round) + ' pick')
-            else:
-                pro_picks_verbose.append(str(c.year) + ' ' + str(c.round) + '.0' + str(c.pick_in_round) + ' pick')
-        except:
-            pass
-
-    pro_assets_verbose = []
-    for asset in pro_assets:
-        try:
-            d = Asset.objects.get(pk=int(asset))
-            if d.asset_type == 'Amnesty':
-                pro_assets_verbose.append(d.asset_type + ' (' + str(d.var_i1) + '%)')
-            elif d.asset_type == 'Salary Cap Boon':
-                pro_assets_verbose.append(d.asset_type + ' ($' + str(d.var_d1) + ')')
-        except:
-            pass
-
-    pro_cash_verbose = []
-    for x in range(0,len(pro_cash)):
-        if float(pro_cash[x]) != 0:
-            pro_cash_verbose.append(str(year_list[x]) + ' cash: $%.2f' % float(pro_cash[x]))
-
-    opp_picks_verbose = []
-    for pick in opp_picks:
-        try:
-            c = Draft_Pick.objects.get(pk=int(pick))
-            if c.pick_overall == 0:
-                if c.original_owner != c.owner:
-                    opp_picks_verbose.append(str(c.year) + ' round ' + str(c.round) + ' pick (' + c.original_owner + ')')
-                else:
-                    opp_picks_verbose.append(str(c.year) + ' round ' + str(c.round) + ' pick')
-            elif c.pick_in_round > 9:
-                opp_picks_verbose.append(str(c.year) + ' ' + str(c.round) + '.' + str(c.pick_in_round) + ' pick')
-            else:
-                opp_picks_verbose.append(str(c.year) + ' ' + str(c.round) + '.0' + str(c.pick_in_round) + ' pick')
-        except:
-            pass
-
-    opp_assets_verbose = []
-    for asset in opp_assets:
-        try:
-            d = Asset.objects.get(pk=int(asset))
-            if d.asset_type == 'Amnesty':
-                opp_assets_verbose.append(d.asset_type + ' (' + str(d.var_i1) + '%)')
-            elif d.asset_type == 'Salary Cap Boon':
-                opp_assets_verbose.append(d.asset_type + ' ($' + str(d.var_d1) + ')')
-        except:
-            pass
-
-    opp_cash_verbose = []
-    for x in range(0,len(opp_cash)):
-        if float(opp_cash[x]) != 0:
-            opp_cash_verbose.append(str(year_list[x]) + ' cash: $%.2f' % float(opp_cash[x]))
-
-    return pro_picks_verbose, pro_assets_verbose, pro_cash_verbose, opp_picks_verbose, opp_assets_verbose, opp_cash_verbose
-
-
 def confirmtradepage(request):
     a = TeamVariable.objects.filter(name='TradeData').get(user=request.user)
     temp = a.text_variable
@@ -2938,6 +2834,10 @@ def confirmtradepage(request):
                                                         'is_proposing_team' : is_proposing_team})
 
 def teamtradelogpage(request):
+    if login_redirect(request) == 'redirect':
+        return render(request, 'login.html', {'failed_login': False,
+                                              'redirect' : '/team/trade_log'})
+
     a = Team.objects.get(user=request.user)
     team = a.internal_name
 

@@ -1,4 +1,4 @@
-{% extends 'team.html' %}
+{% extends 'league.html' %}
 
 {% load staticfiles %}
 
@@ -11,39 +11,8 @@
 
 {% block content %}
     {% csrf_token %}
-    <div class="tab_area" id="third_tab_area">
-        {% if request.path == '/team/pending_transactions' %}
-            <a href="/team/pending_transactions" class="third_tab_button_team" id="team_pending_transactions" style="background-color: #2d99d4; color: white">Pending Transactions</a>
-        {% else %}
-            <a href="/team/pending_transactions" class="third_tab_button_team" id="team_pending_transactions">Pending Transactions</a>
-        {% endif %}
 
-        {% if request.path == '/team/trade' %}
-            <a href="/team/trade" class="third_tab_button_team" id="team_level_cuts" style="background-color: #2d99d4; color: white">View Assets/Propose Trade</a>
-        {% else %}
-            <a href="/team/trade" class="third_tab_button_team" id="team_level_cuts">View Assets/Propose Trade</a>
-        {% endif %}
-
-        {% if request.path == '/team/trade_log' %}
-            <a href="/team/trade_log" class="third_tab_button_team" id="team_level_cuts" style="background-color: #2d99d4; color: white">Trade Log</a>
-        {% else %}
-            <a href="/team/trade_log" class="third_tab_button_team" id="team_level_cuts">Trade Log</a>
-        {% endif %}
-
-        {% if request.path == '/team/release_players' %}
-            <a href="/team/release_players" class="third_tab_button_team" id="team_level_cuts" style="background-color: #2d99d4; color: white">Release Players</a>
-        {% else %}
-            <a href="/team/release_players" class="third_tab_button_team" id="team_level_cuts">Release Players</a>
-        {% endif %}
-
-        {% if request.path == '/team/transactions' %}
-            <a href="/team/transactions" class="third_tab_button_team" id="team_transactions" style="background-color: #2d99d4; color: white">Transaction Log</a>
-        {% else %}
-            <a href="/team/transactions" class="third_tab_button_team" id="team_transactions">Transaction Log</a>
-        {% endif %}
-    </div>
-
-    <div id="display_area">
+    <div id="display_area" style="overflow-y: auto; height: 85%;">
         <div id="team_trans_date_filters_area">
             <div class="team_trans_date_button" id='filter_24_hours_div' style="margin-left: 60px; border: 2px solid white"><button type="button" id="filter_24_hours_button">24 Hours</button></div>
             <div class="team_trans_date_button" id="filter_48_hours_div" style="margin-left: 30px; border: 2px solid white"><button type="button" id="filter_48_hours_button">48 Hours</button></div>
@@ -52,7 +21,13 @@
             <div class="team_trans_date_button" id="filter_month_div" style="margin-left: 30px; border: 2px solid white"><button type="button" id="filter_month_button">Month</button></div>
             <p class="team_trans_date_button" style="margin-left: 50px">Start Date: <input type="text" size='8' id="datepicker_start"></p>
             <p class="team_trans_date_button" style="margin-left: 10px">End Date: <input type="text" size='8' id="datepicker_end"></p>
-            <p class="team_trans_date_button" style="float: right; font-size: smaller">Only transactions involving your team are displayed</p>
+            <select class="team_trade_log_date_button" id="league_trans_log_team_select" style="margin-right: 10px; float: right">
+                <option selected>All Teams</option>
+                {% for x in team_list %}
+                    <option>{{ x.internal_name }}</option>
+                {% endfor %}
+            </select>
+            <p class="team_trade_log_date_button" style="float: right">Filter By Team: &nbsp&nbsp</p>
         </div>
 
         <div class="team_transactions_datagrid" style="height: 90%;">
@@ -62,7 +37,8 @@
                         <th width="15%">Date</th>
                         <th width="15%">Player</th>
                         <th width="15%">Transaction Type</th>
-                        <th width="55%">Details</th>
+                        <th width="13%">Team(s)</th>
+                        <th width="42%">Details</th>
                     </tr>
                 </thead>
                 <tbody id="team_transactions_body">
@@ -106,5 +82,4 @@
             </table>
         {% endfor %}
     </div>
-
 {% endblock %}

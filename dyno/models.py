@@ -311,7 +311,6 @@ class Transaction(models.Model):
         var_t1 = status (pending, rejected, accepted, countered, withdrawn)
         var_t2 = pro team pieces
         var_t3 = opp team pieces
-
     '''
 
     def __str__(self):

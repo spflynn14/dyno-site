@@ -73,20 +73,20 @@
                     Current Balance: &nbsp&nbsp<span>${{ current_balance }}</span><br>
                 {% endif %}
 
-                <span style="font-size: x-small">(includes 2016 league fees)</span><br><br>
+                <span style="font-size: x-small">(includes 2016 league fees)</span><br><br> <!-- (includes 2016 league fees) -->
                 <p style="font-size: smaller" id="show_hide_account_details">(Show/Hide Details)</p><br>
 
                 <div id="account_balance_details_div">
                     {% if yr1_balance == 0 %}
-                        2015 League Year: &nbsp&nbsp<span style="color: green;">Paid!</span><br>
+                        {{ year_list.0 }} League Year: &nbsp&nbsp<span style="color: green;">Paid!</span><br>
                     {% else %}
-                        2015 League Year: &nbsp&nbsp<span style="color: red">Unpaid (${{ yr1_balance }})</span><br>
+                        {{ year_list.0 }} League Year: &nbsp&nbsp<span style="color: red">Unpaid (${{ yr1_balance }})</span><br>
                     {% endif %}
 
                     {% if yr2_balance == 0 %}
-                        2016 League Year: &nbsp&nbsp<span style="color: green;">Paid!</span><br><br>
+                        {{ year_list.1 }} League Year: &nbsp&nbsp<span style="color: green;">Paid!</span><br><br>
                     {% else %}
-                        2016 League Year: &nbsp&nbsp<span style="color: red">Unpaid (${{ yr2_balance }})</span><br><br>
+                        {{ year_list.1 }} League Year: &nbsp&nbsp<span style="color: red">Unpaid (${{ yr2_balance }})</span><br><br>
                     {% endif %}
 
                     <p style="font-size: x-small">(if any of the above information is incorrect,<br>please contact me immediately)</p><br>
@@ -94,16 +94,16 @@
                     <p style="font-size: small;">Bonuses:</p>
 
                     {% if yr1_bonuses.0 == '1' %}
-                        <p style="font-size: small">2015 Extra 3rd Round Rookie Pick</p>
+                        <p style="font-size: small">{{ year_list.0 }} Extra 3rd Round Rookie Pick</p>
                     {% endif %}
                     {% if yr1_bonuses.2 == '1' %}
-                        <p style="font-size: small">2015 "Waiver Extension"</p>
+                        <p style="font-size: small">{{ year_list.0 }} "Waiver Extension"</p>
                     {% endif %}
                     {% if yr2_bonuses.0 == '1' %}
-                        <p style="font-size: small">2016 Extra 3rd Round Rookie Pick</p>
+                        <p style="font-size: small">{{ year_list.1 }} Extra 3rd Round Rookie Pick</p>
                     {% endif %}
                     {% if yr2_bonuses.2 == '1' %}
-                        <p style="font-size: small">2016 "Waiver Extension"</p>
+                        <p style="font-size: small">{{ year_list.1 }} "Waiver Extension"</p>
                     {% endif %}
                 </div>
             </div>

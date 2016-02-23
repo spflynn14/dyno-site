@@ -4,7 +4,14 @@ $(document).ready(function() {
     var filtered_data = [];
 
     var user_status = $('#vw_2-1').text();
-    console.log(user_status);
+    var y1 = $('#vw_2-2').text();
+    var y2 = $('#vw_2-3').text();
+    var y3 = $('#vw_2-4').text();
+    var y4 = $('#vw_2-5').text();
+    var y5 = $('#vw_2-6').text();
+    $('#vw_2').remove();
+    var year_list = [y1, y2, y3, y4, y5];
+    console.log(year_list);
 
     var $master = [];
     $('#vw_1').find('tr').each(function() {
@@ -145,7 +152,7 @@ $(document).ready(function() {
         var team_selected_list = [];
 
         if ($('#all_players_filter_Alexander').prop('checked') == true) {
-            team_selected_list.push('Alexander');
+            team_selected_list.push('Dann');
         }
         if ($('#all_players_filter_Burd').prop('checked') == true) {
             team_selected_list.push('Burd');
@@ -218,31 +225,31 @@ $(document).ready(function() {
         var end = Number($('#all_players_filter_salary_to').val());
 
         $.each(data, function(index, value) {
-            if (year_selected == '2015') {
+            if (year_selected == year_list[0]) {
                 if (value.yr1_salary >= start && value.yr1_salary <= end) {
                     if (value.yr1_salary != 0) {
                         output.push(value);
                     }
                 }
-            } else if (year_selected == '2016') {
+            } else if (year_selected == year_list[1]) {
                 if (value.yr2_salary >= start && value.yr2_salary <= end) {
                     if (value.yr2_salary != 0) {
                         output.push(value);
                     }
                 }
-            } else if (year_selected == '2017') {
+            } else if (year_selected == year_list[2]) {
                 if (value.yr3_salary >= start && value.yr3_salary <= end) {
                     if (value.yr3_salary != 0) {
                         output.push(value);
                     }
                 }
-            } else if (year_selected == '2018') {
+            } else if (year_selected == year_list[3]) {
                 if (value.yr4_salary >= start && value.yr4_salary <= end) {
                     if (value.yr4_salary != 0) {
                         output.push(value);
                     }
                 }
-            } else if (year_selected == '2019') {
+            } else if (year_selected == year_list[4]) {
                 if (value.yr5_salary >= start && value.yr5_salary <= end) {
                     if (value.yr5_salary != 0) {
                         output.push(value);

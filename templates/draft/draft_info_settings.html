@@ -1,0 +1,79 @@
+{% extends 'draft.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/draft_info_settings.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.tablesorter.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="tab_area" id="third_tab_area"; style="margin-top: 30px">
+        <table style="width: 60%; table-layout: fixed">
+            <thead>
+                <tr>
+                    <th style="width: 40%">Select Team To See Total Cost of Picks</th>
+                    <th style="width: 15%; text-align: center">2016 Cost</th>
+                    <th style="width: 15%; text-align: center">2017 Cost</th>
+                    <th style="width: 15%; text-align: center">2018 Cost</th>
+                    <th style="width: 15%; text-align: center">2019 Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <select id="team_pick_sum_select">
+                            <option></option>
+                            {% for x in team_list %}
+                                <option>{{ x.internal_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td style='text-align: center' id="pick_sum_label_yr1"></td>
+                    <td style='text-align: center' id="pick_sum_label_yr2"></td>
+                    <td style='text-align: center' id="pick_sum_label_yr3"></td>
+                    <td style='text-align: center' id="pick_sum_label_yr4"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="display_area" style="overflow-y: auto; margin-top: 40px; height: 70%">
+        <table style="width: 60%; table-layout: fixed">
+            <thead>
+                <tr>
+                    <th style="width: 10%; text-align: center">Overall Pick</th>
+                    <th style="width: 10%; text-align: center">Round</th>
+                    <th style="width: 10%; text-align: center">Pick</th>
+                    <th style="width: 22%">Team</th>
+                    <th style="width: 12%; text-align: center">2016 Cost</th>
+                    <th style="width: 12%; text-align: center">2017 Cost</th>
+                    <th style="width: 12%; text-align: center">2018 Cost</th>
+                    <th style="width: 12%; text-align: center">2019 Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for x in draft_picks %}
+                    <tr>
+                        <td style="text-align: center">{{ x.pick_overall }}</td>
+                        <td style="text-align: center">{{ x.round }}</td>
+                        <td style="text-align: center">{{ x.pick_in_round }}</td>
+                        <td class="pick_owner">{{ x.owner }}</td>
+                        <td style="text-align: center">{{ x.yr1_sal }}</td>
+                        <td style="text-align: center">{{ x.yr2_sal }}</td>
+                        {% if x.yr3_sal != 0 %}
+                            <td style="text-align: center">{{ x.yr3_sal }}</td>
+                        {% else %}
+                            <td style="text-align: center" hidden>{{ x.yr3_sal }}</td>
+                        {% endif %}
+                        {% if x.yr4_sal != 0 %}
+                            <td style="text-align: center">{{ x.yr4_sal }}</td>
+                        {% else %}
+                            <td style="text-align: center" hidden>{{ x.yr4_sal }}</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
