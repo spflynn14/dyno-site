@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    console.log('ready');
+    console.log('ready 2');
 
     var team_list = [];
     $('#vw_1').find('p').each(function() {
@@ -120,8 +120,10 @@ $(document).ready(function() {
 
                 if (data.team != data.user_team) {
                     $('#player_cut_player_button').hide();
+                    $('#player_restructure_button').hide();
                 } else {
                     $('#player_cut_player_button').show();
+                    $('#player_restructure_button').show();
                 }
             }
         });
@@ -801,7 +803,6 @@ $(document).ready(function() {
     });
 
     $('#spinner_1').on('spin', function(event, ui) {
-        console.log('called spinner 1');
         $('#slider_1').slider('value', ui.value*20);
         adjust_sliders(ui, 'spinner', 1);
         fill_total_cost_column();
@@ -981,6 +982,32 @@ $(document).ready(function() {
             dataType: 'json',
             success: function (data) {
                 location.href = '/confirm_cut_players';
+            }
+        });
+    });
+
+    $('#player_restructure_button').on('click', function() {
+        var out_player = $('#name_text').text();
+        var yr1_salary = $('#spinner_1').spinner('value');
+        var yr2_salary = $('#spinner_2').spinner('value');
+        var yr3_salary = $('#spinner_3').spinner('value');
+        var yr4_salary = $('#spinner_4').spinner('value');
+        var yr5_salary = $('#spinner_5').spinner('value');
+        $.ajax({
+            url: '/save_data_restructure_player',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                'player' : out_player,
+                'yr1_sal' : yr1_salary,
+                'yr2_sal' : yr2_salary,
+                'yr3_sal' : yr3_salary,
+                'yr4_sal' : yr4_salary,
+                'yr5_sal' : yr5_salary
+            },
+            dataType: 'json',
+            success: function (data) {
+                location.href = '/confirm_restructure';
             }
         });
     });

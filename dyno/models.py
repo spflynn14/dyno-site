@@ -311,6 +311,16 @@ class Transaction(models.Model):
         var_t1 = status (pending, rejected, accepted, countered, withdrawn)
         var_t2 = pro team pieces
         var_t3 = opp team pieces
+
+    Restructure Contract:
+        team2 = owner
+        var_d1 = total cost per year
+        var_d2 = signing bonus per year
+        var_i1 = total years of contract
+        var_t1 = status (pending)
+        var_t2 = status (confirmed)
+        var_t3 = per year total cost list (split by comma)
+
     '''
 
     def __str__(self):
@@ -441,3 +451,11 @@ class Cap_Penalty_Entry(models.Model):
     def __str__(self):
         return_string = self.team + ' - ' + str(self.year) + ' - ' + str(self.penalty) + ' - ' + self.description
         return return_string
+
+class Session(models.Model):
+    user = models.CharField(max_length=20)
+    date = models.DateTimeField()
+    page = models.CharField(max_length=60)
+
+    def __str__(self):
+        return self.user + ' - ' + str(self.date)

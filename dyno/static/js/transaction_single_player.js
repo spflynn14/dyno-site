@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    console.log('ready');
+    console.log('ready 2');
 
     var $master = {};
     $('#vw_1').find('tr').each(function() {
@@ -24,6 +24,8 @@ $(document).ready(function() {
     var contract_type = 'Regular';
     if ($master.transaction_type == 'Draft Pick') {
         contract_type = 'Rookie'
+    } else if ($master.transaction_type == 'Extension Submitted') {
+        contract_type = 'Regular'
     }
     $('#input_4').val(contract_type);
 
@@ -52,29 +54,45 @@ $(document).ready(function() {
     $('#input_8').val(yr1_sal.toFixed(2));
     if (Number($master.var_i1) >= 2) {
         $('#input_9').val(yr2_sal.toFixed(2));
+    } else {
+        $('#input_9').val(0);
     }
     if (Number($master.var_i1) >= 3) {
         $('#input_10').val(yr3_sal.toFixed(2));
+    } else {
+        $('#input_10').val(0);
     }
     if (Number($master.var_i1) >= 4) {
         $('#input_11').val(yr4_sal.toFixed(2));
+    } else {
+        $('#input_11').val(0);
     }
     if (Number($master.var_i1) >= 5) {
         $('#input_12').val(yr5_sal.toFixed(2));
+    } else {
+        $('#input_12').val(0);
     }
 
     $('#input_13').val(Number($master.var_d2).toFixed(2));
     if (Number($master.var_i1) >= 2) {
         $('#input_14').val(Number($master.var_d2).toFixed(2));
+    } else {
+        $('#input_14').val(0);
     }
     if (Number($master.var_i1) >= 3) {
         $('#input_15').val(Number($master.var_d2).toFixed(2));
+    } else {
+        $('#input_15').val(0);
     }
     if (Number($master.var_i1) >= 4) {
         $('#input_16').val(Number($master.var_d2).toFixed(2));
+    } else {
+        $('#input_16').val(0);
     }
     if (Number($master.var_i1) >= 5) {
         $('#input_17').val(Number($master.var_d2).toFixed(2));
+    } else {
+        $('#input_17').val(0);
     }
 
     if ($('#input_19').val() == 'None') {

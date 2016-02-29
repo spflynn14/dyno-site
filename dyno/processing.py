@@ -621,7 +621,7 @@ def periodic_alerts_routine():
                                       fail_silently=False)
                     else:
                         target_email = c.email
-                        subject_line = '[Dynasty League] Weekly Alerts - '
+                        subject_line = '[Dynasty League] Weekly Alerts'
                         send_mail(subject_line,
                                   email_body + alert_settings_message + email_footer,
                                   '',
@@ -668,6 +668,37 @@ def check_expired_trades():
             b = Transaction.objects.filter(player='trade').get(var_i1=x.id)
             b.var_t1 = 'Expired'
             b.save()
+
+def check_expired_set_contracts():
+    a = Transaction.objects.filter(var_t1='Pending', var_t2='Unconfirmed')
+    for x in a:
+        exp_date = x.date + timezone.timedelta(days=2)
+        if timezone.now() > exp_date:
+            print(x)
+            x.var_i1 = 0
+            x.var_i2 = 0
+            x.var_t1 = ''
+            x.save()
+
+            b = Team.objects.get(internal_name=x.team2)
+            u = b.user
+
+            sb = round(x.var_d1 * Decimal(0.4), 1)
+
+            Transaction.objects.create(player=x.player,
+                                       date=timezone.now(),
+                                       team1=x.team1,
+                                       team2=x.team2,
+                                       transaction_type='Contract Set',
+                                       var_d1 = x.var_d1,
+                                       var_d2 = Decimal(sb),
+                                       var_i1 = 1,
+                                       var_i2 = 0,
+                                       var_t1 = 'Pending',
+                                       var_t2 = 'Confirmed',
+                                       var_t3 = x.var_d2 - Decimal(sb))
+
+            create_alerts('Contract Submitted For Approval', u, [x.player, x.team2])
 
 
 
@@ -3281,3 +3312,89 @@ def league_year_transition(request):
         x.save()
 
     return HttpResponseRedirect('/')
+
+def save_data_restructure_player(request):
+    player = request.POST['player']
+    yr1_sal = request.POST['yr1_sal']
+    yr2_sal = request.POST['yr2_sal']
+    yr3_sal = request.POST['yr3_sal']
+    yr4_sal = request.POST['yr4_sal']
+    yr5_sal = request.POST['yr5_sal']
+
+    a = TeamVariable.objects.filter(name='PlayerForRestructure').get(user=request.user)
+    save_string = player + ':' + yr1_sal + ':' + yr2_sal + ':' + yr3_sal + ':' + yr4_sal + ':' + yr5_sal
+    a.text_variable = save_string
+    a.save()
+
+    return JsonResponse('test', safe=False)
+
+def process_restructure(request):
+    a = TeamVariable.objects.filter(name='PlayerForRestructure').get(user=request.user)
+    temp = a.text_variable.split(':')
+    a.text_variable = ''
+    a.save()
+
+    b = TeamVariable.objects.filter(name='PlayerForPlayerPage').get(user=request.user)
+    b.text_variable = ''
+    b.save()
+
+    player = temp[0]
+    yr1_sal = Decimal(temp[1])
+    yr2_sal = Decimal(temp[2])
+    yr3_sal = Decimal(temp[3])
+    yr4_sal = Decimal(temp[4])
+    yr5_sal = Decimal(temp[5])
+
+    c = Player.objects.get(name=player)
+    total_guar = (c.signing_bonus + c.yr1_salary)
+    if c.years_remaining() == 2:
+        salary_list = [yr1_sal, yr2_sal, 0, 0, 0]
+    elif c.years_remaining() == 3:
+        salary_list = [yr1_sal, yr2_sal, yr3_sal, 0, 0]
+    elif c.years_remaining() == 4:
+        salary_list = [yr1_sal, yr2_sal, yr3_sal, yr4_sal, 0]
+    elif c.years_remaining() == 5:
+        salary_list = [yr1_sal, yr2_sal, yr3_sal, yr4_sal, yr5_sal]
+
+    yearly_sb = round(total_guar / c.years_remaining() * 100) / 100
+    total_sb = yearly_sb * c.years_remaining()
+    
+    yr1_total = yr1_sal + Decimal(yearly_sb)
+    yr2_total = yr2_sal + Decimal(yearly_sb)
+    yr3_total = yr3_sal + Decimal(yearly_sb)
+    yr4_total = yr4_sal + Decimal(yearly_sb)
+    yr5_total = yr5_sal + Decimal(yearly_sb)
+
+    yr1_total = round(float(yr1_total) * 100) / 100
+    yr2_total = round(float(yr2_total) * 100) / 100
+    yr3_total = round(float(yr3_total) * 100) / 100
+    yr4_total = round(float(yr4_total) * 100) / 100
+    yr5_total = round(float(yr5_total) * 100) / 100
+
+    missed_money = int((c.total_value - sum(salary_list) - Decimal(total_sb))*100)
+    count = 5
+    while missed_money > 0:
+        count -= 1
+        if count < 0:
+            count = 4
+        if salary_list[count] != 0:
+            missed_money -= 1
+            salary_list[count] += Decimal(.01)
+    
+    salary_string = str(salary_list[0]) + ',' + str(salary_list[1]) + ',' + str(salary_list[2]) + ',' + str(salary_list[3]) + ',' + str(salary_list[4])
+
+    Transaction.objects.create(player=player,
+                               date=timezone.now(),
+                               team2=c.team,
+                               transaction_type='Restructure Contract',
+                               var_d1 = c.total_value,
+                               var_d2 = yearly_sb,
+                               var_i1 = c.years_remaining(),
+                               var_i2 = 0,
+                               var_t1 = 'Pending',
+                               var_t2 = 'Confirmed',
+                               var_t3 = salary_string)
+
+    create_alerts('Contract Submitted For Approval', request.user, [player, c.team])
+
+    return JsonResponse('test', safe=False)

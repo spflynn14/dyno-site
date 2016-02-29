@@ -112,6 +112,8 @@ $(document).ready(function() {
             }
         } else if (data.transaction_type == 'Trade Accepted') {
             return_text = "You have agreed to a trade. Waiting for commish's office to process.";
+        } else if (data.transaction_type == 'Restructure Contract') {
+            return_text = "You have restructured this player's contract. Waiting for commish's office to process.";
         }
 
         return return_text;

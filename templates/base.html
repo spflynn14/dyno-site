@@ -13,6 +13,7 @@
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+        <script src="{% static 'js/dropdown_delay.js' %}"></script>
         <link rel="stylesheet" href="{% static 'css/dyno.css' %}">
         <script src="{% static 'js/dyno.js' %}"></script>
         <script>
@@ -80,19 +81,57 @@
                         <a href="/main" class="tab_button" id="main_button">Main</a>
                     {% endif %}
 
-                    {% if request.path == '/league/all_players' %}
-                        <a href="/league/all_players" class="tab_button" id="league_button" style="background-color: #2d99d4; color: white">League</a>
+                    {% if user.is_authenticated %}
+                        <div class="dropdown" id="league_top_tab_dropdown">
+                            <a href="/league/all_players" class="dropdown-toggle" style="color: black">League</a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/league/all_players">All Players</a></li>
+                                <li class="divider"></li>
+                                <li class="dropdown-header">EXTENSIONS</li>
+                                <li><a style="color: black" href="/league/extensions">Extensions</a></li>
+                                <li><a style="color: black" href="/league/adp_info">ADP Info</a></li>
+                                <li><a style="color: black" href="/league/performance_info">Performance Info</a></li>
+                                <li class="divider"></li>
+                                <li><a href="/league/league_transaction_log">Transaction Log</a></li>
+                                <li class="divider"></li>
+                                <li><a href="/league/free_agents">Free Agent List</a></li>
+                                <li class="divider"></li>
+                                <li><a href="/league/salary_lists">Salary Lists</a></li>
+                                <li class="divider"></li>
+                                <li><a href="/league/cap_summary">Cap Summary</a></li>
+                            </ul>
+                        </div>
                     {% else %}
-                        <a href="/league/all_players" class="tab_button" id="league_button">League</a>
+                        {% if request.path == '/league/all_players' %}
+                            <a href="/league/all_players" class="tab_button" id="league_button" style="background-color: #2d99d4; color: white">League</a>
+                        {% else %}
+                            <a href="/league/all_players" class="tab_button" id="league_button">League</a>
+                        {% endif %}
                     {% endif %}
 
                     {% if user.is_authenticated %}
 
-                        {% if request.path == '/team' %}
-                            <a href="/team/organization" class="tab_button" id="team_button" style="background-color: #2d99d4; color: white">Team</a>
-                        {% else %}
-                            <a href="/team/organization" class="tab_button" id="team_button">Team</a>
-                        {% endif %}
+                        <div class="dropdown" id="team_top_tab_dropdown">
+                            <a href="/team/organization" class="dropdown-toggle" style="color: black">Team</a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/team/organization">Organization</a></li>
+                                <li class="divider"></li>
+                                <li><a href="/team/cap_situation">Cap Situation By Year</a></li>
+                                <li class="divider"></li>
+                                <li class="dropdown-header">TRANSACTIONS</li>
+                                <li><a style="color: black" href="/team/pending_transactions">Pending Transactions</a></li>
+                                <li><a style="color: black" href="/team/trade">View Assets/Propose Trade</a></li>
+                                <li><a style="color: black" href="/team/trade_log">Trade Log</a></li>
+                                <li><a style="color: black" href="/team/release_players">Release Players</a></li>
+                                <li><a style="color: black" href="/team/transactions">Transaction Log</a></li>
+                                <li class="divider"></li>
+                                <li class="dropdown-header">ALERTS</li>
+                                <li><a style="color: black" href="/team/alerts">Alerts</a></li>
+                                <li><a style="color: black" href="/team/manage_alerts">Manage Alerts</a></li>
+                                <li class="divider"></li>
+                                <li><a href="/team/team_settings">Team Settings</a></li>
+                            </ul>
+                        </div>
 
                         {% if request.path == '/player' %}
                             <a href="/player" class="tab_button" id="player_button" style="background-color: #2d99d4; color: white">Player</a>
@@ -106,11 +145,16 @@
                             <a href="/auction" class="tab_button" id="auction_button">Auction</a>
                         {% endif %}
 
-                        {% if request.path == '/draft' %}
-                            <a href="/draft" class="tab_button" id="draft_button" style="background-color: #2d99d4; color: white">Draft</a>
-                        {% else %}
-                            <a href="/draft" class="tab_button" id="draft_button">Draft</a>
-                        {% endif %}
+                        <div class="dropdown" id="draft_top_tab_dropdown">
+                            <a href="/draft" class="dropdown-toggle" style="color: black">Draft</a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/draft">Draft</a></li>
+                                <li class="divider"></li>
+                                <li><a href="/draft/settings">Draft Info and Settings</a></li>
+                                <li class="divider"></li>
+                                <li><a href="/draft/future_draft_picks">Future Draft Picks</a></li>
+                            </ul>
+                        </div>
 
                         {% if request.path == '/message_board' %}
                             <a href="/message_board" class="tab_button" id="message_board_button" style="background-color: #2d99d4; color: white">Message Board</a>
@@ -120,7 +164,7 @@
 
                     {% endif %}
 
-                    {% if request.path == '' %}
+                    {% if request.path == '/rules' %}
                         <a href="/rules" class="tab_button" id="rules_button" style="background-color: #2d99d4; color: white">Rules</a>
                     {% else %}
                         <a href="/rules" class="tab_button" id="rules_button">Rules</a>

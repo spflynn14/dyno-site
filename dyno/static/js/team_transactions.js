@@ -238,6 +238,16 @@ $(document).ready(function() {
             } else if (data.var_t1 == 'Invalid') {
                 return_text = 'This trade offer was made invalid because one of the pieces of this trade is no longer owned by the same team: ' + data.team1 + " gives up: " + data.var_t2 + '  ' + data.team2 + ' gives up: ' + data.var_t3;
             }
+        } else if (data.transaction_type == 'Restructure Contract') {
+            var temp_list = data.var_t3.split(',');
+            var fixed_string = '';
+            $.each(temp_list, function(index, value) {
+                if (Number(value) != 0) {
+                    fixed_string = fixed_string + '$' + (Number(value) - Number(data.var_d2)).toFixed(2) + ', ';
+                }
+            });
+            fixed_string = fixed_string.slice(0,-2);
+            return_text = 'Restructure was submitted for this player: $' + data.var_d2 + ' signing bonus per year, salary structure = ' + fixed_string;
         } else {
             return_text = 'determine_details function is broke; report this bug'
         }

@@ -1,6 +1,7 @@
 import os
 import sqlite3 as sql3
 from decimal import *
+from django.utils import timezone
 from django.shortcuts import render
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect, HttpResponse
@@ -9,7 +10,7 @@ from .forms import *
 from .models import *
 
 working_local = True
-current_league_year = 2016
+current_league_year = 2015
 year_list = [current_league_year, current_league_year + 1, current_league_year + 2, current_league_year + 3, current_league_year + 4]
 
 draft_pick_salary_list = {1 : [9.00, 10.80, 12.95, 15.55],
@@ -369,32 +370,56 @@ def login_redirect(request):
     if request.user.is_anonymous():
         return 'redirect'
 
+def create_session(user, page):
+    if working_local == True:
+        con = sql3.connect('db.sqlite3')
+    else:
+        con = sql3.connect('/home/spflynn/dyno-site/db.sqlite3')
+    cur = con.cursor()
+
+    date_now = timezone.now()
+
+    cur.execute('INSERT INTO dyno_session(user, date, page) VALUES (?, ?, ?)', [str(user), date_now, page])
+
+    con.commit()
+
+    cur.close()
+    con.close()
+
+
 
 
 def homepage(request):
+    create_session(request.user, 'homepage')
     return render(request, 'base.html', {})
 
 def loginpage(request):
+    create_session(request.user, 'login')
     return render(request, 'login.html', {'failed_login': False})
 
 def loginfailed(request):
+    create_session(request.user, 'loginfailed')
     return render(request, 'login.html', {'failed_login': True})
 
 def logoutView(request):
+    create_session(request.user, 'logout')
     logout(request)
     return HttpResponseRedirect('/login')
 
 def mainpage(request):
+    create_session(request.user, 'mainpage')
     a = Message.objects.get(name='Homepage Message')
     welcome_message = a.content
     return render(request, 'main.html', {'welcome_message': welcome_message})
 
 def rulespage(request):
+    create_session(request.user, 'rulespage')
     a = Message.objects.get(name='Rules')
     rules_text = a.content
     return render(request, 'rules.html', {'rules_text': rules_text})
 
 def messageboardpage(request):
+    create_session(request.user, 'messageboard')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/message_board'})
@@ -402,6 +427,7 @@ def messageboardpage(request):
     return render(request, 'message_board.html', {})
 
 def draftpage(request):
+    create_session(request.user, 'draft')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/draft'})
@@ -409,6 +435,7 @@ def draftpage(request):
     return render(request, 'draft.html', {})
 
 def draftinfoandsettings(request):
+    create_session(request.user, 'draftinfo')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/draft/settings'})
@@ -421,6 +448,7 @@ def draftinfoandsettings(request):
                                                               'team_list' : b})
 
 def auctionpage(request):
+    create_session(request.user, 'auction')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/auction'})
@@ -448,6 +476,7 @@ def auctionpage(request):
                                             'new_auctions' : new_auctions})
 
 def auctionbidconfirmationpage(request):
+    create_session(request.user, 'auctionbidconfirm')
     a = Variable.objects.get(name='New Auction Info')
     b = a.text_variable
 
@@ -467,6 +496,7 @@ def auctionbidconfirmationpage(request):
     return render(request, 'auction_bid_confirmation.html', {'bids_list' : bids_list})
 
 def leagueallplayerspage(request):
+    create_session(request.user, 'leagueallplayers')
     #todo: change to sql pull to speed up
     a = Team.objects.all()
     teams = []
@@ -483,6 +513,7 @@ def leagueallplayerspage(request):
                                                               'year_list' : year_list})
 
 def leagueextensions(request):
+    create_session(request.user, 'extensions')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/league/extensions'})
@@ -760,6 +791,7 @@ def leagueextensions(request):
                                                              'submitted_extensions_list' : g})
 
 def leaguetransactionlog(request):
+    create_session(request.user, 'leaguetranslog')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/league/league_transaction_log'})
@@ -779,6 +811,7 @@ def leaguetransactionlog(request):
                                                                   'team_list' : c})
 
 def leaguefreeagents(request):
+    create_session(request.user, 'freeagentlist')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/league/free_agents'})
@@ -809,6 +842,7 @@ def leaguefreeagents(request):
                                                               'year_list' : year_list})
 
 def leaguesalarylists(request):
+    create_session(request.user, 'salarylists')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/league/salary_lists'})
@@ -846,6 +880,7 @@ def leaguesalarylists(request):
                                                                'k_zero_salary' : k_first,})
 
 def leagueadp(request):
+    create_session(request.user, 'adp')
     a = ADP.objects.all().order_by('rank')
     qb_list = []
     rb_list = []
@@ -895,6 +930,7 @@ def leagueadp(request):
                                                       'k_list' : k_list})
 
 def performancepage(request):
+    create_session(request.user, 'perfpage')
     a = Performance_Yr1.objects.all().order_by('rank')
     qb_yr1_list = []
     rb_yr1_list = []
@@ -992,9 +1028,11 @@ def performancepage(request):
                                                               'k_yr2_list' : k_yr2_list})
 
 def leaguefuturedraftpicks(request):
+    create_session(request.user, 'futuredraftpicks')
     return render(request, 'draft/league_future_draft_picks.html', {})
 
 def leaguecapsummary(request):
+    create_session(request.user, 'capsummary')
     a = Player.objects.all()
     b = Team.objects.all()
 
@@ -1031,6 +1069,7 @@ def leaguecapsummary(request):
     return render(request, 'league/league_cap_summary.html', {'summary_data' : summary_data})
 
 def teamorganizationpage(request):
+    create_session(request.user, 'teamorg')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/team/organization'})
@@ -1271,6 +1310,7 @@ def teamorganizationpage(request):
                                                            'filtered_tags' : filtered_tags})
 
 def teamcapsituationpage(request):
+    create_session(request.user, 'teamcapsit')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/team/cap_situation'})
@@ -1461,6 +1501,7 @@ def teamcapsituationpage(request):
                                                             'year_list' : year_list})
 
 def teamsettingspage(request):
+    create_session(request.user, 'teamsettings')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/team/team_settings'})
@@ -1500,6 +1541,7 @@ def teamsettingspage(request):
                                                        'year_list' : year_list})
 
 def teampendingtransactionspage(request):
+    create_session(request.user, 'teampendingtrans')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/team/pending_transactions'})
@@ -1511,6 +1553,7 @@ def teampendingtransactionspage(request):
                                                                    'user_team_2' : team})
 
 def teamtransactionspage(request):
+    create_session(request.user, 'teamtranslog')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/team/transactions'})
@@ -1527,6 +1570,7 @@ def teamtransactionspage(request):
                                                            'trans_list' : trans_list})
 
 def teamreleaseplayerspage(request):
+    create_session(request.user, 'teamrelease')
     current_user = str(request.user)
     a = Team.objects.get(user=current_user)
     team = a.internal_name
@@ -1638,6 +1682,7 @@ def teamreleaseplayerspage(request):
                                                               'years_list' : year_list})
 
 def teamalertspage(request):
+    create_session(request.user, 'teamalerts')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/team/alerts'})
@@ -1653,6 +1698,7 @@ def teamalertspage(request):
                                                      'alerts' : b})
 
 def teammanagealerts(request):
+    create_session(request.user, 'managealerts')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/team/manage_alerts'})
@@ -1661,6 +1707,7 @@ def teammanagealerts(request):
     return render(request, 'team/team_manage_alerts.html', {'alert_settings' : a})
 
 def teamtrades(request):
+    create_session(request.user, 'teamtradepage')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/team/trade'})
@@ -1819,6 +1866,7 @@ def teamtrades(request):
                                                     'view_flag_trade_id' : view_flag_trade_id})
 
 def playerpage(request):
+    create_session(request.user, 'player')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/player'})
@@ -1844,13 +1892,16 @@ def playerpage(request):
                                            'year_list' : year_list})
 
 def settingspage(request):
+    create_session(request.user, 'settings')
     #use commishofficepage instead
     return render(request, 'admin/settings.html', {})
 
 def batchpage(request):
+    create_session(request.user, 'batch')
     return render(request, 'admin/batch.html', {})
 
 def testview(request):
+    create_session(request.user, 'testview')
     b = Player.objects.order_by('name')
     test_list = []
     for x in b:
@@ -1879,6 +1930,7 @@ def testview(request):
                                             'player_list': player_list})
 
 def user_change_password_page(request):
+    create_session(request.user, 'userchangepassword')
     a = Team.objects.get(user=request.user)
 
     username = a.user
@@ -1886,6 +1938,7 @@ def user_change_password_page(request):
     return render(request, 'admin/user_change_password.html', {'username' : username})
 
 def bugtrackingpage(request):
+    create_session(request.user, 'bugtracking')
     a = Bug.objects.all()
 
     bug_list = []
@@ -1908,6 +1961,7 @@ def bugtrackingpage(request):
     return render(request, 'admin/bug_tracking.html', {'bug_list' : bug_list})
 
 def newbugpage(request):
+    create_session(request.user, 'newbug')
     e = os.environ
     o = request.user_agent.os
     b = request.META['HTTP_USER_AGENT']
@@ -1916,11 +1970,12 @@ def newbugpage(request):
                                                   'browser' : b})
 
 def featurerequestpage(request):
-
+    create_session(request.user, 'featurerequest')
 
     return render(request, 'admin/feature_request.html', {})
 
 def featurelistchangelogpage(request):
+    create_session(request.user, 'featurelistchangelog')
     a = Message.objects.get(name='Features List')
     features_list = a.content
 
@@ -1931,6 +1986,7 @@ def featurelistchangelogpage(request):
                                                        'changelog' : changelog})
 
 def commishofficepage(request):
+    create_session(request.user, 'commishoffice')
     a = Variable.objects.get(name='Default AuctionClock')
     default_auction_clock = int(a.int_variable / 60)
 
@@ -1957,10 +2013,12 @@ def commishofficepage(request):
                                                    'include_impending' : include_impending})
 
 def commishviewmodel(request):
+    create_session(request.user, 'commishviewmodel')
     a = Player.objects.all().order_by('name')
     return render(request, 'commish/commish_view_model.html', {'players' : a})
 
 def commisheditmodel(request):
+    create_session(request.user, 'commisheditmodel')
     if request.method == 'POST':
         player = Player.objects.get(name=request.POST['name'])
         form = PlayerForm(request.POST, instance=player)
@@ -1980,6 +2038,7 @@ def commisheditmodel(request):
     return render(request, 'model_edit/model_edit_player.html', {'form' : form})
 
 def commishtransactionpage(request):
+    create_session(request.user, 'commishtranspage')
     a = Transaction.objects.all().order_by('-date')
     trans_list = []
     for x in a:
@@ -1990,10 +2049,12 @@ def commishtransactionpage(request):
                                                                  'type_list' : trans_list})
 
 def commishpendingtransactionspage(request):
+    create_session(request.user, 'commishpendingtrans')
     b = Transaction.objects.filter(var_t1='Pending').filter(Q(var_t2='Confirmed') | Q(player='trade')).exclude(Q(transaction_type='Trade Offer') | Q(transaction_type='Counter Offer'))
     return render(request, 'commish/commish_pending_transactions.html', {'transactions' : b})
 
 def commishpendingalerts(request):
+    create_session(request.user, 'commishpendingalerts')
     a = Alert.objects.filter(user='commish').order_by('-date')
     type_list = []
     for x in a:
@@ -2004,6 +2065,7 @@ def commishpendingalerts(request):
                                                                     'alerts' : a})
 
 def commishallalerts(request):
+    create_session(request.user, 'commishalerts')
     a = Alert.objects.all().order_by('-date')
     type_list = []
     for x in a:
@@ -2014,6 +2076,7 @@ def commishallalerts(request):
                                                                'alerts' : a})
 
 def setcontractstructurepage(request):
+    create_session(request.user, 'setcontractstructure')
     a = TeamVariable.objects.filter(user=request.user).get(name='PlayerForConStr')
     player = a.text_variable
     a.text_variable = ''
@@ -2142,7 +2205,69 @@ def setcontractstructurepage(request):
                                                                     'cap_dict' : cap_dict,
                                                                     'year_list' : year_list})
 
+def confirmrestructurepage(request):
+    create_session(request.user, 'confirmstructure')
+    a = TeamVariable.objects.filter(name='PlayerForRestructure').get(user=request.user)
+    temp = a.text_variable.split(':')
+
+    c = TeamVariable.objects.filter(name='PlayerForPlayerPage').get(user=request.user)
+    c.text_variable = temp[0]
+    c.save()
+
+    player = temp[0]
+    yr1_sal = Decimal(temp[1])
+    yr2_sal = Decimal(temp[2])
+    yr3_sal = Decimal(temp[3])
+    yr4_sal = Decimal(temp[4])
+    yr5_sal = Decimal(temp[5])
+
+    b = Player.objects.get(name=player)
+    total_guar = (b.signing_bonus + b.yr1_salary)
+    #total_guar = 36.44
+
+    if b.years_remaining() == 2:
+        salary_list = [yr1_sal, yr2_sal, 0, 0, 0]
+    elif b.years_remaining() == 3:
+        salary_list = [yr1_sal, yr2_sal, yr3_sal, 0, 0]
+    elif b.years_remaining() == 4:
+        salary_list = [yr1_sal, yr2_sal, yr3_sal, yr4_sal, 0]
+    elif b.years_remaining() == 5:
+        salary_list = [yr1_sal, yr2_sal, yr3_sal, yr4_sal, yr5_sal]
+
+    yearly_sb = round(total_guar / b.years_remaining() * 100) / 100
+    total_sb = yearly_sb * b.years_remaining()
+    
+    yr1_total = yr1_sal + Decimal(yearly_sb)
+    yr2_total = yr2_sal + Decimal(yearly_sb)
+    yr3_total = yr3_sal + Decimal(yearly_sb)
+    yr4_total = yr4_sal + Decimal(yearly_sb)
+    yr5_total = yr5_sal + Decimal(yearly_sb)
+
+    missed_money = int((b.total_value - sum(salary_list) - Decimal(total_sb))*100)
+    count = 5
+    while missed_money > 0:
+        count -= 1
+        if count < 0:
+            count = 4
+        if salary_list[count] != 0:
+            missed_money -= 1
+            salary_list[count] += Decimal(.01)
+    
+    totals = [yr1_total, yr2_total, yr3_total, yr4_total, yr5_total]
+
+    total_sal = round(sum(salary_list)*100) / 100
+
+
+    return render(request, 'team/confirm_restructure.html', {'year_list' : year_list,
+                                                             'player' : b,
+                                                             'sb' : total_sb,
+                                                             'yearly_sb' : yearly_sb,
+                                                             'total_sal' : total_sal,
+                                                             'yearly_totals' : totals,
+                                                             'salary_list' : salary_list})
+
 def transactionsingleplayer(request):
+    create_session(request.user, 'transsingleplayer')
     a = Variable.objects.get(name='player selected')
     id_selected = a.int_variable
     a.int_variable = 0
@@ -2157,6 +2282,7 @@ def transactionsingleplayer(request):
                                                                       'player' : c})
 
 def transactioncut(request):
+    create_session(request.user, 'transcut')
     a = Variable.objects.get(name='player selected')
     id_selected = a.int_variable
     a.int_variable = 0
@@ -2181,6 +2307,7 @@ def transactioncut(request):
                                                             'amnesty' : e})
 
 def transactiontrade(request):
+    create_session(request.user, 'transtrade')
     a = Variable.objects.get(name='player selected')
     id_selected = a.int_variable
     a.int_variable = 0
@@ -2245,6 +2372,7 @@ def transactiontrade(request):
                                                               'opp_cap_pen' : opp_cap_pen})
 
 def tagspage(request):
+    create_session(request.user, 'tagspage')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/team/tags'})
@@ -2485,6 +2613,7 @@ def tagspage(request):
                                               'has_trans_tag' : has_trans_tag})
 
 def confirm_tags(request):
+    create_session(request.user, 'confirmtags')
     a = TeamVariable.objects.filter(name='PlayerForTags').get(user=request.user)
     temp = a.text_variable.strip().split(':')
     player = temp[0]
@@ -2505,6 +2634,7 @@ def confirm_tags(request):
                                                       'salary' : salary})
 
 def confirmextensionstructure(request):
+    create_session(request.user, 'confirmextensionstructure')
     a = TeamVariable.objects.filter(user=request.user).get(name='PlayerForExtension')
     temp = a.text_variable
     a.text_variable = ''
@@ -2605,6 +2735,7 @@ def confirmextensionstructure(request):
                                                                      'instructions' : instructions})
 
 def confirmcutplayers(request):
+    create_session(request.user, 'confirmcut')
     a = TeamVariable.objects.filter(name='PlayersForCut').get(user=request.user)
     temp = a.text_variable
     from_int = int(a.int_variable)
@@ -2638,6 +2769,7 @@ def confirmcutplayers(request):
                                                              'current_year' : current_league_year})
 
 def confirmtradepage(request):
+    create_session(request.user, 'confirmtrade')
     a = TeamVariable.objects.filter(name='TradeData').get(user=request.user)
     temp = a.text_variable
     
@@ -2834,6 +2966,7 @@ def confirmtradepage(request):
                                                         'is_proposing_team' : is_proposing_team})
 
 def teamtradelogpage(request):
+    create_session(request.user, 'teamtradelog')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/team/trade_log'})

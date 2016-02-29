@@ -1,0 +1,89 @@
+{% extends 'team.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/confirm_restructure.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="third_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        <div id="setconstr_header_area">
+            <h4 id='player_label' style="color: blue;">{{ player.name }}</h4><br>
+            <p>Total Value: &nbsp&nbsp${{ player.total_value }}</p>
+            <p id="sb_p">Signing Bonus: &nbsp&nbsp${{ sb|floatformat:2 }}</p>
+            <p id="sal_p">Salary: &nbsp&nbsp${{ total_sal|floatformat:2 }}</p><br>
+        </div>
+
+        <div id="setconstr_contract_area">
+            <br>
+            <table style="table-layout: fixed; width: 80%; height: auto">
+                <thead>
+                    <tr style="height: 30px">
+                        <th style="width: 25%; text-align: center">Year</th>
+                        <th style="width: 25%; text-align: center">Total Cost</th>
+                        <th style="width: 25%; text-align: center">Signing Bonus</th>
+                        <th style="width: 25%; text-align: center">Salary</th>
+                    </tr>
+                </thead>
+                <tbody id="setconstr_table_body">
+                    <tr style="height: 30px">
+                        <td style="text-align: center">{{ year_list.0 }}</td>
+                        <td style="text-align: center">{{ yearly_totals.0|floatformat:2 }}</td>
+                        <td style="text-align: center">{{ yearly_sb|floatformat:2 }}</td>
+                        <td style="text-align: center">{{ salary_list.0|floatformat:2 }}</td>
+                    </tr>
+                    <tr style="height: 30px">
+                        <td style="text-align: center">{{ year_list.1 }}</td>
+                        <td style="text-align: center">{{ yearly_totals.1|floatformat:2 }}</td>
+                        <td style="text-align: center">{{ yearly_sb|floatformat:2 }}</td>
+                        <td style="text-align: center">{{ salary_list.1|floatformat:2 }}</td>
+                    </tr>
+                    {% if salary_list.2 != 0 %}
+                        <tr style="height: 30px">
+                            <td style="text-align: center">{{ year_list.2 }}</td>
+                            <td style="text-align: center">{{ yearly_totals.2|floatformat:2 }}</td>
+                            <td style="text-align: center">{{ yearly_sb|floatformat:2 }}</td>
+                            <td style="text-align: center">{{ salary_list.2|floatformat:2 }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if salary_list.3 != 0 %}
+                        <tr style="height: 30px">
+                            <td style="text-align: center">{{ year_list.3 }}</td>
+                            <td style="text-align: center">{{ yearly_totals.3|floatformat:2 }}</td>
+                            <td style="text-align: center">{{ yearly_sb|floatformat:2 }}</td>
+                            <td style="text-align: center">{{ salary_list.3|floatformat:2 }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if salary_list.4 != 0 %}
+                        <tr style="height: 30px">
+                            <td style="text-align: center">{{ year_list.4 }}</td>
+                            <td style="text-align: center">{{ yearly_totals.4|floatformat:2 }}</td>
+                            <td style="text-align: center">{{ yearly_sb|floatformat:2 }}</td>
+                            <td style="text-align: center">{{ salary_list.4|floatformat:2 }}</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            <table style="table-layout: fixed; width: 80%; margin-top: 30px">
+                <tbody id="setconstr_totals_body">
+                    <tr style="height: 30px">
+                        <td style="width: 25%; text-align: center"></td>
+                        <td style="width: 25%; text-align: center"></td>
+                        <td style="width: 25%; text-align: center"></td>
+                        <td style="width: 25%; text-align: center; padding-top: 20px">
+                            <button id='restructure_cancel_button' type="button" style="display: inline-block;color: red">Cancel</button>
+                            <button id="restructure_submit_button"  type="button" style="margin-left: 20px; color: blue">Submit</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

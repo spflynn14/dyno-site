@@ -121,4 +121,7 @@ urlpatterns = [
     url(r'^team/trade_log$', views.teamtradelogpage, name='team trade log page'),
     url(r'^save_redirect_trade_data$', processing.save_redirect_trade_data, name='save redirect info to move to trade confirm screen'),
     url(r'^retrieve_ownership_info_trade_transaction$', processing.retrieve_ownership_info_trade_transaction, name='get ownership info to display after trade processing'),
+    url(r'^save_data_restructure_player$', processing.save_data_restructure_player, name='save restructure data'),
+    url(r'^confirm_restructure$', views.confirmrestructurepage, name='confirm restructure'),
+    url(r'^process_restructure$', processing.process_restructure, name='process restructure'),
 ]

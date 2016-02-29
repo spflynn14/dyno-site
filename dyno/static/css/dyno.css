@@ -28,6 +28,13 @@
     padding-top: 14px;
 }
 
+.dropdown-menu li:hover {
+    text-decoration: underline;
+    cursor: pointer;
+    color: #2c609b;
+}
+
+
 #center_area {
     padding: 1% 5% 2% 5%;
 }
@@ -2314,11 +2321,7 @@
     font-size: small;
 }
 
-.dropdown-menu li:hover {
-    text-decoration: underline;
-    cursor: pointer;
-    color: #2c609b;
-}
+
 
 #trade_right_players_area {
     border: 1px solid #dcdcdc;
@@ -2477,3 +2480,49 @@
 }
 
 /* END: FREE AGENT LIST */
+
+
+#draft_top_tab_dropdown {
+    width: 12%;
+    height: 90%;
+    vertical-align: middle;
+    color: black;
+    background-color: white;
+    padding-top: 0.55%;
+    border-radius: 5px;
+    border: 2px solid #cccccc;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1.15em;
+}
+
+#league_top_tab_dropdown {
+    width: 12%;
+    height: 90%;
+    vertical-align: middle;
+    color: black;
+    background-color: white;
+    padding-top: 0.55%;
+    border-radius: 5px;
+    border: 2px solid #cccccc;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1.15em;
+}
+
+#team_top_tab_dropdown {
+    width: 12%;
+    height: 90%;
+    vertical-align: middle;
+    color: black;
+    background-color: white;
+    padding-top: 0.55%;
+    border-radius: 5px;
+    border: 2px solid #cccccc;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 1.15em;
+}
