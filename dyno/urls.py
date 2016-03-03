@@ -124,4 +124,8 @@ urlpatterns = [
     url(r'^save_data_restructure_player$', processing.save_data_restructure_player, name='save restructure data'),
     url(r'^confirm_restructure$', views.confirmrestructurepage, name='confirm restructure'),
     url(r'^process_restructure$', processing.process_restructure, name='process restructure'),
+    url(r'^create_message_board_post$', processing.create_message_board_post, name='create message board post'),
+    url(r'^save_message_board_favs$', processing.save_message_board_favs, name='save message board favs'),
+    url(r'^save_message_board_stickys$', processing.save_message_board_stickys, name='save message board stickys'),
+    url(r'^save_message_board_views$', processing.save_message_board_views, name='save message board views'),
 ]

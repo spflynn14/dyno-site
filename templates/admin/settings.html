@@ -83,7 +83,22 @@
         </div>
 
         <div id="commish_office_second_column">
-
+            <table style="table-layout: fixed; width: 100%">
+                <thead>
+                    <tr>
+                        <th style="width: 15%">User</th>
+                        <th style="width: 85%">Last Activity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for x in last_action_list %}
+                        <tr>
+                            <td>{{ x.user }}</td>
+                            <td>{{ x.last_action }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
 
         <div id="commish_office_third_column">

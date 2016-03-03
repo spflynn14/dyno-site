@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    console.log('ready');
+    console.log('ready 2');
 
     var $master = {};
     $('#vw_1').find('tr').each(function() {
@@ -88,6 +88,12 @@ $(document).ready(function() {
         $("input[name='instant_trade_accepted_checkbox'][value='yes']").prop('checked', true);
     } else {
          $("input[name='instant_trade_accepted_checkbox'][value='no']").prop('checked', true);
+    }
+
+    if (instant_alerts_list[5] == '1') {
+        $("input[name='new_board_post_checkbox'][value='yes']").prop('checked', true);
+    } else {
+         $("input[name='new_board_post_checkbox'][value='no']").prop('checked', true);
     }
 
 
@@ -201,6 +207,12 @@ $(document).ready(function() {
             instant_alerts_list[4] = '1'
         } else {
             instant_alerts_list[4] = '0'
+        }
+
+        if ($("input[name='new_board_post_checkbox'][value='yes']").prop('checked') == true) {
+            instant_alerts_list[5] = '1'
+        } else {
+            instant_alerts_list[5] = '0'
         }
 
         save_changes();

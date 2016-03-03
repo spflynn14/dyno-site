@@ -192,6 +192,18 @@ def generate_alert_email_line(source_info, alert_type, var_list):
         elif source_info == 'alert object':
             pro_team, opp_team, pro_string, opp_string = pull_strings_from_trade(var_list.var_i1)
             return pro_team + ' has withdrawn their trade offer.'
+    elif alert_type == 'New Board Post':
+        #var_list = title, is_reply, replied_post_title, user
+        if source_info == 'direct':
+            if var_list[1] == 'yes':
+                return str(var_list[3]) + ' replied: "' + var_list[0] + '" to the post titled: "' + var_list[2] + '"'
+            else:
+                return str(var_list[3]) + ' created a post titled: "' + var_list[0] + '"'
+        elif source_info == 'alert object':
+            if var_list.var_t2 == 'yes':
+                return 'A reply was made "' + var_list.var_t1 + '" to the post titled: "' + var_list.var_t3 + '"'
+            else:
+                return 'A post was created titled: "' + var_list.var_t1 + '"'
 
 def send_instant_alert(alert_type, user, email, var_list):
     if user != 'commish':
@@ -338,6 +350,17 @@ def send_instant_alert(alert_type, user, email, var_list):
                   '',
                   [target_email],
                   fail_silently=False)
+    elif alert_type == 'New Board Post':
+        #var_list = title, is_reply, replied_post_title, user
+        if instant_alerts[5] == '1':
+            target_email = email
+            subject_line = '[Dynasty League] New Message Board Post'
+            email_body = generate_alert_email_line('direct', alert_type, var_list)
+            send_mail(subject_line,
+                      email_body + alert_settings_message + email_footer,
+                      '',
+                      [target_email],
+                      fail_silently=False)
 
 def create_alerts(alert_type, current_user, var_list):
     date_time = timezone.now()
@@ -457,6 +480,18 @@ def create_alerts(alert_type, current_user, var_list):
                              date=date_time,
                              var_i1=var_list[1])
         send_instant_alert(alert_type, current_user, c.email, [current_user, var_list[1]])
+    elif alert_type == 'New Board Post':
+        #var_list = title, is_reply, replied_post_title
+        var_list.append(current_user)
+        a = Team.objects.all().exclude(user=current_user)
+        for x in a:
+            Alert.objects.create(user=x.user,
+                                 alert_type=alert_type,
+                                 date=date_time,
+                                 var_t1=var_list[0],
+                                 var_t2=var_list[1],
+                                 var_t3=var_list[2])
+            send_instant_alert(alert_type, x.user, x.email, var_list)
 
 
 def auction_end_routine():
@@ -2619,7 +2654,10 @@ def save_trade_data(request):
 
     b = TeamVariable.objects.filter(name='TradeViewFlags').get(user=request.user)
     b.text_variable = view_flag_text + ',' + is_proposing_team
-    b.int_variable = int(view_flag_trade_id)
+    try:
+        b.int_variable = int(view_flag_trade_id)
+    except:
+        b.int_variable = 999999
     b.save()
     
     return JsonResponse('test', safe=False)
@@ -3148,8 +3186,10 @@ def save_transaction_trade(request):
 
     h = Team.objects.get(internal_name=opp_team)
     opp_user = h.user
+    h = Team.objects.get(internal_name=pro_team)
+    pro_user = h.user
 
-    create_alerts('Trade Processed', request.user, [opp_user, trade_id])
+    create_alerts('Trade Processed', pro_user, [opp_user, trade_id])
 
     k = Transaction.objects.get(pk=trans_id)
     k.var_t1 = ''
@@ -3396,5 +3436,120 @@ def process_restructure(request):
                                var_t3 = salary_string)
 
     create_alerts('Contract Submitted For Approval', request.user, [player, c.team])
+
+    return JsonResponse('test', safe=False)
+
+def create_message_board_post(request):
+    title = request.POST['title']
+    post = request.POST['post']
+    post_id = request.POST['id']
+    is_reply = request.POST['is_reply']
+
+    if is_reply == 'yes':
+        b = Board_Post.objects.get(pk=int(post_id))
+        b.reply_count += 1
+        b.save()
+
+        parent_id = b.location.split('.')[0]
+        c = Board_Post.objects.get(pk=parent_id)
+        c.reply_count += 1
+        c.save()
+
+        if b.location[-2:] == '.2':
+            write_location = b.location
+        else:
+            write_location = post_id + '.2'
+    else:
+        write_location = '1'
+
+    if post_id == 'none' or is_reply == 'yes':
+        Board_Post.objects.create(user=request.user,
+                                  date=timezone.now(),
+                                  title=title,
+                                  location=write_location,
+                                  text=post)
+    else:
+        t = datetime.datetime.now()
+        if t.hour > 12:
+            h = t.hour - 12
+            f = 'pm'
+        else:
+            h = t.hour
+            f = 'am'
+        time = str(t.month) + '/' + str(t.day) + '/' + str(t.year) + ', ' + str(h) + ':' + str(t.minute) + f + ' EST'
+        post = post + '\n\n(post edited '  + time + ')'
+        a = Board_Post.objects.get(pk=int(post_id))
+        a.title = title
+        a.text = post
+        a.save()
+
+    try:
+        replied_post_title = c.title
+    except:
+        replied_post_title = ''
+
+    create_alerts('New Board Post', request.user, [title, is_reply, replied_post_title])
+
+    return JsonResponse('test', safe=False)
+
+def save_message_board_favs(request):
+    post_id = request.POST['post_id']
+    action = request.POST['action']
+
+    a = TeamVariable.objects.filter(name='MessageBoardFavs').get(user=request.user)
+    try:
+        favs_list = a.text_variable.strip().split(',')
+    except:
+        favs_list = []
+
+    if action == 'add':
+        favs_list.append(post_id)
+    elif action == 'remove':
+        favs_list.pop(favs_list.index(post_id))
+
+    output_string = ''
+    for x in favs_list:
+        output_string = output_string + x + ','
+    output_string = output_string[:-1]
+
+    a.text_variable = output_string
+    a.save()
+
+    return JsonResponse('test', safe=False)
+
+def save_message_board_stickys(request):
+    post_id = request.POST['post_id']
+    action = request.POST['action']
+
+    a = Board_Post.objects.get(pk=int(post_id))
+    try:
+        sticky_list = a.options.strip().split(',')
+    except:
+        sticky_list = []
+
+    if action == 'add':
+        sticky_list[0] = '1'
+    elif action == 'remove':
+        sticky_list[0] = '0'
+
+    output_string = ''
+    for x in sticky_list:
+        output_string = output_string + x + ','
+    output_string = output_string[:-1]
+
+    a.options = output_string
+    a.save()
+
+    return JsonResponse('test', safe=False)
+
+def save_message_board_views(request):
+    if request.user.username == 'sean':
+        return JsonResponse('test', safe=False)
+    post_id = request.POST['post_id']
+    views = request.POST['views']
+
+    a = Board_Post.objects.get(pk=int(post_id))
+    a.view_count = int(views)
+    a.save()
 
     return JsonResponse('test', safe=False)

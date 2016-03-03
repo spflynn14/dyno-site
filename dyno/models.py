@@ -58,6 +58,18 @@ class Player(models.Model):
     def current_year_cap_hit(self):
         return self.yr1_salary+self.yr1_sb
 
+    def yr2_cap_hit(self):
+        return self.yr2_salary+self.yr2_sb
+
+    def yr3_cap_hit(self):
+        return self.yr3_salary+self.yr3_sb
+
+    def yr4_cap_hit(self):
+        return self.yr4_salary+self.yr4_sb
+
+    def yr5_cap_hit(self):
+        return self.yr5_salary+self.yr5_sb
+
     def __str__(self):
         return self.name
 
@@ -459,3 +471,22 @@ class Session(models.Model):
 
     def __str__(self):
         return self.user + ' - ' + str(self.date)
+
+class Board_Post(models.Model):
+    user = models.CharField(max_length=20)
+    date = models.DateTimeField()
+    options = models.TextField(blank=True, default='0')
+    title = models.CharField(max_length=60)
+    view_count = models.IntegerField(default=0)
+    reply_count = models.IntegerField(default=0)
+    location = models.CharField(max_length=20)
+    text = models.TextField(blank=True, default='')
+
+    '''
+    Current Options:
+        0: Is Sticky (1), or Not Sticky (0)
+
+    '''
+
+    def __str__(self):
+        return self.user + ' - ' + self.title + ' - ' + str(self.date)

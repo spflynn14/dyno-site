@@ -424,7 +424,58 @@ def messageboardpage(request):
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/message_board'})
 
-    return render(request, 'message_board.html', {})
+    b = TeamVariable.objects.filter(name='MessageBoardFavs').get(user=request.user)
+    try:
+        favs_list = b.text_variable.strip().split(',')
+    except:
+        favs_list = []
+    for x in range(0,len(favs_list)):
+        favs_list[x] = int(favs_list[x])
+
+    a = Board_Post.objects.filter(location='1').order_by('-date')
+    aa = Board_Post.objects.all().exclude(location='1').order_by('date')
+
+    top_level_group = []
+    reply_group = []
+    sticky_group = []
+    favorite_group = []
+
+    for post in a:
+        try:
+            options_list = post.options.strip().split(',')
+        except:
+            options_list = []
+
+        if options_list[0] == '1':
+            sticky_group.append(post)
+        elif post.id in favs_list:
+            favorite_group.append(post)
+        elif post.location == '1':
+            top_level_group.append(post)
+
+    for post in aa:
+        reply_group.append(post)
+
+    output = []
+    for post in sticky_group:
+        output.append(post)
+        for x in reply_group:
+            if x.location == str(post.id) + '.2':
+                output.append(x)
+    for post in favorite_group:
+        output.append(post)
+        for x in reply_group:
+            if x.location == str(post.id) + '.2':
+                output.append(x)
+    for post in top_level_group:
+        output.append(post)
+        for x in reply_group:
+            if x.location == str(post.id) + '.2':
+                output.append(x)
+
+    return render(request, 'message_board.html', {'posts' : output,
+                                                  'current_user' : request.user.username,
+                                                  'favs_list' : favs_list})
 
 def draftpage(request):
     create_session(request.user, 'draft')
@@ -719,6 +770,8 @@ def leagueextensions(request):
 
             if num_years + max_years > 5:
                 max_years = 5 - num_years
+            else:
+                max_years = max_years - (x.years_remaining() - 1)
 
             if num_years > 1:
                 if (avg_yearly * 1.2) > base_extension:
@@ -1688,7 +1741,7 @@ def teamalertspage(request):
                                               'redirect' : '/team/alerts'})
 
     type_list = ['Auction - Outbid', 'Auction - New Auction', 'Auction - Won', 'Trade Offer', 'Trade Rejected', 'Trade Accepted',
-                 'Trade Withdrawn']
+                 'Trade Withdrawn', 'New Board Post']
     a = Alert.objects.filter(user=request.user).order_by('-date')
     b = []
     for x in a:
@@ -2005,12 +2058,28 @@ def commishofficepage(request):
     f = Variable.objects.get(name='Include Impending')
     include_impending = int(f.int_variable)
 
+    g = Team.objects.all()
+    user_list = []
+    for x in g:
+        user_list.append(x.user)
+    last_action_list = []
+    for user in user_list:
+        try:
+            h = Session.objects.filter(user=user).order_by('-date')[0]
+            last_action_list.append({'user' : user,
+                                     'last_action' : h.date})
+        except:
+            last_action_list.append({'user' : user,
+                                     'last_action' : 'none'})
+
+
     return render(request, 'admin/settings.html', {'default_auction_clock' : default_auction_clock,
                                                    'ext_switch' : ext_switch,
                                                    'commish_periodic' : commish_periodic,
                                                    'cut_season' : cut_season,
                                                    'new_auctions' : new_auctions,
-                                                   'include_impending' : include_impending})
+                                                   'include_impending' : include_impending,
+                                                   'last_action_list' : last_action_list})
 
 def commishviewmodel(request):
     create_session(request.user, 'commishviewmodel')

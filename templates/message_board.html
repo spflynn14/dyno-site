@@ -1,15 +1,97 @@
 {% extends 'base.html' %}
 
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/message_board.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/message_board.css' %}">
+{% endblock %}
+
 {% block content %}
+    {% csrf_token %}
     <div class="tab_area" id="second_tab_area">
 
     </div>
 
     <div class="tab_area" id="third_tab_area">
-
+        <div id="create_new_post_button">
+            <div style="margin: auto">
+                <i class="glyphicon glyphicon-plus"></i> &nbsp&nbsp&nbspCreate New Post
+            </div>
+        </div>
     </div>
 
     <div id="display_area">
-        I'll get to it
+        <div id="message_board_area">
+            {% for post in posts %}
+                {% if post.location == '1' %}
+                    {% if post.options.0 == '1' %}
+                        <div class="post_card" id="{{ post.id }}" style="border: 2px solid goldenrod">
+                    {% elif post.id in favs_list %}
+                        <div class="post_card" id="{{ post.id }}" style="border: 2px solid #cd0000">
+                    {% else %}
+                        <div class="post_card" id="{{ post.id }}">
+                    {% endif %}
+                {% else %}
+                    {% if post.id in favs_list %}
+                        <div class="short_post_card" id="{{ post.id }}" style="border: 2px solid #cd0000">
+                    {% else %}
+                        <div class="short_post_card" id="{{ post.id }}">
+                    {% endif %}
+                {% endif %}
+                    <div class="title_bar" id="closed">
+                        <table style="table-layout: fixed; width: 100%">
+                            <tr>
+                                <td id='h_title_td' style="width: 45%;"><h5><strong style="color: blue">{{ post.title }}</strong></h5></td>
+                                <td style="width: 25%;">{{ post.date|date:'D m/d/y, f a T' }}</td>
+                                <td style="width: 10%; text-decoration: underline">{{ post.user }}</td>
+                                {% if post.location == '1' %}
+                                    <td id='h_views_td' style="width: 10%;">views: {{ post.view_count }}</td>
+                                    <td style="width: 10%;">replies: {{ post.reply_count }}</td>
+                                {% endif %}
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="text_area">
+                        {{ post.text|safe|linebreaks }}
+                    </div>
+
+                    <div class="action_area">
+                        <p class="location_data" style="display: inline-block; color: white">{{ post.location }}</p>
+                        <p style="display: inline-block; color: white">{{ post.id }}</p>
+
+                        {% if current_user == post.user %}
+                            <div class="edit_post action_button">
+                                <i class="glyphicon glyphicon-edit" title="Edit Post"></i>
+                            </div>
+                        {% endif %}
+                        {% if user.is_superuser %}
+                            <div class="sticky_post action_button">
+                                {% if post.options.0 == '1' %}
+                                    <i class="glyphicon glyphicon-lock" title="Sticky" style="color: goldenrod" id="gold"></i>
+                                {% else %}
+                                    <i class="glyphicon glyphicon-lock" title="Sticky" id="black"></i>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                        <div class="favorite_post action_button">
+                            {% if post.id in favs_list %}
+                                <i class="glyphicon glyphicon-heart" title="Favorite" style="color: red" id="red"></i>
+                            {% else %}
+                                <i class="glyphicon glyphicon-heart" title="Favorite" id="black"></i>
+                            {% endif %}
+                        </div>
+                        <div class="reply_to_post action_button">
+                            <i class="glyphicon glyphicon-share-alt" title="Reply"></i>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
+
+    <p style='color: white'>end of board</p>
+    <br><br>
 {% endblock %}

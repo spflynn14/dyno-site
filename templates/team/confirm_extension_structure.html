@@ -20,13 +20,13 @@
             <table style="table-layout: fixed; width: 100%">
                 <tr>
                     <td style="width: 10%;">{{ year_list.0 }}: &nbsp</td>
-                    <td style="width: 40%;">${{ player.yr1_salary|add:player.yr1_sb|floatformat:2 }}</td>
+                    <td style="width: 40%;">${{ player.current_year_cap_hit }}</td>
                     <td style="width: 50%;"><p>1-year Extension: &nbsp${{ yr1_ext|floatformat:2 }}</p></td>
                 </tr>
                 <tr>
                     {% if player.yr2_salary > 0 %}
                         <td>{{ year_list.1 }}: &nbsp</td>
-                        <td>${{ player.yr2_salary|add:player.yr2_sb|floatformat:2 }}</td>
+                        <td>${{ player.yr2_cap_hit }}</td>
                     {% else %}
                         <td></td>
                         <td></td>
@@ -40,7 +40,7 @@
                 <tr>
                     {% if player.yr3_salary > 0 %}
                         <td>{{ year_list.2 }}: &nbsp</td>
-                        <td>${{ player.yr3_salary|add:player.yr3_sb|floatformat:2 }}</td>
+                        <td>${{ player.yr3_cap_hit }}</td>
                     {% else %}
                         <td></td>
                         <td></td>
@@ -54,7 +54,7 @@
                 <tr>
                     {% if player.yr4_salary > 0 %}
                         <td>{{ year_list.3 }}: &nbsp</td>
-                        <td>${{ player.yr4_salary|add:player.yr4_sb|floatformat:2 }}</td>
+                        <td>${{ player.yr4_cap_hit }}</td>
                     {% else %}
                         <td></td>
                         <td></td>
@@ -68,7 +68,7 @@
                 <tr>
                     {% if player.yr5_salary > 0 %}
                         <td>{{ year_list.4 }}: &nbsp</td>
-                        <td>${{ player.yr5_salary|add:player.yr5_sb|floatformat:2 }}</td>
+                        <td>${{ player.yr5_cap_hit }}</td>
                     {% endif %}
             </table>
         </div>

@@ -53,7 +53,12 @@ $(document).ready(function() {
                             'yr2_space' : 0,
                             'yr3_space' : 0,
                             'yr4_space' : 0,
-                            'yr5_space' : 0
+                            'yr5_space' : 0,
+                            'yr1_total_cost' : 0,
+                            'yr2_total_cost' : 0,
+                            'yr3_total_cost' : 0,
+                            'yr4_total_cost' : 0,
+                            'yr5_total_cost' : 0,
     };
 
     var $t = [];
@@ -273,7 +278,7 @@ $(document).ready(function() {
         var yr1_costs = Number(data.yr1_costs) + cap_hit_yr1;
         var yr1_pen = Number(data.yr1_pen) - Number(data.yr1_guar);
         var yr1_space = 200 - yr1_costs - yr1_pen;
-        var yr1_space_diff = Number(data.yr1_space) - yr1_space;
+        var yr1_space_diff = cap_hit_yr1 - Number(data.yr1_total_cost);
 
         if (Number(data.yr2_guar) == 0) {
             var yr2_costs = Number(data.yr2_costs);
@@ -284,7 +289,7 @@ $(document).ready(function() {
             var yr2_pen = Number(data.yr2_pen) - Number(data.yr2_guar);
         }
         var yr2_space = 200 - yr2_costs - yr2_pen;
-        var yr2_space_diff = Number(data.yr2_space) - yr2_space;
+        var yr2_space_diff = cap_hit_yr2 - Number(data.yr2_total_cost);
 
         if (Number(data.yr3_guar) == 0) {
             var yr3_costs = Number(data.yr3_costs);
@@ -294,7 +299,7 @@ $(document).ready(function() {
             var yr3_pen = Number(data.yr3_pen) - Number(data.yr3_guar);
         }
         var yr3_space = 200 - yr3_costs - yr3_pen;
-        var yr3_space_diff = Number(data.yr3_space) - yr3_space;
+        var yr3_space_diff = cap_hit_yr3 - Number(data.yr3_total_cost);
 
         if (Number(data.yr4_guar) == 0) {
             var yr4_costs = Number(data.yr4_costs);
@@ -304,7 +309,7 @@ $(document).ready(function() {
             var yr4_pen = Number(data.yr4_pen) - Number(data.yr4_guar);
         }
         var yr4_space = 200 - yr4_costs - yr4_pen;
-        var yr4_space_diff = Number(data.yr4_space) - yr4_space;
+        var yr4_space_diff = cap_hit_yr4 - Number(data.yr4_total_cost);
 
         if (Number(data.yr5_guar) == 0) {
             var yr5_costs = Number(data.yr5_costs);
@@ -314,7 +319,10 @@ $(document).ready(function() {
             var yr5_pen = Number(data.yr5_pen) - Number(data.yr5_guar);
         }
         var yr5_space = 200 - yr5_costs - yr5_pen;
-        var yr5_space_diff = Number(data.yr5_space) - yr5_space;
+        var yr5_space_diff = cap_hit_yr5 - Number(data.yr5_total_cost);
+
+        console.log(cap_hit_yr5, Number(data.yr5_total_cost));
+        console.log(data);
 
         //row 1
         $('<td>').addClass('player_interaction_cells').attr('align', 'center').css('font-weight', 'bold').text(year_list[0]).appendTo('#player_interaction_2');
@@ -798,6 +806,11 @@ $(document).ready(function() {
                 $bottom_table_data.yr3_space = data.yr3_space;
                 $bottom_table_data.yr4_space = data.yr4_space;
                 $bottom_table_data.yr5_space = data.yr5_space;
+                $bottom_table_data.yr1_total_cost = data.yr1_total_cost;
+                $bottom_table_data.yr2_total_cost = data.yr2_total_cost;
+                $bottom_table_data.yr3_total_cost = data.yr3_total_cost;
+                $bottom_table_data.yr4_total_cost = data.yr4_total_cost;
+                $bottom_table_data.yr5_total_cost = data.yr5_total_cost;
             }
         });
     });

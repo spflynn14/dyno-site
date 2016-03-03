@@ -90,12 +90,12 @@ $(document).ready(function() {
             $('#input_3').val(temp3.toFixed(2));
             $('#input_4').val(temp4.toFixed(2));
             $('#input_5').val(temp5.toFixed(2));
-        } else if (amnesty_percentage == 10) {
-            var temp1 = (yr1_sal + yr1_sb) * 0.90;
-            var temp2 = (yr2_sb) * 0.90;
-            var temp3 = (yr3_sb) * 0.90;
-            var temp4 = (yr4_sb) * 0.90;
-            var temp5 = (yr5_sb) * 0.90;
+        } else if (amnesty_percentage == 40) {
+            var temp1 = (yr1_sal + yr1_sb) * 0.60;
+            var temp2 = (yr2_sb) * 0.60;
+            var temp3 = (yr3_sb) * 0.60;
+            var temp4 = (yr4_sb) * 0.60;
+            var temp5 = (yr5_sb) * 0.60;
             $('#input_1').val(temp1.toFixed(2));
             $('#input_2').val(temp2.toFixed(2));
             $('#input_3').val(temp3.toFixed(2));
@@ -135,12 +135,12 @@ $(document).ready(function() {
         $('#input_5').val(temp5.toFixed(2));
     });
 
-    $('#amnesty_10_button').on('click', function() {
-        var temp1 = (yr1_sal + yr1_sb) * 0.90;
-        var temp2 = (yr2_sb) * 0.90;
-        var temp3 = (yr3_sb) * 0.90;
-        var temp4 = (yr4_sb) * 0.90;
-        var temp5 = (yr5_sb) * 0.90;
+    $('#amnesty_40_button').on('click', function() {
+        var temp1 = (yr1_sal + yr1_sb) * 0.60;
+        var temp2 = (yr2_sb) * 0.60;
+        var temp3 = (yr3_sb) * 0.60;
+        var temp4 = (yr4_sb) * 0.60;
+        var temp5 = (yr5_sb) * 0.60;
         $('#input_1').val(temp1.toFixed(2));
         $('#input_2').val(temp2.toFixed(2));
         $('#input_3').val(temp3.toFixed(2));

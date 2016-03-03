@@ -112,6 +112,13 @@ $(document).ready(function() {
         } else if (data.alert_type == 'Auction - Won') {
             return_text = data.var_t1 + ' - auction was won by ' + data.var_t2 + ' with a bid of $' + data.var_d1 + '.';
             return return_text;
+        } else if (data.alert_type == 'New Board Post') {
+            if (data.var_t2 == 'yes') {
+                return_text = 'A reply was made "' + data.var_t1 + '" to the post titled: "' + data.var_t3 + '"';
+            } else {
+                return_text = 'A post was created titled: "' + data.var_t1 + '"'
+            }
+            return return_text;
         }
 
         return 'none';
