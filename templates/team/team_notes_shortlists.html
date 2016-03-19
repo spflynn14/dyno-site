@@ -1,0 +1,75 @@
+{% extends 'team.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/team_notes.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.tablesorter.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/team_notes.css' %}">
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="third_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        <div id="top_area">
+            <div id="shortlist_dropdown_area">
+                Select Shortlist: &nbsp&nbsp&nbsp
+                <select id="shortlist_select">
+                    {% for x in shortlists %}
+                        {% if x.id == default_shortlist %}
+                            <option value="{{ x.id }}" selected>{{ x.title }}</option>
+                        {% else %}
+                            <option value="{{ x.id }}">{{ x.title }}</option>
+                        {% endif %}
+                    {% endfor %}
+                    <option disabled>-----</option>
+                    <option value="all">Show All Notes</option>
+                </select>
+                <br><br><br>
+                <p style="font-size: smaller">You can manage shortlists (adding/deleting/renaming) from the Team Settings page</p>
+            </div>
+            <div id="make_default_area">
+                <button id="button_make_default">Make Current Shortlist Default</button>
+            </div>
+            <div id="message_area" style="color: red">
+
+            </div>
+        </div>
+        <div id="table_area" class="table_area">
+            <div class="notes_table_div">
+                <table style="table-layout: fixed; width: 100%;" id="notes_table">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%; text-align: center; min-width: 100px"></th>
+                            <th style="width: 4%; text-align: center">Pos</th>
+                            <th style="width: 12%">Player</th>
+                            <th style="width: 8%">Team</th>
+                            <th style="width: 4%; text-align: center">Age</th>
+                            <th style="width: 6%; text-align: center">Avg Yearly Cost</th>
+                            <th style="width: 6%; text-align: center">{{ year_list.0 }} Cap Hit</th>
+                            <th style="width: 5%; text-align: center">Years Left</th>
+                            <th style="width: 50%">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="notes_table_tbody">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="vw_1" hidden>
+        <p>{{ default_shortlist }}</p>
+    </div>
+
+    <div id="vw_2" hidden>
+        {% for x in shortlists %}
+            <p id="{{ x.id }}">{{ x.title }}</p>
+        {% endfor %}
+    </div>
+{% endblock %}

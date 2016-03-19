@@ -11,7 +11,6 @@ $(document).ready(function() {
     var y5 = $('#vw_2-6').text();
     $('#vw_2').remove();
     var year_list = [y1, y2, y3, y4, y5];
-    console.log(year_list);
 
     var $master = [];
     $('#vw_1').find('tr').each(function() {
@@ -32,7 +31,9 @@ $(document).ready(function() {
             'yr4_sb': Number($(this).find('#vw_1-15').text()),
             'yr5_salary': Number($(this).find('#vw_1-16').text()),
             'yr5_sb': Number($(this).find('#vw_1-17').text()),
-            'notes': $(this).find('#vw_1-18').text()});
+            'notes': $(this).find('#vw_1-18').text(),
+            'inseason_pickup': Number($(this).find('#vw_1-19').text()),
+            'age': Number($(this).find('#vw_1-20').text())});
         $(this).remove();
     });
 
@@ -49,6 +50,7 @@ $(document).ready(function() {
             var td_pos = $('<td>');
             var td_name = $('<td>');
             var td_team = $('<td>');
+            var td_age = $('<td>');
             var td_contract_type = $('<td>');
             var td_total_value = $('<td>');
             var td_signing_bonus = $('<td>');
@@ -69,6 +71,11 @@ $(document).ready(function() {
             }
 
             td_team.text(value.team);
+            if (value.age > 100) {
+                td_age.text('').css({'text-align' : 'center'});
+            } else {
+                td_age.text(value.age.toFixed(1)).css({'text-align': 'center'});
+            }
             td_contract_type.text(value.contract_type).css({'text-align' : 'center'});
             td_total_value.text('$' + value.total_value.toFixed(2)).css({'text-align' : 'center'});
             td_signing_bonus.text('$' + value.signing_bonus.toFixed(2)).css({'text-align' : 'center'});
@@ -95,11 +102,17 @@ $(document).ready(function() {
                 yr5_string = '$' + value.yr5_salary.toFixed(2) + ' ($' + value.yr5_sb.toFixed(2) + ')';
             }
             td_yr5.text(yr5_string).css({'text-align' : 'center'});
-            td_notes.text(value.notes);
+
+            if (value.inseason_pickup == 1) {
+                td_notes.text('In-season pickup');
+            } else {
+                td_notes.text('');
+            }
 
             tr.append(td_pos);
             tr.append(td_name);
             tr.append(td_team);
+            tr.append(td_age);
             tr.append(td_contract_type);
             tr.append(td_total_value);
             tr.append(td_signing_bonus);
@@ -268,7 +281,7 @@ $(document).ready(function() {
             return data;
         } else {
             $.each(data, function(index, value) {
-                if (value.notes == 'In-season pickup') {
+                if (value.inseason_pickup == 1) {
                     output.push(value);
                 }
             });
@@ -337,11 +350,59 @@ $(document).ready(function() {
         var vis = $('#all_players_filter_area').is(':visible');
         if (vis == false) {
             $('#all_players_filter_area').show();
-            $('.all_players_datagrid').css({'height' : '70%'});
+            $('.all_players_datagrid').css({'height' : '65%'});
         } else {
             $('#all_players_filter_area').hide();
             $('.all_players_datagrid').css({'height' : '100%'});
         }
 
+    });
+
+    $('#check_all_pos').on('click', function() {
+        $('#all_players_filter_1').find('input[type=checkbox]').each(function() {
+            $(this).prop('checked', true);
+        });
+        var output1 = filter_position($master);
+        var output2 = filter_team(output1);
+        var output3 = filter_contract_type(output2);
+        var output4 = filter_salary(output3);
+        var output5 = filter_notes(output4);
+        fill_table(output5);
+    });
+
+    $('#uncheck_all_pos').on('click', function() {
+        $('#all_players_filter_1').find('input[type=checkbox]').each(function() {
+            $(this).prop('checked', false);
+        });
+        var output1 = filter_position($master);
+        var output2 = filter_team(output1);
+        var output3 = filter_contract_type(output2);
+        var output4 = filter_salary(output3);
+        var output5 = filter_notes(output4);
+        fill_table(output5);
+    });
+
+    $('#check_all_team').on('click', function() {
+        $('#all_players_filter_2').find('input[type=checkbox]').each(function() {
+            $(this).prop('checked', true);
+        });
+        var output1 = filter_position($master);
+        var output2 = filter_team(output1);
+        var output3 = filter_contract_type(output2);
+        var output4 = filter_salary(output3);
+        var output5 = filter_notes(output4);
+        fill_table(output5);
+    });
+
+    $('#uncheck_all_team').on('click', function() {
+        $('#all_players_filter_2').find('input[type=checkbox]').each(function() {
+            $(this).prop('checked', false);
+        });
+        var output1 = filter_position($master);
+        var output2 = filter_team(output1);
+        var output3 = filter_contract_type(output2);
+        var output4 = filter_salary(output3);
+        var output5 = filter_notes(output4);
+        fill_table(output5);
     });
 });

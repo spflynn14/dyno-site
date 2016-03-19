@@ -4,6 +4,7 @@
 
 {% block head %}
     <script src="{% static 'js/team_settings.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/team_settings.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -24,15 +25,54 @@
                 <input type="email" id="email_input" style="display: inline-block" />
             </div>
             <br>
-            <div id="logo_div">
-                <h5 style="display: inline-block; font-weight: bold">Assign Team Logo: &nbsp&nbsp</h5>
-                <input type="file" id="logo_input" style="display: inline-block"/>
-                <p style="font-size: small">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp(sorry, not implemented yet)</p>
-            </div>
-            <br>
             <div id="save_changes_div">
                 <button type="submit" id="team_settings_save_changes">Save Changes</button>
                 <br><br><p id="team_settings_message" style="color: blue"></p>
+            </div>
+            <br><br>
+            <div id="manage_shortlists_area">
+                <h5 style="font-weight: bold; text-decoration: underline">Manage Shortlists</h5><br>
+                <button id="show_new_shortlist_button" style="font-size: small">Create New Shortlist</button>
+                <div id="create_new_shortlist_div" hidden>
+                    <table style="table-layout: fixed; width: 350px" id="none">
+                        <tr>
+                            <th style="width: 25%;">Title:</th>
+                            <td style="width: 60%;">
+                                <input type="text" id="shortlist_title" style="width: 90%" maxlength="20"/>
+                            </td>
+                            <td style="width: 15%;"></td>
+                        </tr>
+                        <tr>
+                            <th style="width: 25%;">Description:</th>
+                            <td style="width: 60%;">
+                                <input type="text" id="shortlist_description" style="width: 90%" maxlength="80"/>
+                            </td>
+                            <td style="width: 15%;">
+                                <button id="create_new_shortlist_button">Create</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <br><br><br>
+                <table id="shortlist_table" style="table-layout: fixed; width: 100%">
+                    <thead>
+                        <tr>
+                            <th style="width: 65%; text-decoration: underline">Shortlists</th>
+                            <th style="width: 35%;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for x in shortlists %}
+                            <tr style="height: 30px">
+                                <td style="font-size: small" id="{{ x.id }}">{{ x.title }}</td>
+                                <td>
+                                    <button style="font-size: small" class="shortlist_delete_button">Delete</button>
+                                    <button style="font-size: small" class="shortlist_edit_button">Edit</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
 

@@ -1,4 +1,6 @@
 $(document).ready(function() {
+    console.log('ready');
+
     var $team_name = $('#vw_1').find('p').text();
     $('#vw_1').remove();
     var $user_email = $('#vw_2').find('p').text();
@@ -85,5 +87,80 @@ $(document).ready(function() {
             filters_list.push($(this).val());
         }
         save_filters();
+    });
+
+    function show_new_shortlist_area () {
+        $('#show_new_shortlist_button').hide();
+        $('#create_new_shortlist_div').show();
+
+        $('#create_new_shortlist_button').on('click', function() {
+            var title = $('#shortlist_title').val();
+            var description = $('#shortlist_description').val();
+            var shortlist_id = $('#create_new_shortlist_div table').prop('id');
+
+            $.ajax({
+                url : '/create_new_shortlist',
+                type: "POST",
+                data: {csrfmiddlewaretoken:document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                    'title': title,
+                    'description': description,
+                    'shortlist_id' : shortlist_id
+                },
+                dataType: 'json',
+                success: function(data){
+                    location.reload();
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        });
+    }
+
+    $('#show_new_shortlist_button').on('click', function() {
+        show_new_shortlist_area();
+    });
+
+    $(document).on('click', '.shortlist_edit_button', function() {
+        var id = $(this).parent().prev().prop('id');
+        $('#create_new_shortlist_div table').prop('id', id);
+
+        $.ajax({
+            url : '/get_shortlist_details',
+            type: "POST",
+            data: {csrfmiddlewaretoken:document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                'shortlist_id' : id
+            },
+            dataType: 'json',
+            success: function(data){
+                $('#shortlist_title').val(data.title);
+                $('#shortlist_description').val(data.description);
+            },
+            error: function(data) {
+                console.log(data);
+            }
+        });
+
+        $('#create_new_shortlist_button').text('Confirm');
+        show_new_shortlist_area();
+    });
+
+    $(document).on('click', '.shortlist_delete_button', function() {
+        var id = $(this).parent().prev().prop('id');
+
+        $.ajax({
+            url : '/delete_shortlist',
+            type: "POST",
+            data: {csrfmiddlewaretoken:document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                'shortlist_id' : id
+            },
+            dataType: 'json',
+            success: function(data){
+                location.reload();
+            },
+            error: function(data) {
+                console.log(data);
+            }
+        });
     });
 });

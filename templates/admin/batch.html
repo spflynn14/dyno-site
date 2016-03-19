@@ -44,6 +44,35 @@
         <section id="center_area">
             <div>
                  <div id="display_area">
+                     <a href="/input_draft_results" style="float: left">Input Draft Results</a>
+                     <br><br>
+                     <div>
+                         <form method="post" action="/input_old_transactions">
+                             {% csrf_token %}
+                             Transaction Data: <textarea rows="4" cols="120" name="trans_data"></textarea><br>
+                             <input type="submit" value="Go To Transaction Processing Page">
+                         </form>
+                     </div>
+                     <br><br>
+                     <form method="post" action="/process_player_stats">
+                         {% csrf_token %}
+                         Year: <textarea rows="1" cols="10" name="year"></textarea><br>
+                         Fantasy Stats Batch: <textarea rows="4" cols="120" name="stats_text"></textarea><br>
+                         Scoring Stats Batch: <textarea rows="4" cols="120" name="scoring_stats_text"></textarea><br>
+                         Rushing Stats Batch: <textarea rows="4" cols="120" name="rushing_stats_text"></textarea><br>
+                         Kicking Stats Batch: <textarea rows="4" cols="120" name="kicking_stats_text"></textarea><br>
+                         Defense Stats Batch: <textarea rows="4" cols="120" name="defense_stats_text"></textarea><br>
+                         <input type="submit" value="Submit">
+                     </form>
+                     <br><br>
+                     <form method="post" action="/assign_pfr_ids">
+                         {% csrf_token %}
+                         ID List: <textarea rows="4" cols="120" name="id_list"></textarea><br>
+                         <input type="submit" value="Assign PFR Ids">
+                     </form>
+
+                     <br><br><br>************************************<br><br><br><br>
+
                      <form method="post" action="/process_player_contract_batch">
                          {% csrf_token %}
                          Player Contract Batch: <textarea rows="8" cols="120" name="player_contract_text"></textarea><br>
@@ -55,7 +84,7 @@
                          Salary Batch: <textarea rows="8" cols="120" name="salary_lists_text"></textarea><br>
                          <input type="submit" value="Submit">
                      </form>
-                    <br>
+                     <br><br><br>
                      <form method="post" action="/reset_all_roles" style="float: right">
                          {% csrf_token %}
                          Click To Reset All Roles &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="submit" value="Submit">
@@ -90,6 +119,12 @@
                          <input type="submit" value="Submit">
                      </form>
                      <br><br>
+                     <form method="post" action="/process_birthdates">
+                         {% csrf_token %}
+                         Birthdates Batch: <textarea rows="8" cols="120" name="birthdates_text"></textarea><br>
+                         <input type="submit" value="Submit">
+                     </form>
+                     <br><br>
                      <form method="post" action="/process_adp">
                          {% csrf_token %}
                          ADP Batch: <textarea rows="8" cols="120" name="adp_text"></textarea><br>
@@ -106,6 +141,19 @@
                          {% csrf_token %}
                          Performance Year 2 Batch: <textarea rows="8" cols="120" name="perf_text"></textarea><br>
                          <input type="submit" value="Submit">
+                     </form>
+                     <br><br>
+                     <form method="post" action="/create_divisions">
+                         {% csrf_token %}
+                         Pot A: <textarea rows="1" cols="120" name="pot_a"></textarea><br>
+                         Pot B: <textarea rows="1" cols="120" name="pot_b"></textarea><br>
+                         Pot C: <textarea rows="1" cols="120" name="pot_c"></textarea><br>
+                         <input type="submit" value="Create Divisions">
+                     </form>
+                     <br><br>
+                     <form method="post" action="/clear_team_emails">
+                         {% csrf_token %}
+                         Click To Clear All Team Emails &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<input type="submit" value="Submit">
                      </form>
                  </div>
             </div>

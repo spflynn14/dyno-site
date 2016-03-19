@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.utils import timezone
+from math import floor
 
 class Player(models.Model):
     position = models.CharField(max_length=3)
@@ -26,6 +28,9 @@ class Player(models.Model):
     yr3_role = models.CharField(max_length=8, null=True, blank=True)
     yr4_role = models.CharField(max_length=8, null=True, blank=True)
     yr5_role = models.CharField(max_length=8, null=True, blank=True)
+    inseason_pickup = models.IntegerField(default=0)
+    birthdate = models.DateField(blank=True, default='1900-01-01')
+    pfr_id = models.CharField(max_length=20, blank=True, default='')
 
     def years_remaining(self):
         year_count = 0
@@ -53,7 +58,10 @@ class Player(models.Model):
         return year_count
 
     def average_yearly_cost(self):
-        return self.total_value/self.years_remaining()
+        try:
+            return self.total_value/self.years_remaining()
+        except:
+            return 0
 
     def current_year_cap_hit(self):
         return self.yr1_salary+self.yr1_sb
@@ -69,6 +77,12 @@ class Player(models.Model):
 
     def yr5_cap_hit(self):
         return self.yr5_salary+self.yr5_sb
+
+    def age(self):
+        full_age = timezone.now().date() - self.birthdate
+        age_days = full_age.days
+        age_years = floor(age_days / 364 * 10) / 10
+        return age_years
 
     def __str__(self):
         return self.name
@@ -111,6 +125,7 @@ class Team(models.Model):
     yr3_bonuses = models.CommaSeparatedIntegerField(max_length=3, default='0,0')
     current_balance = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     filtered_tags = models.TextField(default='')
+    default_shortlist = models.IntegerField(blank=True, default=888888)
 
     def __str__(self):
         return self.internal_name
@@ -210,6 +225,11 @@ class Auction(models.Model):
     high_bidder_proxy_bid = models.DecimalField(max_digits=5, decimal_places=2)
     clock_reset = models.DateTimeField()
     clock_timeout_minutes = models.IntegerField(default=4320)
+
+    def time_left(self):
+        auction_end = self.clock_reset + timezone.timedelta(minutes=self.clock_timeout_minutes)
+        time_left = auction_end - timezone.now()
+        return time_left
 
     def __str__(self):
         return self.player
@@ -332,6 +352,13 @@ class Transaction(models.Model):
         var_t1 = status (pending)
         var_t2 = status (confirmed)
         var_t3 = per year total cost list (split by comma)
+
+    Rookie Draft Pick:
+        team2 = owner
+        var_d1 = pick_in_round
+
+    Waiver Add:
+        team2 = owner
 
     '''
 
@@ -490,3 +517,80 @@ class Board_Post(models.Model):
 
     def __str__(self):
         return self.user + ' - ' + self.title + ' - ' + str(self.date)
+
+class PlayerNote(models.Model):
+    user = models.CharField(max_length=20)
+    player_id = models.IntegerField(default=999999)
+    notes = models.TextField(blank=True, default='')
+
+    def __str__(self):
+        return self.user + ' - ' + str(self.player_id)
+
+class Shortlist(models.Model):
+    user = models.CharField(max_length=20)
+    title = models.CharField(max_length=80)
+    description = models.CharField(max_length=400)
+    members = models.TextField(blank=True, default='')
+
+    def __str__(self):
+        return self.user + ' - ' + self.title
+
+class YearlyStats(models.Model):
+    player_id = models.IntegerField(default=999999)
+    year = models.IntegerField(default=0)
+    team = models.CharField(max_length=3, blank=True, default='')
+    g = models.IntegerField(default=0)
+    gs = models.IntegerField(default=0)
+    pass_comp = models.IntegerField(default=0)
+    pass_att = models.IntegerField(default=0)
+    pass_yds = models.IntegerField(default=0)
+    pass_td = models.IntegerField(default=0)
+    pass_int = models.IntegerField(default=0)
+    rush_att = models.IntegerField(default=0)
+    rush_yds = models.IntegerField(default=0)
+    rush_td = models.IntegerField(default=0)
+    rec_targets = models.IntegerField(default=0)
+    rec = models.IntegerField(default=0)
+    rec_yds = models.IntegerField(default=0)
+    rec_td = models.IntegerField(default=0)
+    two_pt_conv = models.IntegerField(default=0)
+    fumbles = models.IntegerField(default=0)
+
+    def __str__(self):
+        return str(self.player_id) + ' - ' + str(self.year)
+
+class YearlyStatsKicker(models.Model):
+    player_id = models.IntegerField(default=999999)
+    year = models.IntegerField(default=0)
+    team = models.CharField(max_length=3, blank=True, default='')
+    g = models.IntegerField(default=0)
+    fg_made_0 = models.IntegerField(default=0)
+    fg_att_0 = models.IntegerField(default=0)
+    fg_made_20 = models.IntegerField(default=0)
+    fg_att_20 = models.IntegerField(default=0)
+    fg_made_30 = models.IntegerField(default=0)
+    fg_att_30 = models.IntegerField(default=0)
+    fg_made_40 = models.IntegerField(default=0)
+    fg_att_40 = models.IntegerField(default=0)
+    fg_made_50 = models.IntegerField(default=0)
+    fg_att_50 = models.IntegerField(default=0)
+    xp_made = models.IntegerField(default=0)
+    xp_att = models.IntegerField(default=0)
+
+    def __str__(self):
+        return str(self.player_id) + ' - ' + str(self.year)
+
+class YearlyStatsDefense(models.Model):
+    player_id = models.IntegerField(default=999999)
+    year = models.IntegerField(default=0)
+    pts_allowed = models.IntegerField(default=0)
+    total_yds_allowed = models.IntegerField(default=0)
+    rush_yds_allowed = models.IntegerField(default=0)
+    pass_yds_allowed = models.IntegerField(default=0)
+    rushes_against = models.IntegerField(default=0)
+    passes_against = models.IntegerField(default=0)
+    fumbles = models.IntegerField(default=0)
+    int = models.IntegerField(default=0)
+
+    def __str__(self):
+        return str(self.player_id) + ' - ' + str(self.year)

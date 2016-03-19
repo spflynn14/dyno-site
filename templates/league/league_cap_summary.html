@@ -1,5 +1,12 @@
 {% extends 'league.html' %}
 
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/league_cap_summary.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.tablesorter.js' %}"></script>
+{% endblock %}
+
 {% block content %}
     <div class="tab_area" id="third_tab_area">
 
@@ -11,28 +18,21 @@
                 <thead>
                     <tr>
                         <th width="100px"></th>
+                        <th width="60px" style="text-align: center">Players</th>
                         <th width="100px" style="text-align: center">Total Salary</th>
                         <th width="100px" style="text-align: center">Current Cap Penalty</th>
                         <th width="100px" style="text-align: center">Cap Space</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for a,b,c,d in summary_data %}
-                        {% if forloop.counter0|divisibleby:2 %}
-                            <tr>
-                                <td>{{ a }}</td>
-                                <td style="text-align: center">${{ b }}</td>
-                                <td style="text-align: center">${{ c }}</td>
-                                <td style="text-align: center">${{ d }}</td>
-                            </tr>
-                        {% else %}
-                            <tr class="cap_summary_data_aux">
-                                <td>{{ a }}</td>
-                                <td style="text-align: center">${{ b }}</td>
-                                <td style="text-align: center">${{ c }}</td>
-                                <td style="text-align: center">${{ d }}</td>
-                            </tr>
-                        {% endif %}
+                    {% for a,b,c,d,e in summary_data %}
+                        <tr>
+                            <td>{{ a }}</td>
+                            <td style="text-align: center">{{ b }}</td>
+                            <td style="text-align: center">${{ c }}</td>
+                            <td style="text-align: center">${{ d }}</td>
+                            <td style="text-align: center">${{ e }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>

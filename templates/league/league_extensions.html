@@ -38,9 +38,10 @@
             <table>
                 <thead>
                     <tr>
-                        <th width="5%" style="text-align: center">Pos</th>
+                        <th width="4%" style="text-align: center">Pos</th>
                         <th width="14%">Player</th>
-                        <th width="10%">Team</th>
+                        <th width="8%">Team</th>
+                        <th width="4%" style="text-align: center">Age</th>
                         <th width="7%" style="text-align: center">Avg Yearly Cost</th>
                         <th width="7%" style="text-align: center">Years Left</th>
                         <th width="7%" style="text-align: center">Base Extension Value</th>
@@ -74,6 +75,7 @@
                     <td id="vw_1-9">{{ x.2yr_extension }}</td>
                     <td id="vw_1-10">{{ x.3yr_extension }}</td>
                     <td id="vw_1-11">{{ x.4yr_extension }}</td>
+                    <td id="vw_1-12">{{ x.age }}</td>
                 </tr>
             {% endfor %}
         </table>

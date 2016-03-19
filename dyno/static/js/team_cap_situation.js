@@ -88,7 +88,8 @@ $(document).ready(function() {
             'avail_roles_yr2': a_r_2,
             'avail_roles_yr3': a_r_3,
             'avail_roles_yr4': a_r_4,
-            'avail_roles_yr5': a_r_5});
+            'avail_roles_yr5': a_r_5,
+            'age': Number($(this).find('#vw_1-25').text())});
         $(this).remove();
     });
 
@@ -183,6 +184,7 @@ $(document).ready(function() {
             var td_roles = $('<td>');
             var td_pos = $('<td>');
             var td_name = $('<td>');
+            var td_age = $('<td>');
             var td_contract_type = $('<td>');
             var td_cap = $('<td>');
             var td_salary = $('<td>');
@@ -192,6 +194,11 @@ $(document).ready(function() {
             td_pos.text(data.pos).attr('align','center');
             var name_link = $('<div>').addClass('name_link').text(data.name);
             td_name.append(name_link);
+            if (data.age > 100) {
+                td_age.text('').css({'text-align' : 'center'});
+            } else {
+                td_age.text(data.age.toFixed(1)).css({'text-align': 'center'});
+            }
             td_contract_type.text(data.contract_type).attr('align','center');
             td_cap.text('$' + cap_hit.toFixed(2)).attr('align','center');
             td_salary.text('$' + data.yr1_salary.toFixed(2)).attr('align','center');
@@ -218,6 +225,7 @@ $(document).ready(function() {
             tr.append(td_roles);
             tr.append(td_pos);
             tr.append(td_name);
+            tr.append(td_age);
             tr.append(td_contract_type);
             tr.append(td_cap);
             tr.append(td_salary);
@@ -237,6 +245,7 @@ $(document).ready(function() {
                 var td_roles = $('<td>');
                 var td_pos = $('<td>');
                 var td_name = $('<td>');
+                var td_age = $('<td>');
                 var td_contract_type = $('<td>');
                 var td_cap = $('<td>');
                 var td_salary = $('<td>');
@@ -246,6 +255,12 @@ $(document).ready(function() {
                 td_pos.text(data.pos).attr('align','center');
                 var name_link = $('<div>').addClass('name_link').text(data.name);
                 td_name.append(name_link);
+                if (data.age > 100) {
+                    td_age.text('').css({'text-align' : 'center'});
+                } else {
+                    var adj_age = data.age + 1;
+                    td_age.text(adj_age.toFixed(1)).css({'text-align': 'center'});
+                }
                 td_contract_type.text(data.contract_type).attr('align', 'center');
                 td_cap.text('$' + cap_hit.toFixed(2)).attr('align', 'center');
                 td_salary.text('$' + data.yr2_salary.toFixed(2)).attr('align', 'center');
@@ -277,6 +292,7 @@ $(document).ready(function() {
                 tr.append(td_roles);
                 tr.append(td_pos);
                 tr.append(td_name);
+                tr.append(td_age);
                 tr.append(td_contract_type);
                 tr.append(td_cap);
                 tr.append(td_salary);
@@ -299,6 +315,7 @@ $(document).ready(function() {
                 var td_roles = $('<td>');
                 var td_pos = $('<td>');
                 var td_name = $('<td>');
+                var td_age = $('<td>');
                 var td_contract_type = $('<td>');
                 var td_cap = $('<td>');
                 var td_salary = $('<td>');
@@ -308,6 +325,12 @@ $(document).ready(function() {
                 td_pos.text(data.pos).attr('align','center');
                 var name_link = $('<div>').addClass('name_link').text(data.name);
                 td_name.append(name_link);
+                if (data.age > 100) {
+                    td_age.text('').css({'text-align' : 'center'});
+                } else {
+                    var adj_age = data.age + 2;
+                    td_age.text(adj_age.toFixed(1)).css({'text-align': 'center'});
+                }
                 td_contract_type.text(data.contract_type).attr('align', 'center');
                 td_cap.text('$' + cap_hit.toFixed(2)).attr('align', 'center');
                 td_salary.text('$' + data.yr3_salary.toFixed(2)).attr('align', 'center');
@@ -339,6 +362,7 @@ $(document).ready(function() {
                 tr.append(td_roles);
                 tr.append(td_pos);
                 tr.append(td_name);
+                tr.append(td_age);
                 tr.append(td_contract_type);
                 tr.append(td_cap);
                 tr.append(td_salary);
@@ -361,6 +385,7 @@ $(document).ready(function() {
                 var td_roles = $('<td>');
                 var td_pos = $('<td>');
                 var td_name = $('<td>');
+                var td_age = $('<td>');
                 var td_contract_type = $('<td>');
                 var td_cap = $('<td>');
                 var td_salary = $('<td>');
@@ -370,6 +395,12 @@ $(document).ready(function() {
                 td_pos.text(data.pos).attr('align','center');
                 var name_link = $('<div>').addClass('name_link').text(data.name);
                 td_name.append(name_link);
+                if (data.age > 100) {
+                    td_age.text('').css({'text-align' : 'center'});
+                } else {
+                    var adj_age = data.age + 3;
+                    td_age.text(adj_age.toFixed(1)).css({'text-align': 'center'});
+                }
                 td_contract_type.text(data.contract_type).attr('align', 'center');
                 td_cap.text('$' + cap_hit.toFixed(2)).attr('align', 'center');
                 td_salary.text('$' + data.yr4_salary.toFixed(2)).attr('align', 'center');
@@ -401,6 +432,7 @@ $(document).ready(function() {
                 tr.append(td_roles);
                 tr.append(td_pos);
                 tr.append(td_name);
+                tr.append(td_age);
                 tr.append(td_contract_type);
                 tr.append(td_cap);
                 tr.append(td_salary);
@@ -423,6 +455,7 @@ $(document).ready(function() {
                 var td_roles = $('<td>');
                 var td_pos = $('<td>');
                 var td_name = $('<td>');
+                var td_age = $('<td>');
                 var td_contract_type = $('<td>');
                 var td_cap = $('<td>');
                 var td_salary = $('<td>');
@@ -432,6 +465,12 @@ $(document).ready(function() {
                 td_pos.text(data.pos).attr('align','center');
                 var name_link = $('<div>').addClass('name_link').text(data.name);
                 td_name.append(name_link);
+                if (data.age > 100) {
+                    td_age.text('').css({'text-align' : 'center'});
+                } else {
+                    var adj_age = data.age + 4;
+                    td_age.text(adj_age.toFixed(1)).css({'text-align': 'center'});
+                }
                 td_contract_type.text(data.contract_type).attr('align', 'center');
                 td_cap.text('$' + cap_hit.toFixed(2)).attr('align', 'center');
                 td_salary.text('$' + data.yr5_salary.toFixed(2)).attr('align', 'center');
@@ -463,6 +502,7 @@ $(document).ready(function() {
                 tr.append(td_roles);
                 tr.append(td_pos);
                 tr.append(td_name);
+                tr.append(td_age);
                 tr.append(td_contract_type);
                 tr.append(td_cap);
                 tr.append(td_salary);

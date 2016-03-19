@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/input_old_transactions.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="second_tab_area">
+
+    </div>
+
+    <div class="tab_area" id="third_tab_area">
+        <button id="submit_button" style="float: right">Submit</button>
+    </div>
+
+    <div id="display_area" style="overflow-y: auto">
+        <table style="table-layout: fixed; width: 100%; height: 90%;">
+            <thead>
+                <tr>
+                    <th style="width: 14%">Date</th>
+                    <th style="width: 14%">Transaction Type</th>
+                    <th style="width: 15%">Team1</th>
+                    <th style="width: 15%">Team2</th>
+                    <th style="width: 14%">Player</th>
+                    <th style="width: 14%">PFR ID</th>
+                    <th style="width: 14%">player_id</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for x in trans_list %}
+                    <tr>
+                        <td><input type="text" class='date' value="{{ x.date }}"></td>
+                        <td><input type="text" class='trans_type' value="{{ x.trans_type }}"></td>
+                        <td><input type="text" class='team1' value="{{ x.team1 }}"></td>
+                        <td><input type="text" class='team2' value="{{ x.team2 }}"></td>
+                        <td><input type="text" class='player' value="{{ x.player }}"></td>
+                        <td><input type="text" class='pfr_id' value="{{ x.pfr }}"></td>
+                        <td><input type="text" class='player_id' value="{{ x.player_id }}"></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

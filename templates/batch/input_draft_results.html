@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/input_draft_results.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="second_tab_area">
+
+    </div>
+
+    <div class="tab_area" id="third_tab_area">
+        Date of Draft: <input type="date" id="draft_date"/>
+    </div>
+
+    <div id="display_area" style="overflow-y: auto">
+        <table style="table-layout: fixed; width: 50%; height: 90%; margin-left: 50px">
+            <thead>
+                <tr>
+                    <th style="width: 20%">Overall Pick</th>
+                    <th style="width: 20%">Pick</th>
+                    <th style="width: 20%">Team</th>
+                    <th style="width: 20%">Player</th>
+                    <th style="width: 20%">Enter Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for x in num_picks %}
+                    <tr>
+                        <td><input type="text" style="width: 100%" value="{{ x }}"></td>
+                        <td><input type="text" class='pick' style="width: 100%"></td>
+                        <td><input type="text" class='team' style="width: 100%"></td>
+                        <td>
+                            <select class="player">
+                                {% for y in player_list %}
+                                    <option value="{{ y.id }}">{{ y.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td><input type="text" class='manual_player' style="width: 100%"></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button id="submit_button">Submit</button>
+    </div>
+{% endblock %}

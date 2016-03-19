@@ -56,6 +56,11 @@
                     </td>
                 </tr>
             </table>
+            <br>
+            <div style="text-align: center">
+                <button id="check_all_pos" style="display: inline-block; font-size: x-small">Check All</button>
+                <button id="uncheck_all_pos" style="display: inline-block; font-size: x-small">Uncheck All</button>
+            </div>
         </div>
         <div id="all_players_filter_2">
             <h6 style="color: blue; text-decoration: underline; margin-left: 20px">Team</h6>
@@ -145,6 +150,11 @@
                     </td>
                 </tr>
             </table>
+            <br>
+            <div>
+                <button id="check_all_team" style="display: inline-block; font-size: x-small; margin-left: 20px">Check All</button>
+                <button id="uncheck_all_team" style="display: inline-block; font-size: x-small">Uncheck All</button>
+            </div>
         </div>
         <div id="all_players_filter_3">
             <h6 style="color: blue; text-decoration: underline; margin-left: 40px">Contract Type</h6>
@@ -192,7 +202,7 @@
             </table>
         </div>
         <div id="all_players_filter_5">
-            <h6 style="color: blue; text-decoration: underline; margin-left: 25px">Notes</h6>
+            <h6 style="color: blue; text-decoration: underline; margin-left: 25px"></h6>
             <table style="width: 100%; table-layout: fixed">
                 <tr>
                     <td style="width: 15%; text-align: right">
@@ -215,6 +225,7 @@
                         <th width="6%">Position</th>
                         <th width="8%">Name</th>
                         <th width="6%">Team</th>
+                        <th width="4%" style="text-align: center">Age</th>
                         <th width="6%" style="text-align: center">Contract Type</th>
                         <th width="6%" style="text-align: center">Total Value</th>
                         <th width="6%" style="text-align: center">Signing Bonus</th>
@@ -224,7 +235,7 @@
                         <th width="8%" style="text-align: center">{{ year_list.2 }} Salary/<br>Signing Bonus</th>
                         <th width="8%" style="text-align: center">{{ year_list.3 }} Salary/<br>Signing Bonus</th>
                         <th width="8%" style="text-align: center">{{ year_list.4 }} Salary/<br>Signing Bonus</th>
-                        <th width="16%">Notes</th>
+                        <th width="12%"></th>
                     </tr>
                 </thead>
                 <tbody  id="all_players_body">
@@ -256,6 +267,8 @@
                     <td id="vw_1-16">{{ x.yr5_salary }}</td>
                     <td id="vw_1-17">{{ x.yr5_sb }}</td>
                     <td id="vw_1-18">{{ x.notes }}</td>
+                    <td id="vw_1-19">{{ x.inseason_pickup }}</td>
+                    <td id="vw_1-20">{{ x.age }}</td>
                 </tr>
             {% endfor %}
         </table>

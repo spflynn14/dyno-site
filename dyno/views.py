@@ -2,6 +2,7 @@ import os
 import sqlite3 as sql3
 from decimal import *
 from django.utils import timezone
+from django.utils.dateparse import parse_date
 from django.shortcuts import render
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect, HttpResponse
@@ -10,8 +11,10 @@ from .forms import *
 from .models import *
 
 working_local = True
-current_league_year = 2015
+current_league_year = 2016
 year_list = [current_league_year, current_league_year + 1, current_league_year + 2, current_league_year + 3, current_league_year + 4]
+acceptable_trans_list = ['Auction End', 'Waiver Extension', 'Franchise Tag', 'Transition Tag', 'Extension Submitted', 'Expansion Draft Pick',
+                 'Player Cut', 'Trade Accepted', 'Rookie Draft Pick']
 
 draft_pick_salary_list = {1 : [9.00, 10.80, 12.95, 15.55],
                            2 : [8.50, 10.20, 12.25, 14.70],
@@ -509,26 +512,30 @@ def auctionpage(request):
     for x in a:
         new_auction_player_list.append(x.position + ' - ' + x.name)
 
-    b = Auction.objects.all().order_by('clock_reset')
+    #b = Auction.objects.all()
+    b = sorted(Auction.objects.all(), key=lambda a: a.time_left())
 
     c = Team.objects.get(user=request.user)
     current_team = c.internal_name
 
-    d = Variable.objects.get(name='New Auction Info')
+    d = TeamVariable.objects.filter(user=request.user).get(name='AuctionBids')
     d.text_variable = ''
     d.save()
 
     e = Variable.objects.get(name='New Auction Flag')
     new_auctions = e.int_variable
 
+    f = Player.objects.filter(team='Auction')
+
     return render(request, 'auction.html', {'new_auction_player_list' : new_auction_player_list,
                                             'auctions' : b,
                                             'current_team' : current_team,
-                                            'new_auctions' : new_auctions})
+                                            'new_auctions' : new_auctions,
+                                            'auction_players' : f})
 
 def auctionbidconfirmationpage(request):
     create_session(request.user, 'auctionbidconfirm')
-    a = Variable.objects.get(name='New Auction Info')
+    a = TeamVariable.objects.filter(user=request.user).get(name='AuctionBids')
     b = a.text_variable
 
     bids_list = []
@@ -827,6 +834,7 @@ def leagueextensions(request):
                           '2yr_extension' : yr2_extension,
                           '3yr_extension' : yr3_extension,
                           '4yr_extension' : yr4_extension,
+                          'age' : x.age()
                           })
 
 
@@ -849,18 +857,16 @@ def leaguetransactionlog(request):
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/league/league_transaction_log'})
 
-    type_list = ['Auction End', 'Waiver Extension', 'Franchise Tag', 'Transition Tag', 'Extension Submitted', 'Expansion Draft Pick',
-                 'Player Cut', 'Trade Accepted']
     a = Transaction.objects.all().order_by('-date')
     b = []
     for x in a:
-        if x.transaction_type in type_list:
+        if x.transaction_type in acceptable_trans_list:
             b.append(x)
 
     c = Team.objects.all()
 
     return render(request, 'league/league_transaction_log.html', {'transactions' : b,
-                                                                  'trans_list' : sorted(type_list),
+                                                                  'trans_list' : sorted(acceptable_trans_list),
                                                                   'team_list' : c})
 
 def leaguefreeagents(request):
@@ -1090,6 +1096,7 @@ def leaguecapsummary(request):
     b = Team.objects.all()
 
     team_list = []
+    num_players_list = []
     salary_list = []
     current_cap_penalty = []
     cap_space = []
@@ -1098,6 +1105,7 @@ def leaguecapsummary(request):
         team_list.append(x.internal_name)
 
     for x in range(len(team_list)):
+        num_players_list.append(0)
         salary_list.append(Decimal(0))
         current_cap_penalty.append(Decimal(0))
         cap_space.append(Decimal(0))
@@ -1105,6 +1113,7 @@ def leaguecapsummary(request):
     for x in a:
         for y in range(len(team_list)):
             if x.team == team_list[y]:
+                num_players_list[y] += 1
                 salary_list[y] += (Decimal(x.yr1_salary)+Decimal(x.yr1_sb))
 
     for x in b:
@@ -1117,7 +1126,7 @@ def leaguecapsummary(request):
 
     summary_data = []
     for x in range(len(team_list)):
-        summary_data.append([team_list[x], salary_list[x], current_cap_penalty[x], cap_space[x]])
+        summary_data.append([team_list[x], num_players_list[x], salary_list[x], current_cap_penalty[x], cap_space[x]])
 
     return render(request, 'league/league_cap_summary.html', {'summary_data' : summary_data})
 
@@ -1501,6 +1510,9 @@ def teamcapsituationpage(request):
         avail_ro_3 = avail_roles(con, cur, team, x[1], x[2], 3)
         avail_ro_4 = avail_roles(con, cur, team, x[1], x[2], 4)
         avail_ro_5 = avail_roles(con, cur, team, x[1], x[2], 5)
+        full_age = timezone.now().date() - parse_date(x[25])
+        age_days = full_age.days
+        age_years = floor(age_days / 364 * 10) / 10
         team_json1.append({'yr1_role': x[19],
                          'yr2_role' : x[20],
                          'yr3_role' : x[21],
@@ -1524,7 +1536,8 @@ def teamcapsituationpage(request):
                           'avail_roles_yr2' : avail_ro_2,
                           'avail_roles_yr3' : avail_ro_3,
                           'avail_roles_yr4' : avail_ro_4,
-                          'avail_roles_yr5' : avail_ro_5,})
+                          'avail_roles_yr5' : avail_ro_5,
+                           'age' : age_years})
 
     cur.execute('SELECT role, unique_role, applies_to_QB, applies_to_RB, applies_to_WR, applies_to_TE, applies_to_DEF, applies_to_K FROM dyno_availablerole WHERE user=?', [str(request.user)])
     c = cur.fetchall()
@@ -1580,6 +1593,8 @@ def teamsettingspage(request):
         roles_list.append({'role' : x.role,
                            'description' : x.description})
 
+    c = Shortlist.objects.filter(user=request.user)
+
     return render(request, 'team/team_settings.html', {'team_name' : team_name,
                                                        'user_email' : user_email,
                                                        'yr1_balance' : yr1_balance,
@@ -1591,7 +1606,8 @@ def teamsettingspage(request):
                                                        'current_balance' : current_balance,
                                                        'filtered_tags' : filtered_tags,
                                                        'role_list' : roles_list,
-                                                       'year_list' : year_list})
+                                                       'year_list' : year_list,
+                                                       'shortlists' : c})
 
 def teampendingtransactionspage(request):
     create_session(request.user, 'teampendingtrans')
@@ -3057,3 +3073,59 @@ def teamtradelogpage(request):
 
     return render (request, 'team/team_trade_log.html', {'trade_list' : b,
                                                          'user_team_2' : team})
+
+def teamnotesandshortlists(request):
+    a = Shortlist.objects.filter(user=request.user)
+
+    b = Team.objects.get(user=request.user)
+    default_shortlist = b.default_shortlist
+
+    if default_shortlist == 888888:
+        default_shortlist = 'all'
+
+    return render (request, 'team/team_notes_shortlists.html', {'shortlists' : a,
+                                                                'year_list' : year_list,
+                                                                'default_shortlist' : default_shortlist,
+                                                                })
+
+def input_draft_results(request):
+    num_picks = []
+    for x in range(1,73):
+        num_picks.append(x)
+
+    a = Player.objects.all().order_by('name')
+    player_list = []
+    for x in a:
+        player_list.append({'name' : x.name, 'id' : x.id})
+
+    return render (request, 'batch/input_draft_results.html', {'num_picks' : num_picks,
+                                                                 'player_list' : player_list})
+
+def input_old_transactions(request):
+    transaction_data = request.POST['trans_data']
+
+    line_list = transaction_data.split('\r\n')
+
+    trans_list = []
+    for x in line_list:
+        date, trans_type, team1, team2, player1, player2, pfr1, pfr2 = x.strip().split('@')
+        try:
+            a = Player.objects.get(pfr_id=pfr1)
+            player_id = a.id
+        except:
+            player_id = ''
+        cut = player1[:-4].strip()
+        if player1[-4:] == 'D/ST':
+            if cut == 'Buccaneers':
+                cut = 'Bucs'
+            a = Player.objects.get(name=cut)
+            player_id = a.id
+        trans_list.append({'date' : date,
+                           'trans_type' : trans_type,
+                           'team1' : team1,
+                           'team2' : team2,
+                           'player' : player1,
+                           'pfr' : pfr1,
+                           'player_id' : player_id})
+
+    return render (request, 'batch/input_old_transactions.html', {'trans_list' : trans_list})

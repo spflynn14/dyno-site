@@ -39,12 +39,17 @@ $(document).ready(function() {
     var a = '';
 
     temp_list = $master.daily_email_time.split(' ');
-    if (temp_list[1] == 'a.m.') {
-        a = 'am'
+    if ($master.daily_email_time == 'noon') {
+        daily_time = '12:00 pm';
     } else {
-        a = 'pm'
+        if (temp_list[1] == 'a.m.') {
+            a = 'am'
+        } else {
+            a = 'pm'
+        }
+        daily_time = temp_list[0] + ':00' + ' ' + a;
     }
-    daily_time = temp_list[0] + ':00' + ' ' + a;
+    //console.log(daily_time, $master.daily_email_time);
     $('#daily_email_time_select').val(daily_time);
     $master.daily_email_time = daily_time;
 
@@ -98,8 +103,8 @@ $(document).ready(function() {
 
 
     function save_changes() {
-        console.log($master);
-        console.log(instant_alerts_list);
+        //console.log($master);
+        //console.log(instant_alerts_list);
         $.ajax({
             url: '/save_team_manage_alerts',
             type: 'POST',

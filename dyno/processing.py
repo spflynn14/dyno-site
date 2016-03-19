@@ -1,16 +1,19 @@
 import os, platform
 import sqlite3 as sql3
 from django.utils import timezone
-from django.db.models import Sum
+from django.utils.dateparse import parse_datetime
+from django.db.models import Q, Sum
 from decimal import *
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.core import serializers
+from random import shuffle
 import datetime
+from math import floor
 from .forms import *
-from .views import working_local, year_list, draft_pick_salary_list, get_verbose_trade_info
+from .views import working_local, year_list, draft_pick_salary_list, get_verbose_trade_info, acceptable_trans_list
 
 
 def check_trade_for_dup_assets(trade, pro_players, pro_picks, pro_assets, opp_players, opp_picks, opp_assets):
@@ -172,7 +175,7 @@ def generate_alert_email_line(source_info, alert_type, var_list):
         #var_list = trade_id, comments
         if source_info == 'direct':
             pro_team, opp_team, pro_string, opp_string = pull_strings_from_trade(var_list[0])
-            return 'A trade has been agreed to between ' + pro_team + ' and ' + opp_team + '.\n\n\n\n' + pro_team + ' gives up: \n' + pro_string + '\n' + opp_team + ' gives up: \n' + opp_string + '\n\nComments: ' + var_list[1]
+            return 'A trade has been agreed to between ' + pro_team + ' and ' + opp_team + '.\n\n\n\n' + pro_team + ' gives up: \n' + pro_string + '\n' + opp_team + ' gives up: \n' + opp_string
         elif source_info == 'alert object':
             pro_team, opp_team, pro_string, opp_string = pull_strings_from_trade(var_list.var_i1)
             return 'A trade has been agreed to between ' + pro_team + ' and ' + opp_team + '.'
@@ -791,6 +794,43 @@ def player_processing_2(request):
     a = Player.objects.get(name=player_selected)
     b = Team.objects.get(user=request.user)
     user_team = b.internal_name
+
+    c = Transaction.objects.filter(Q(player=player_selected) | Q(var_t2__contains=player_selected) | Q(var_t3__contains=player_selected)).order_by('-date')
+    acceptable_list = acceptable_trans_list
+    try:
+        acceptable_list.pop(acceptable_trans_list.index('Auction End'))
+        acceptable_list.pop(acceptable_trans_list.index('Waiver Extension'))
+        acceptable_list.pop(acceptable_trans_list.index('Franchise Tag'))
+        acceptable_list.pop(acceptable_trans_list.index('Transition Tag'))
+        acceptable_list.pop(acceptable_trans_list.index('Extension Submitted'))
+        acceptable_list.append('Contract Processed')
+    except:
+        pass
+    trans_list = []
+    for x in c:
+        if x.transaction_type in acceptable_list:
+            trans_list.append(x)
+
+    try:
+        d = PlayerNote.objects.filter(user=request.user).get(player_id=a.id)
+        notes = d.notes
+    except:
+        notes = ''
+
+    e = Shortlist.objects.filter(user=request.user)
+
+    age_years = a.age()
+
+    birthdate = str(a.birthdate.month) + '-' + str(a.birthdate.day) + '-' + str(a.birthdate.year)
+
+    if a.position == 'K':
+        f = YearlyStatsKicker.objects.filter(player_id=a.id).order_by('-year')
+    elif a.position == 'DEF':
+        f = YearlyStatsDefense.objects.filter(player_id=a.id).order_by('-year')
+    else:
+        f = YearlyStats.objects.filter(player_id=a.id).order_by('-year')
+
+
     return_data = {'name' : a.name,
                    'pos' : a.position,
                    'team' : a.team,
@@ -814,7 +854,14 @@ def player_processing_2(request):
                    'yr4_total' : a.yr4_salary+a.yr4_sb,
                    'yr5_total' : a.yr5_salary+a.yr5_sb,
                    'notes' : a.notes,
-                   'user_team' : user_team}
+                   'user_team' : user_team,
+                   'trans_list' : serializers.serialize('json', trans_list),
+                   'shortlists' : serializers.serialize('json', e),
+                   'player_notes' : notes,
+                   'player_id' : a.id,
+                   'age' : age_years,
+                   'birthdate' : birthdate,
+                   'career_stats' : serializers.serialize('json', f)}
 
     return JsonResponse(return_data)
 
@@ -1334,7 +1381,7 @@ def get_new_auction_data(request):
 
     bid = round(bid*4)/4
 
-    a = Variable.objects.get(name='New Auction Info')
+    a = TeamVariable.objects.filter(user=request.user).get(name='AuctionBids')
     a.text_variable = player + ':' + str(bid)
     a.save()
 
@@ -1356,7 +1403,7 @@ def get_existing_auction_data(request):
         except:
             pass
 
-    a = Variable.objects.get(name='New Auction Info')
+    a = TeamVariable.objects.filter(user=request.user).get(name='AuctionBids')
     for x in l:
         a.text_variable = a.text_variable + '\n' + x['player'] + ':' + str(x['bid'])
 
@@ -1380,6 +1427,16 @@ def process_auction_bids(request):
                         create_alerts('Auction - Outbid', request.user, [x.high_bidder, team, x.player, x.high_bid])
                         x.high_bidder_proxy_bid = Decimal(bid)
                         x.high_bidder = team
+
+                        auction_end = x.clock_reset + timezone.timedelta(minutes=x.clock_timeout_minutes)
+                        time_left = auction_end - timezone.now()
+                        if time_left.days >= 2:
+                            pass
+                        elif time_left.days == 1:
+                            x.clock_timeout_minutes = 2880
+                        else:
+                            x.clock_timeout_minutes = 1440
+
                         x.clock_reset = timezone.now()
                     else:
                         x.high_bidder_proxy_bid = Decimal(bid)
@@ -1389,7 +1446,7 @@ def process_auction_bids(request):
                             x.high_bid = Decimal(bid)
             x.save()
 
-    a = Variable.objects.get(name='New Auction Info')
+    a = TeamVariable.objects.filter(user=request.user).get(name='AuctionBids')
     b = a.text_variable
 
     bids_list = []
@@ -3468,6 +3525,11 @@ def create_message_board_post(request):
                                   title=title,
                                   location=write_location,
                                   text=post)
+        try:
+            replied_post_title = c.title
+        except:
+            replied_post_title = ''
+        create_alerts('New Board Post', request.user, [title, is_reply, replied_post_title])
     else:
         t = datetime.datetime.now()
         if t.hour > 12:
@@ -3482,13 +3544,6 @@ def create_message_board_post(request):
         a.title = title
         a.text = post
         a.save()
-
-    try:
-        replied_post_title = c.title
-    except:
-        replied_post_title = ''
-
-    create_alerts('New Board Post', request.user, [title, is_reply, replied_post_title])
 
     return JsonResponse('test', safe=False)
 
@@ -3553,3 +3608,663 @@ def save_message_board_views(request):
     a.save()
 
     return JsonResponse('test', safe=False)
+
+def create_divisions(request):
+    potA = request.POST['pot_a'].strip().split(',')
+    potB = request.POST['pot_b'].strip().split(',')
+    potC = request.POST['pot_c'].strip().split(',')
+
+    shuffle(potA)
+    shuffle(potB)
+    shuffle(potC)
+
+    divA = [potA[0],potB[0],potC[0]]
+    divB = [potA[1],potB[1],potC[1]]
+    divC = [potA[2],potB[2],potC[2]]
+    divD = [potA[3],potB[3],potC[3]]
+
+    line_a = 'Divisons for ' + str(year_list[0]) + ':\n\n'
+    line_b = 'North Division:\t' + divA[0] + ', ' + divA[1] + ', ' + divA[2] + '\n'
+    line_c = 'South Division:\t' + divB[0] + ', ' + divB[1] + ', ' + divB[2] + '\n'
+    line_d = 'East Division:\t' + divC[0] + ', ' + divC[1] + ', ' + divC[2] + '\n'
+    line_e = 'West Division:\t' + divD[0] + ', ' + divD[1] + ', ' + divD[2] + '\n\n\n'
+    line_f = 'Division winners each make the playoffs. The two Wildcard teams are the two remaining teams with the most points scored.'
+
+    subject_line = '[Dynasty League] New divisons drawn for ' + str(year_list[0])
+    email_body = line_a + line_b + line_c + line_d + line_e + line_f
+    email_footer = "\n\n\n\n\n\n\n**This email was sent from an unmonitored account. Do not reply to this email.**\n" + str(timezone.now())
+
+
+    a = Team.objects.all()
+    for x in a:
+        target_email = x.email
+        send_mail(subject_line,
+                  email_body + email_footer,
+                  '',
+                  [target_email],
+                  fail_silently=False)
+
+    return HttpResponseRedirect('/')
+
+def save_player_notes(request):
+    player = request.POST['player']
+    notes_text = request.POST['notes_text']
+
+    a = Player.objects.get(name=player)
+    player_id = a.id
+
+    try:
+        b = PlayerNote.objects.filter(user=request.user).get(player_id=player_id)
+        b.notes = notes_text
+        b.save()
+    except:
+        PlayerNote.objects.create(user=request.user,
+                                  player_id=player_id,
+                                  notes=notes_text)
+
+    return JsonResponse('test', safe=False)
+
+def save_player_shortlist_assignments(request):
+    player = request.POST['player']
+    shortlist_id = int(request.POST['shortlist_id'])
+    which = request.POST['which']
+
+    if shortlist_id == 999999:
+        a = Shortlist.objects.filter(user=request.user)
+        current_shortlist = a[0]
+    else:
+        current_shortlist = Shortlist.objects.get(pk=shortlist_id)
+    m = current_shortlist.members
+    members = m.split(',')
+
+    b = Player.objects.get(name=player)
+    player_id = b.id
+
+    output = []
+    output_string = ''
+    if which == 'add':
+        if str(player_id) in members:
+            pass
+        else:
+            members.append(player_id)
+        for x in members:
+            output_string = output_string + str(x) + ','
+        output_string = output_string[:-1]
+    else:
+        for x in members:
+            if x != str(player_id):
+                output.append(x)
+        for x in output:
+            output_string = output_string + str(x) + ','
+        output_string = output_string[:-1]
+
+    current_shortlist.members = output_string
+    current_shortlist.save()
+
+    return JsonResponse('test', safe=False)
+
+def process_player_stats(request):
+    def convert_to_int(data):
+        pfr_id, team, age, g, gs, pass_comp, pass_att, pass_yds, pass_td, pass_int, rush_att, rush_yds, rush_ypa, rush_td, rec_targets, rec, rec_yds, rec_ypr, rec_td, a, b, c, d, e, f, i = data
+        
+        try:
+            output_g = int(g)
+        except:
+            output_g = 0
+        try:
+            output_gs = int(gs)
+        except:
+            output_gs = 0
+        try:
+            output_pass_comp = int(pass_comp)
+        except:
+            output_pass_comp = 0
+        try:
+            output_pass_att = int(pass_att)
+        except:
+            output_pass_att = 0
+        try:
+            output_pass_yds = int(pass_yds)
+        except:
+            output_pass_yds = 0
+        try:
+            output_pass_td = int(pass_td)
+        except:
+            output_pass_td = 0
+        try:
+            output_pass_int = int(pass_int)
+        except:
+            output_pass_int = 0
+        try:
+            output_rush_att = int(rush_att)
+        except:
+            output_rush_att = 0
+        try:
+            output_rush_yds = int(rush_yds)
+        except:
+            output_rush_yds = 0
+        try:
+            output_rush_td = int(rush_td)
+        except:
+            output_rush_td = 0
+        try:
+            output_rec_targets = int(rec_targets)
+        except:
+            output_rec_targets = 0
+        try:
+            output_rec = int(rec)
+        except:
+            output_rec = 0
+        try:
+            output_rec_yds = int(rec_yds)
+        except:
+            output_rec_yds = 0
+        try:
+            output_rec_td = int(rec_td)
+        except:
+            output_rec_td = 0
+    
+        return pfr_id, team, output_g, output_gs, output_pass_comp, output_pass_att, output_pass_yds, output_pass_td, output_pass_int, output_rush_att, output_rush_yds, output_rush_td, output_rec_targets, output_rec, output_rec_yds, output_rec_td
+
+    def convert_kicking_data(data):
+        pfr_id, team, g, gs, fga0, fgm0, fga20, fgm20, fga30, fgm30, fga40, fgm40, fga50, fgm50, fga, fgm, fgpercent, xpa, xpm, xppercent, punts, puntyds, puntlong, puntsblocked, ydsperpunt = data
+        
+        try:
+            output_g = int(g)
+        except:
+            output_g = 0
+        try:
+            output_fga0 = int(fga0)
+        except:
+            output_fga0 = 0
+        try:
+            output_fgm0 = int(fgm0)
+        except:
+            output_fgm0 = 0
+        try:
+            output_fga20 = int(fga20)
+        except:
+            output_fga20 = 0
+        try:
+            output_fgm20 = int(fgm20)
+        except:
+            output_fgm20 = 0
+        try:
+            output_fga30 = int(fga30)
+        except:
+            output_fga30 = 0
+        try:
+            output_fgm30 = int(fgm30)
+        except:
+            output_fgm30 = 0
+        try:
+            output_fga40 = int(fga40)
+        except:
+            output_fga40 = 0
+        try:
+            output_fgm40 = int(fgm40)
+        except:
+            output_fgm40 = 0
+        try:
+            output_fga50 = int(fga50)
+        except:
+            output_fga50 = 0
+        try:
+            output_fgm50 = int(fgm50)
+        except:
+            output_fgm50 = 0
+        try:
+            output_xpa = int(xpa)
+        except:
+            output_xpa = 0
+        try:
+            output_xpm = int(xpm)
+        except:
+            output_xpm = 0
+            
+        return pfr_id, team, output_g, output_fga0, output_fgm0, output_fga20, output_fgm20, output_fga30, output_fgm30, output_fga40, output_fgm40, output_fga50, output_fgm50, output_xpa, output_xpm
+
+    year = request.POST['year']
+    stats_text = request.POST['stats_text']
+    scoring_stats_text = request.POST['scoring_stats_text']
+    rushing_stats_text = request.POST['rushing_stats_text']
+    kicking_stats_text = request.POST['kicking_stats_text']
+    defense_stats_text = request.POST['defense_stats_text']
+
+    stats_list = stats_text.split('\r\n')
+    scoring_list = scoring_stats_text.split('\r\n')
+    rushing_list = rushing_stats_text.split('\r\n')
+    kicking_list = kicking_stats_text.split('\r\n')
+    defense_list = defense_stats_text.split('\r\n')
+
+    unfound_list = []
+
+    if len(defense_stats_text) != 0:
+        a = Player.objects.filter(position='DEF')
+        for player in a:
+            found_player = False
+            for line in defense_list:
+                line_list = line.strip().split(',')
+                team, g, pts, total_yds, plays, ydsperplay, to, fr, firstdowns, pass_comp, pass_att, pass_yds, pass_td, pass_int, pass_nya, pass_1stdowns, rush_att, rush_yds, rush_td, rush_ypa, rush_1stdowns, pen, penyds, pen1stdowns, scoreperc, toperc, exp = line_list
+
+                pts_allowed = int(pts)
+                total_yds_allowed = int(total_yds)
+                rush_yds_allowed = int(rush_yds)
+                pass_yds_allowed = int(pass_yds)
+                rushes_against = int(rush_att)
+                passes_against = int(pass_att)
+                fumbles = int(fr)
+                interceptions = int(pass_int)
+
+                if team == 'Buccaneers':
+                    team = 'Bucs'
+
+                if team == player.name:
+                    found_player = True
+                    YearlyStatsDefense.objects.create(player_id=player.id,
+                                                      year=int(year),
+                                                      pts_allowed=pts_allowed,
+                                                      total_yds_allowed=total_yds_allowed,
+                                                      rush_yds_allowed=rush_yds_allowed,
+                                                      pass_yds_allowed=pass_yds_allowed,
+                                                      rushes_against=rushes_against,
+                                                      passes_against=passes_against,
+                                                      fumbles=fumbles,
+                                                      int=interceptions)
+            if found_player == False:
+                unfound_list.append(player.name + ':')
+
+    if len(kicking_stats_text) != 0:
+        a = Player.objects.filter(position='K')
+        for player in a:
+            if len(player.pfr_id) != 0:
+                found_player = False
+                for line in kicking_list:
+                    line_list = line.strip().split(',')
+                    pfr_id, team, g, fga0, fgm0, fga20, fgm20, fga30, fgm30, fga40, fgm40, fga50, fgm50, xpa, xpm = convert_kicking_data(line_list)
+
+                    if pfr_id == player.pfr_id:
+                        found_player = True
+                        YearlyStatsKicker.objects.create(player_id=player.id,
+                                                         year=int(year),
+                                                         team=team,
+                                                         g=g,
+                                                         fg_made_0=fgm0,
+                                                         fg_att_0=fga0,
+                                                         fg_made_20=fgm20,
+                                                         fg_att_20=fga20,
+                                                         fg_made_30=fgm30,
+                                                         fg_att_30=fga30,
+                                                         fg_made_40=fgm40,
+                                                         fg_att_40=fga40,
+                                                         fg_made_50=fgm50,
+                                                         fg_att_50=fga50,
+                                                         xp_made=xpm,
+                                                         xp_att=xpa)
+                if found_player == False:
+                    unfound_list.append(player.name + ':')
+
+    if len(stats_text) != 0:
+        two_pt_list = []
+        for line in scoring_list:
+            line_list = line.strip().split(',')
+            if len(line_list[11]) == 0:
+                two_pt = 0
+            else:
+                two_pt = line_list[11]
+            two_pt_list.append({'pfr_id' : line_list[0],
+                                'two_pt_conv' : two_pt})
+
+        fumb_list = []
+        for line in rushing_list:
+            line_list = line.strip().split(',')
+            fumb_list.append({'pfr_id' : line_list[0],
+                              'fumb' : line_list[20]})
+
+        a = Player.objects.all()
+        for player in a:
+            if len(player.pfr_id) != 0:
+                found_player = False
+                for line in stats_list:
+                    line_list = line.strip().split(',')
+                    pfr_id, team, g, gs, pass_comp, pass_att, pass_yds, pass_td, pass_int, rush_att, rush_yds, rush_td, rec_targets, rec, rec_yds, rec_td = convert_to_int(line_list)
+
+                    if pfr_id == player.pfr_id:
+                        found_player = True
+                        two_pt_conv = 0
+                        fumbles = 0
+                        for x in two_pt_list:
+                            if x['pfr_id'] == pfr_id:
+                                two_pt_conv = x['two_pt_conv']
+                        for x in fumb_list:
+                            if x['pfr_id'] == pfr_id:
+                                fumbles = x['fumb']
+
+                        YearlyStats.objects.create(player_id=player.id,
+                                                   year=int(year),
+                                                   team=team,
+                                                   g=int(g),
+                                                   gs=int(gs),
+                                                   pass_comp=int(pass_comp),
+                                                   pass_att=int(pass_att),
+                                                   pass_yds=int(pass_yds),
+                                                   pass_td=int(pass_td),
+                                                   pass_int=int(pass_int),
+                                                   rush_att=int(rush_att),
+                                                   rush_yds=int(rush_yds),
+                                                   rush_td=int(rush_td),
+                                                   rec_targets=int(rec_targets),
+                                                   rec=int(rec),
+                                                   rec_yds=int(rec_yds),
+                                                   rec_td=int(rec_td),
+                                                   two_pt_conv=int(two_pt_conv),
+                                                   fumbles=int(fumbles))
+
+                if found_player == False:
+                    unfound_list.append(player.name + ':')
+
+    if len(unfound_list) == 0:
+        return HttpResponseRedirect('/')
+    else:
+        return HttpResponse(unfound_list)
+
+def process_birthdates(request):
+    birthdates_text = request.POST['birthdates_text']
+
+    bday_list = birthdates_text.split('\r\n')
+
+    a = Player.objects.all()
+    unfound_list = []
+
+    fix_list = [['Beckham, Odell' , 'Beckham, Jr, Odell'],
+                ['Green, A.J.' , 'Green, AJ'],
+                ["Bell, Le'Veon" , "Bell, Le'veon"],
+                ['Cooks, Brandin' , 'Cooks, Brandon'],
+                ['Hilton, T.Y.' , 'Hilton, TY'],
+                ['Yeldon, T.J.' , 'Yeldon, TJ'],
+                ['Bernard, Giovani' , 'Bernard, Giovanni'],
+                ['Anderson, C.J.' , 'Anderson, CJ'],
+                ['Ginn, Ted' , 'Ginn, Jr, Ted'],
+                ['Spiller, C.J.' , 'Spiller, CJ'],
+                ['Johnson, Steve' , 'Johnson, Stevie'],
+                ['Reece, Marcel' , 'Reese, Marcel'],
+                ['Nelson, JJ' , 'Nelson, J.J.'],
+                ['Housler, Rob' , 'Housler, Robert'],
+                ['Magee, Terrance' , 'Magee, Terrence'],
+                ['Powell, Walt' , 'Powell, Walter'],
+                ['Blount, LeGarrette' , 'Blount, LaGarrette'],
+                ['Allen, RaShaun', 'Allen, Rashaun']]
+
+    for player in a:
+        name = player.name
+        found_player = False
+        for line in bday_list:
+            l = line.split(':')
+
+            for x in fix_list:
+                if name == x[1]:
+                    name = x[0]
+
+            if l[0] == name:
+                found_player = True  #write birthdate
+                z = l[1].split('/')
+                player.birthdate = z[2] + '-' + z[0] + '-' + z[1]
+                player.save()
+
+        if found_player == False:
+            unfound_list.append(name)
+            player.birthdate = '1900-1-1'
+            player.save()
+
+
+    if len(unfound_list) > 0:
+        unfound_string = ''
+        for x in unfound_list:
+            unfound_string = unfound_string + x + ' - '
+
+    if len(unfound_list) == 0:
+        return HttpResponseRedirect('/')
+    else:
+        return HttpResponse(unfound_string)
+
+def assign_pfr_ids(request):
+    id_text = request.POST['id_list']
+
+    id_list = id_text.split('\r\n')
+
+    fix_list = [['Beckham, Odell' , 'Beckham, Jr, Odell'],
+                ['Green, A.J.' , 'Green, AJ'],
+                ["Bell, Le'Veon" , "Bell, Le'veon"],
+                ['Cooks, Brandin' , 'Cooks, Brandon'],
+                ['Hilton, T.Y.' , 'Hilton, TY'],
+                ['Yeldon, T.J.' , 'Yeldon, TJ'],
+                ['Bernard, Giovani' , 'Bernard, Giovanni'],
+                ['Anderson, C.J.' , 'Anderson, CJ'],
+                ['Ginn, Ted' , 'Ginn, Jr, Ted'],
+                ['Spiller, C.J.' , 'Spiller, CJ'],
+                ['Johnson, Steve' , 'Johnson, Stevie'],
+                ['Reece, Marcel' , 'Reese, Marcel'],
+                ['Nelson, JJ' , 'Nelson, J.J.'],
+                ['Housler, Rob' , 'Housler, Robert'],
+                ['Magee, Terrance' , 'Magee, Terrence'],
+                ['Powell, Walt' , 'Powell, Walter'],
+                ['Blount, LeGarrette' , 'Blount, LaGarrette'],
+                ['Allen, RaShaun', 'Allen, Rashaun'],
+                ['Watson, Ben', 'Watson, Benjamin'],
+                ['Griffin, Robert', 'Griffin III, Robert'],
+                ]
+
+    a = Player.objects.all()
+    unfound_list = []
+
+    count = 0
+    for x in a:
+        count += 1
+        print(count)
+        player_found = False
+        player_id = ''
+        for y in id_list:
+            line_list = y.strip().split(':')
+            for z in fix_list:
+                if z[0] == line_list[0]:
+                    line_list[0] = z[1]
+            if line_list[0] == x.name:
+                player_found = True
+                player_id = line_list[1]
+        if player_found == False:
+            unfound_list.append(x.name)
+        else:
+            x.pfr_id = player_id
+            x.save()
+
+    for x in unfound_list:
+        print(x)
+
+
+    return HttpResponse()
+
+def create_new_shortlist(request):
+    title = request.POST['title']
+    description = request.POST['description']
+    shortlist_id = request.POST['shortlist_id']
+
+    if shortlist_id == 'none':
+        Shortlist.objects.create(user=request.user,
+                                 title=title,
+                                 description=description)
+    else:
+        try:
+            sh_id = int(shortlist_id)
+            a = Shortlist.objects.get(pk=sh_id)
+            a.title = title
+            a.description = description
+            a.save()
+        except:
+            pass
+
+    return JsonResponse('test', safe=False)
+
+def get_shortlist_details(request):
+    shortlist_id = int(request.POST['shortlist_id'])
+
+    a = Shortlist.objects.get(pk=shortlist_id)
+
+    output = {'title' : a.title, 'description' : a.description}
+
+    return JsonResponse(output)
+
+def delete_shortlist(request):
+    shortlist_id = int(request.POST['shortlist_id'])
+
+    a = Shortlist.objects.get(pk=shortlist_id)
+    a.user = 'deleted'
+    a.save()
+
+    b = Team.objects.get(user=request.user)
+    if b.default_shortlist == shortlist_id:
+        b.default_shortlist = 888888
+        b.save()
+
+    return JsonResponse('test', safe=False)
+
+def get_shortlist_members(request):
+    shortlist_id = request.POST['shortlist_id']
+
+    if shortlist_id == 'all':
+        m_list = []
+        d = PlayerNote.objects.filter(user=request.user)
+        for x in d:
+            if (len(x.notes)) != 0:
+                m_list.append(str(x.player_id))
+    else:
+        shortlist_id = int(shortlist_id)
+        try:
+            a = Shortlist.objects.get(pk=shortlist_id)
+            members = a.members
+        except:
+            try:
+                a = Shortlist.objects.filter(user=request.user)
+                members = a[0].members
+            except:
+                members = ''
+
+        try:
+            m_list = members.strip().split(',')
+        except:
+            m_list = []
+
+    players = []
+    for x in m_list:
+        if len(x) > 0:
+            b = Player.objects.get(pk=int(x))
+            try:
+                c = PlayerNote.objects.filter(user=request.user).get(player_id=int(x))
+                notes = c.notes
+            except:
+                notes = ''
+            players.append({'pos' : b.position,
+                            'name' : b.name,
+                            'team' : b.team,
+                            'age' : b.age(),
+                            'avg_yearly_cost' : b.average_yearly_cost(),
+                            'cap_hit' : b.current_year_cap_hit(),
+                            'years_left' : b.years_remaining(),
+                            'notes' : notes
+                            })
+
+    players = sorted(players, key=lambda a: a['name'])
+
+    return JsonResponse(players, safe=False)
+
+def save_default_shortlist(request):
+    shortlist_id = request.POST['shortlist_id']
+
+    a = Team.objects.get(user=request.user)
+
+    if shortlist_id == 'all':
+        a.default_shortlist = 888888
+    else:
+        a.default_shortlist = int(shortlist_id)
+
+    a.save()
+
+    return JsonResponse('test', safe=False)
+
+def save_draft_input(request):
+    pick = Decimal(request.POST['pick'])
+    overall = request.POST['overall']
+    team = request.POST['team']
+    player_id = int(request.POST['player_id'])
+    draft_date = request.POST['draft_date']
+    manual_player = request.POST['manual_player']
+
+    a = Player.objects.get(pk=player_id)
+
+    d = parse_datetime(draft_date + ' 00:' + overall)
+
+    if len(manual_player) == 0:
+        player = a.name
+    else:
+        player = manual_player
+
+    Transaction.objects.create(player=player,
+                               team2=team,
+                               transaction_type='Rookie Draft Pick',
+                               var_d1=pick,
+                               date=d)
+
+    year = d.year
+    round = str(pick).split('.')[0]
+    pick_in_round = str(pick).split('.')[1]
+
+    if int(year) == 2013:
+        num_teams = 8
+    else:
+        num_teams = 10
+
+    pick_overall = ((int(round) - 1) * num_teams) + int(pick_in_round)
+
+    Draft_Pick.objects.create(owner=team,
+                              original_owner=team,
+                              year=int(year),
+                              round=int(round),
+                              pick_in_round=int(pick_in_round),
+                              pick_overall=pick_overall,
+                              player_selected=player)
+
+    return JsonResponse('test', safe=False)
+
+def save_old_transactions(request):
+    date = request.POST['date']
+    trans_type = request.POST['trans_type']
+    team1 = request.POST['team1']
+    team2 = request.POST['team2']
+    player_id = int(request.POST['player_id'])
+
+    a = Player.objects.get(pk=player_id)
+
+    d = parse_datetime(date)
+
+    if trans_type == 'add':
+        Transaction.objects.create(player=a.name,
+                                   date=d,
+                                   transaction_type='Waiver Add',
+                                   team2=team1)
+    elif trans_type == 'drop':
+        Transaction.objects.create(player=a.name,
+                                   date=d,
+                                   transaction_type='Player Cut',
+                                   team2=team1,
+                                   var_i1=-1,
+                                   var_t2="Confirmed")
+
+    return JsonResponse('test', safe=False)
+
+def clear_team_emails(request):
+    a = Team.objects.all().exclude(user='sean')
+
+    for x in a:
+        x.email = ''
+        x.save()
+
+    return HttpResponseRedirect('/')

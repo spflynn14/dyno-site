@@ -4,6 +4,7 @@
 
 {% block head %}
     <script src="{% static 'js/confirm_contract_structure.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/player.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -74,7 +75,7 @@
         <div id="setconstr_cap_tables_area">
             <table style="table-layout: fixed; width: 100%; margin-top: 50px">
                 <thead>
-                    <tr>
+                    <tr style="height: 60px">
                         <th class='player_interaction_cells' style="text-align: center; width: 25%;"></th>
                         <th class='player_interaction_cells' style="text-align: center; width: 25%;">Total Players Costs</th>
                         <th class='player_interaction_cells' style="text-align: center; width: 25%;">Cap Penalties</th>
@@ -85,8 +86,6 @@
 
                 </tbody>
             </table>
-            <br>
-            The above numbers are off one year, they will be correct when the league years kicks over to 2016
         </div>
     </div>
 

@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    console.log('ready');
+    console.log('ready 2');
 
     var yearly_sb = 0;
     var yearly_sal = 0;
@@ -78,7 +78,7 @@ $(document).ready(function() {
         $.each(years_list, function(index, value) {
             var tr = $('<tr>');
             var td_year = $('<td>');
-            var td_total_cost = $('<td>');
+            var td_total_cost = $('<td>').addClass('total_cost_cell');
             var td_sb = $('<td>');
             var td_salary = $('<td>');
             var salary_textbox = $('<input type="text">');
@@ -91,6 +91,9 @@ $(document).ready(function() {
             td_total_cost.text('$' + temp);
             td_sb.text('$' + yearly_sb.toFixed(2));
             salary_textbox.val(yearly_sal.toFixed(2));
+            if (yearly_sal < 1) {
+                salary_textbox.prop('disabled', true);
+            }
 
             td_year.addClass('setconstr_cell');
             td_total_cost.addClass('setconstr_cell');
@@ -113,10 +116,17 @@ $(document).ready(function() {
         $('#setconstr_totals_salary').text('$' + total_c.toFixed(2));
     }
 
-    function set_totals_table () {
+    function set_totals_table (where_from) {
+        var below1 = false;
         var temp = 0;
         $('.setconstr_salary_input').each(function() {
             temp = temp + Number($(this).val());
+            if (Number($(this).val()) < 1) {
+                below1 = true;
+            }
+            var total_cost_cell = $(this).parent().prev().prev();
+            var total = yearly_sb + Number($(this).val());
+            total_cost_cell.text('$' + total.toFixed(2));
         });
         $('#setconstr_totals_salary').text('$' + temp.toFixed(2));
         var temp2 = temp + (yearly_sb * num_years);
@@ -138,6 +148,10 @@ $(document).ready(function() {
             var temp4 = temp_total - temp;
             $('#setconstr_totals_message').text('under by $' + temp4.toFixed(2));
             $('#setconstr_totals_message').addClass('setconstr_totals_message_red');
+            $('#setconstr_submit_button').prop('disabled', true);
+        }
+
+        if (below1 == true && where_from == 'keyup') {
             $('#setconstr_submit_button').prop('disabled', true);
         }
     }
@@ -262,7 +276,7 @@ $(document).ready(function() {
             years_list.push(temp);
             clear_tables();
             fill_tables();
-            set_totals_table();
+            set_totals_table('add_year');
             get_totals_for_bottom_table();
             fill_bottom_table($bottom_table_data);
         }
@@ -274,7 +288,7 @@ $(document).ready(function() {
             years_list.splice(-1, 1);
             clear_tables();
             fill_tables();
-            set_totals_table();
+            set_totals_table('remove_year');
             get_totals_for_bottom_table();
             fill_bottom_table($bottom_table_data);
         }
@@ -285,11 +299,11 @@ $(document).ready(function() {
         if ($.isNumeric(Number(input_value)) == false) {
             console.log('not a number');
             $(this).val(yearly_sal);
-            set_totals_table();
+            set_totals_table('keyup');
             get_totals_for_bottom_table();
             fill_bottom_table($bottom_table_data);
         } else {
-            set_totals_table();
+            set_totals_table('keyup');
             get_totals_for_bottom_table();
             fill_bottom_table($bottom_table_data);
         }

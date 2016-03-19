@@ -224,4 +224,29 @@ $(document).ready(function() {
         filtered_data = filter_by_cat(output1);
         fill_table(filtered_data);
     });
+
+    $('#check_all').on('click', function() {
+        $('input[type=checkbox]').each(function() {
+            $(this).prop('checked', true);
+        });
+        cat_filter_items = [];
+
+        var output1 = filter_by_date($master);
+        filtered_data = filter_by_cat(output1);
+        fill_table(filtered_data);
+    });
+
+    $('#uncheck_all').on('click', function() {
+        var temp_list = [];
+        $('input[type=checkbox]').each(function() {
+            $(this).prop('checked', false);
+            var n = $(this).parent().prev().text();
+            temp_list.push(n);
+        });
+        cat_filter_items = temp_list;
+
+        var output1 = filter_by_date($master);
+        filtered_data = filter_by_cat(output1);
+        fill_table(filtered_data);
+    });
 });

@@ -110,6 +110,8 @@
                             <li><a style="color: black" href="/team/alerts">Alerts</a></li>
                             <li><a style="color: black" href="/team/manage_alerts">Manage Alerts</a></li>
                             <li class="divider"></li>
+                            <li><a href="/team/team_notes_shortlists">Shortlists & Notes</a></li>
+                            <li class="divider"></li>
                             <li><a href="/team/team_settings">Team Settings</a></li>
                         </ul>
                     </div>
@@ -166,6 +168,12 @@
                             <a href="/team/alerts" class="second_tab_button_team" id="team_alerts" style="background-color: #2d99d4; color: white">Alerts</a>
                         {% else %}
                             <a href="/team/alerts" class="second_tab_button_team" id="team_alerts">Alerts</a>
+                        {% endif %}
+
+                        {% if request.path == '/team/team_notes_shortlists' %}
+                            <a href="/team/team_notes_shortlists" class="second_tab_button_team" id="team_alerts" style="background-color: #2d99d4; color: white">Shortlists & Notes</a>
+                        {% else %}
+                            <a href="/team/team_notes_shortlists" class="second_tab_button_team" id="team_alerts">Shortlists & Notes</a>
                         {% endif %}
 
                         {% if request.path == '/team/team_settings' %}

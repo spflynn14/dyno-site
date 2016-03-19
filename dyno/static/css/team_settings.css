@@ -1,0 +1,92 @@
+/* TEAM SETTINGS */
+
+#team_settings_column_one {
+    display: inline-block;
+    height: 100%;
+    width: 33%;
+    float: left;
+}
+
+#team_settings_column_two {
+    display: inline-block;
+    height: 100%;
+    width: 33%;
+    float: left;
+}
+
+#team_settings_column_three {
+    display: inline-block;
+    height: 100%;
+    width: 33%;
+    float: left;
+}
+
+#team_name_div {
+    border: 1px solid #dcdcdc;
+    padding: 20px 20px 20px 20px;
+    width: auto;
+    display: inline-block;
+}
+
+#change_user_password_div {
+    width: 100%;
+    height: 10%;
+    float: right;
+}
+
+#email_div {
+    border: 1px solid #dcdcdc;
+    padding: 20px 20px 20px 20px;
+    width: auto;
+}
+
+#save_changes_div {
+    width: auto;
+    height: 10%;
+}
+
+#manage_shortlists_area {
+    border: 1px solid #dcdcdc;
+    padding: 20px 20px 20px 20px;
+    width: auto;
+    height: auto;
+    max-height: 50%;
+    overflow-y: auto;
+}
+
+#account_balance_div {
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 60%;
+    height: auto;
+    max-height: 60%;
+    overflow-y: auto;
+    float: right;
+    border: 1px solid #dcdcdc;
+}
+
+#show_hide_account_details:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#team_settings_player_display_filters_area {
+    height: auto;
+    width: 75%;
+    padding: 10px 10px 10px 10px;
+    margin-left: 25%;
+    border: 1px solid #dcdcdc;
+}
+
+#team_settings_role_descriptions_area {
+    height: auto;
+    max-height: 65%;
+    overflow-y: auto;
+    width: 75%;
+    padding: 10px 10px 10px 10px;
+    margin-left: 25%;
+    border: 1px solid #dcdcdc;
+}
+
+/* END: TEAM SETTINGS */

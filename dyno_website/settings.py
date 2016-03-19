@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import pytz
 #import raven
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -111,7 +112,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'US/Eastern'
+pa_tz = pytz.timezone('US/Eastern')
+
+TIME_ZONE = pa_tz.zone
 
 USE_I18N = True
 

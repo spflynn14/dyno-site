@@ -15,7 +15,8 @@ $(document).ready(function() {
             'yr1_extension': $(this).find('#vw_1-8').text(),
             'yr2_extension': $(this).find('#vw_1-9').text(),
             'yr3_extension': $(this).find('#vw_1-10').text(),
-            'yr4_extension': $(this).find('#vw_1-11').text()});
+            'yr4_extension': $(this).find('#vw_1-11').text(),
+            'age': Number($(this).find('#vw_1-12').text())});
         $(this).remove();
     });
 
@@ -45,6 +46,7 @@ $(document).ready(function() {
             var td_pos = $('<td>');
             var td_player = $('<td>');
             var td_team = $('<td>');
+            var td_age = $('<td>');
             var td_avg_yearly_cost = $('<td>');
             var td_years_left = $('<td>');
             var td_base_extension_value = $('<td>');
@@ -59,6 +61,11 @@ $(document).ready(function() {
             var name_link = $('<div>').addClass('name_link').text(value.player);
             td_player.append(name_link);
             td_team.text(value.team);
+            if (value.age > 100) {
+                td_age.text('').css({'text-align' : 'center'});
+            } else {
+                td_age.text(value.age.toFixed(1)).css({'text-align': 'center'});
+            }
             td_avg_yearly_cost.text('$' + value.avg_yearly_cost.toFixed(2)).css({'text-align' : 'center'});
             td_years_left.text(value.years_left).css({'text-align' : 'center'});
             td_base_extension_value.text('$' + value.base_extension_value.toFixed(2)).css({'text-align' : 'center'});
@@ -99,6 +106,7 @@ $(document).ready(function() {
             tr.append(td_pos);
             tr.append(td_player);
             tr.append(td_team);
+            tr.append(td_age);
             tr.append(td_avg_yearly_cost);
             tr.append(td_years_left);
             tr.append(td_base_extension_value);

@@ -188,6 +188,8 @@ $(document).ready(function() {
             }
         } else if (data.transaction_type == 'Expansion Draft Pick') {
             return_text = "Expansion Draft Pick: taken by " + data.team2 + ' with pick ' + data.var_i1 + '. Previously owned by ' + data.team1 + '.';
+        } else if (data.transaction_type == 'Rookie Draft Pick') {
+            return_text = "Rookie Draft Pick: taken by " + data.team2 + ' with pick ' + data.var_d1 + '.';
         } else if (data.transaction_type == 'Player Cut') {
             if (Number(data.var_i1) == -1) {
                 return_text = "Set to be released";
@@ -501,6 +503,45 @@ $(document).ready(function() {
         var output1 = filter_by_date($master);
         var output2 = filter_by_team(output1);
         filtered_data = filter_by_cat(output2);
+        fill_table(filtered_data);
+    });
+
+    $('#check_all').on('click', function() {
+        $('input[type=checkbox]').each(function() {
+            $(this).prop('checked', true);
+        });
+        cat_filter_items = [];
+
+        var output1 = filter_by_date($master);
+
+        if (pathname == '/league/league_transaction_log') {
+            var output2 = filter_by_team(output1);
+            filtered_data = filter_by_cat(output2);
+        } else {
+            filtered_data = filter_by_cat(output1);
+        }
+
+        fill_table(filtered_data);
+    });
+
+    $('#uncheck_all').on('click', function() {
+        var temp_list = [];
+        $('input[type=checkbox]').each(function() {
+            $(this).prop('checked', false);
+            var n = $(this).parent().prev().text();
+            temp_list.push(n);
+        });
+        cat_filter_items = temp_list;
+
+        var output1 = filter_by_date($master);
+
+        if (pathname == '/league/league_transaction_log') {
+            var output2 = filter_by_team(output1);
+            filtered_data = filter_by_cat(output2);
+        } else {
+            filtered_data = filter_by_cat(output1);
+        }
+
         fill_table(filtered_data);
     });
 });

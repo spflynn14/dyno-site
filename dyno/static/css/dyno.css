@@ -81,7 +81,7 @@
 }
 
 .second_tab_button_team {
-    width: 19.4%;
+    width: 16.1%;
 }
 
 .third_tab_button_team {
@@ -125,7 +125,7 @@
 }
 #all_players_filter_area {
     height: auto;
-    max-height: 25%;
+    max-height: 35%;
     width: 100%;
     float: left;
 }
@@ -300,157 +300,14 @@
 .cap_summary_datagrid table tbody tr:last-child td {
     border-bottom: none;
 }
-.cap_summary_data_aux {
+
+.cap_summary_datagrid th:hover {
+    cursor: pointer;
+}
+
+.cap_summary_datagrid tbody tr:nth-child(even) {
     background-color: #dcdcdc;
 }
-
-
-
-
-
-
-
-/* PLAYER PAGE */
-
-#player_search_area {
-    /*border: 1px solid red;*/
-    display: inline-block;
-    height: 100%;
-    width: 15%;
-    float: left;
-}
-
-#player_display_area {
-    /*border: 1px solid blue;*/
-    display: inline-block;
-    height: 100%;
-    width: 50%;
-    float: left;
-}
-
-#player_interaction_area {
-    /*border: 1px solid green;*/
-    display: inline-block;
-    height: 100%;
-    width: 35%;
-}
-
-#player_select_listbox {
-    min-width: 80%;
-    max-width: 100%;
-}
-
-#search_text {
-    max-width: 100%;
-}
-
-.display_div {
-    /*border: 1px dotted green;*/
-    width: 100%;
-    height: 6%;
-}
-
-#line_2 {
-    height: 6%;
-}
-
-#line_9 {
-    height: 6%;
-}
-
-#line_11 {
-    height: 10%;
-}
-
-#name_text {
-    display: inline-block;
-    font-weight: bold;
-    font-size: 1.25em;
-    color: #0000ff;
-    width: 45%;
-    float: left;
-    padding-left: 5%;
-    /*border: 1px solid red;*/
-}
-
-#pos_text {
-    display: inline-block;
-    text-decoration: underline;
-    font-weight: bold;
-    width: 25%;
-    float: left;
-    /*border: 1px solid red;*/
-}
-
-#team_text {
-    display: inline-block;
-    width: 15%;
-    font-weight: bold;
-    float: left;
-    /*border: 1px solid red;*/
-}
-
-.hidden_divs, .hidden_headers, .line_text {
-    /*border: 1px solid red;*/
-}
-
-.hidden_headers {
-    font-weight: bold;
-    display: inline-block;
-}
-
-.line_text {
-    display: inline-block;
-    width: 20%;
-    text-align: center;
-}
-
-#player_mini_tab_area {
-    width: 100%;
-    height: 8%;
-    text-align: center;
-    /*border: 1px solid red;*/
-}
-
-.mini_tab_button_player {
-    width: 33%;
-    padding: 2px 2px 2px 2px;
-}
-
-.mini_tab_button_player:hover {
-    text-decoration: underline;
-    cursor: pointer;
-    color: #2c609b;
-}
-
-#player_interaction_display_area {
-    width: 100%;
-    height: 95%;
-    padding-top: 3%;
-    /*border: 1px solid blue;*/
-}
-
-.player_interaction_cells {
-    height: 25px;
-    width: 20%;
-    text-align: center;
-    font-size: smaller;
-    /*border: 1px solid red;*/
-}
-
-.player_interaction_cells_restructure {
-    height: 25px;
-    text-align: center;
-    font-size: smaller;
-    /*border: 1px solid red;*/
-}
-
-/* END PLAYER PAGE */
-
-
-
-
-
 
 
 
@@ -759,96 +616,6 @@
     width: 2%;
 }
 
-
-/* TEAM SETTINGS */
-
-#team_settings_column_one {
-    display: inline-block;
-    height: 100%;
-    width: 33%;
-    float: left;
-}
-
-#team_settings_column_two {
-    display: inline-block;
-    height: 100%;
-    width: 33%;
-    float: left;
-}
-
-#team_settings_column_three {
-    display: inline-block;
-    height: 100%;
-    width: 33%;
-    float: left;
-}
-
-#team_name_div {
-    border: 1px solid #dcdcdc;
-    padding: 20px 20px 20px 20px;
-    width: auto;
-    display: inline-block;
-}
-
-#change_user_password_div {
-    width: 100%;
-    height: 10%;
-    float: right;
-}
-
-#logo_div {
-    border: 1px solid #dcdcdc;
-    padding: 20px 20px 20px 20px;
-    width: auto;
-}
-
-#email_div {
-    border: 1px solid #dcdcdc;
-    padding: 20px 20px 20px 20px;
-    width: auto;
-}
-
-#save_changes_div {
-    width: auto;
-    height: 10%;
-}
-
-#account_balance_div {
-    padding-left: 10px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    width: 60%;
-    height: auto;
-    max-height: 60%;
-    overflow-y: auto;
-    float: right;
-    border: 1px solid #dcdcdc;
-}
-
-#show_hide_account_details:hover {
-    text-decoration: underline;
-    cursor: pointer;
-}
-
-#team_settings_player_display_filters_area {
-    height: auto;
-    width: 75%;
-    padding: 10px 10px 10px 10px;
-    margin-left: 25%;
-    border: 1px solid #dcdcdc;
-}
-
-#team_settings_role_descriptions_area {
-    height: auto;
-    max-height: 65%;
-    overflow-y: auto;
-    width: 75%;
-    padding: 10px 10px 10px 10px;
-    margin-left: 25%;
-    border: 1px solid #dcdcdc;
-}
-
-/* END: TEAM SETTINGS */
 
 
 
@@ -1160,7 +927,7 @@
 
 #active_auctions_table_area {
     width: 100%;
-    height: 60%;
+    height: 70%;
     float: left;
 }
 
@@ -1176,16 +943,18 @@
 
 #auction_page_bottom_area {
     width: 100%;
-    height: 35%;
+    height: 15%;
     padding-top: 2%;
     float: left;
 }
 
 #submit_auction_bids_div {
-    width: 30%;
+    width: 10%;
     float: right;
-    height: 100%;
+    height: 80%;
     display: inline-block;
+    vertical-align: bottom;
+    position: relative;
 }
 
 
@@ -1195,7 +964,8 @@
     table-layout: fixed;
 }
 .active_auctions_datagrid {
-    width: 70%;
+    height: 100%;
+    width: 90%;
     padding-top: 10px;
     background: #fff;
     overflow-y: auto;
@@ -1203,6 +973,7 @@
     -moz-border-radius: 10px;
     border-radius: 10px;
     display: inline-block;
+    float: left;
 }
 
 .active_auctions_datagrid table td, .active_auctions_datagrid table th {
@@ -1235,6 +1006,10 @@
     background-color: #dcdcdc;
 }
 
+.active_auctions_datagrid thead:hover {
+    cursor: pointer;
+}
+
 /* END: AUCTION PAGE */
 
 .commish_view_model_button {
@@ -1257,7 +1032,7 @@
     height: 90%;
     display: inline-block;
     float: right;
-    margin-top: 50px;
+    margin-top: 20px;
     overflow-y: auto;
 }
 
@@ -1403,6 +1178,7 @@
 
 #setconstr_cap_tables_area {
     /*border: 1px solid purple;*/
+    margin-top: 20px;
     width: 40%;
     height: 65%;
     display: inline-block;
@@ -1599,7 +1375,7 @@
     height: 80%;
     display: inline-block;
     float: right;
-    margin-top: 50px;
+    margin-top: 20px;
     overflow-y: auto;
 }
 
@@ -1678,7 +1454,7 @@
     height: 80%;
     display: inline-block;
     float: right;
-    margin-top: 50px;
+    margin-top: 20px;
     overflow-y: auto;
 }
 
@@ -1757,7 +1533,7 @@
     height: 80%;
     display: inline-block;
     float: right;
-    margin-top: 50px;
+    margin-top: 20px;
     overflow-y: auto;
 }
 
@@ -1835,7 +1611,7 @@
     height: 80%;
     display: inline-block;
     float: right;
-    margin-top: 50px;
+    margin-top: 20px;
     overflow-y: auto;
 }
 

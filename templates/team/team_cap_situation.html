@@ -43,7 +43,8 @@
                     <tr>
                         <th width="9%" >Role</th>
                         <th width="7%" style="text-align: center">Pos</th>
-                        <th width="18%">Name</th>
+                        <th width="14%">Name</th>
+                        <th width="4%" style="text-align: center">Age</th>
                         <th width="12%" style="text-align: center">Contract Type</th>
                         <th width="10%" style="text-align: center">Cap Hit</th>
                         <th width="10%" style="text-align: center">Salary</th>
@@ -106,6 +107,7 @@
                             <p>{{ x }}</p>
                     {% endfor %}
                     </td>
+                    <td id="vw_1-25">{{ x.age }}</td>
                 </tr>
             </table>
         {% endfor %}

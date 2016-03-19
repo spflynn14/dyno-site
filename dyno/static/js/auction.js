@@ -1,5 +1,7 @@
 $(document).ready(function() {
-    console.log('ready 4');
+    console.log('ready 3');
+
+    $(".active_auctions_datagrid table").tablesorter();
 
     var $auction_timeouts = [];
     $('#vw_1').find('p').each(function() {
@@ -23,12 +25,9 @@ $(document).ready(function() {
     for (i = 0; i < total_auctions; i++) {
         var t = '#auction_time_left' + i;
         var temp1 = $(t).text();
-        console.log(temp1);
         var temp2 = new Date(Date.parse(temp1, 'MMM dd, yyyy, hh:mm a'));
         $auction_times.push(temp2);
     }
-
-    console.log($auction_times);
 
     var now = new Date($.now());
     var diff = (now - $auction_times[0]) / 1000;
@@ -123,13 +122,26 @@ $(document).ready(function() {
 
     $('#add_new_auction_button').on('click', function() {
         var player = $('#new_auction_player_select').val();
+
+        var found_data = false;
         var bid = $('#new_auction_proxy_bid').val();
-        if (bid == '') {
-            return
-        } else if (Number(bid) < 1) {
-            $('#new_auction_proxy_bid').val('');
-            return
+        if (bid.charAt(0) == '$') {
+            bid = bid.slice(1, bid.length);
         }
+        if (bid != '') {
+            found_data = true;
+        }
+        if ($.isNumeric(Number(bid)) == false) {
+            found_data = false;
+        } else if (Number(bid) < 1) {
+            found_data = false;
+        }
+
+        if (found_data == false) {
+            $('#new_auction_proxy_bid').val('');
+            return;
+        }
+
         $('button').prop('disabled', true);
         $('input').prop('disabled', true);
         $.ajax({
@@ -149,7 +161,6 @@ $(document).ready(function() {
 
     $('#submit_auction_bids_button').on('click', function() {
         var auction_data = pull_data_from_auction_table();
-        console.log(auction_data);
         if (auction_data == 'no data') {
             return;
         }

@@ -1,0 +1,194 @@
+.player_card {
+    width: 100%;
+    border: 2px solid #cdcdcd;
+    float: left;
+    border-radius: 20px;
+    padding: 10px 5px 5px 5px;
+    overflow-y: hidden;
+    margin-bottom: 5px;
+}
+
+.title_bar {
+    width: 100%;
+    height: 25px;
+    float: left;
+}
+
+.title_bar:hover {
+    cursor: pointer;
+}
+
+.contract_area, .transaction_history_area, .notes_area, .current_stats_area, .career_stats_area {
+    width: 100%;
+    float: left;
+    margin-bottom: 10px;
+    padding: 5px 5px 0px 5px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-top: 1px solid #cdcdcd;
+    max-height: 250px;
+}
+
+.contract_area th, .contract_area td {
+    text-align: center;
+    font-size: small;
+}
+
+.career_stats_area th, .career_stats_area td {
+    text-align: center;
+    font-size: smaller;
+}
+
+.contract_area tr {
+    height: 25px;
+}
+
+.transaction_history_area td, .current_stats_area td {
+    font-size: small;
+}
+
+.notes_area {
+    font-size: small;
+    height: 250px;
+}
+
+#left_area {
+    height: 100%;
+    width: 70%;
+    float: left;
+    /*border: 1px solid blue;*/
+    display: inline-block;
+    padding: 5px 5px 5px 5px;
+}
+
+#right_area {
+    height: 95%;
+    width: 30%;
+    /*border: 1px solid red;*/
+    display: inline-block;
+    padding: 5px 5px 5px 20px;
+    border-left: 1px solid #cdcdcd;
+    overflow-y: auto;
+}
+
+#notes_label, #notes_text {
+    height: 80%;
+    width: 100%;
+    margin-right: 25px;
+    overflow-y: auto;
+}
+
+#shortlist_table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.border_stat {
+    border-left: 1px solid #cdcdcd;
+}
+
+
+
+/* PLAYER PAGE */
+
+#player_search_area {
+    /*border: 1px solid red;*/
+    display: inline-block;
+    height: 100%;
+    width: 15%;
+    float: left;
+}
+
+#player_display_area {
+    /*border: 1px solid blue;*/
+    display: inline-block;
+    height: 100%;
+    width: 50%;
+    float: left;
+    overflow-y: auto;
+}
+
+#player_interaction_area {
+    /*border: 1px solid green;*/
+    display: inline-block;
+    height: 100%;
+    width: 35%;
+    float: right;
+}
+
+#player_select_listbox {
+    min-width: 80%;
+    max-width: 100%;
+}
+
+#search_text {
+    max-width: 100%;
+}
+
+.display_div {
+    /*border: 1px dotted green;*/
+    width: 100%;
+    height: 6%;
+}
+
+#name_text {
+    font-weight: bold;
+    font-size: 1.25em;
+    color: #0000ff;
+    vertical-align: top;
+    padding-left: 10px;
+}
+
+#pos_text {
+    text-decoration: underline;
+    font-weight: bold;
+    text-align: left;
+    vertical-align: top;
+}
+
+#team_text {
+    font-weight: bold;
+    float: right;
+}
+
+#player_mini_tab_area {
+    width: 100%;
+    height: 8%;
+    text-align: center;
+    /*border: 1px solid red;*/
+}
+
+.mini_tab_button_player {
+    width: 33%;
+    padding: 2px 2px 2px 2px;
+}
+
+.mini_tab_button_player:hover {
+    text-decoration: underline;
+    cursor: pointer;
+    color: #2c609b;
+}
+
+#player_interaction_display_area {
+    width: 100%;
+    height: 95%;
+    padding-top: 3%;
+    /*border: 1px solid blue;*/
+}
+
+.player_interaction_cells {
+    height: 25px;
+    width: 20%;
+    text-align: center;
+    font-size: smaller;
+    /*border: 1px solid red;*/
+}
+
+.player_interaction_cells_restructure {
+    height: 25px;
+    text-align: center;
+    font-size: smaller;
+    /*border: 1px solid red;*/
+}
+
+/* END PLAYER PAGE */
