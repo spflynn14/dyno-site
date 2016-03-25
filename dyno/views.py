@@ -7,6 +7,7 @@ from django.shortcuts import render
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect, HttpResponse
 from django.db.models import Q, Sum
+import django.apps
 from .forms import *
 from .models import *
 
@@ -413,7 +414,8 @@ def mainpage(request):
     create_session(request.user, 'mainpage')
     a = Message.objects.get(name='Homepage Message')
     welcome_message = a.content
-    return render(request, 'main.html', {'welcome_message': welcome_message})
+    current_time = timezone.now()
+    return render(request, 'main.html', {'welcome_message': welcome_message, 'current_time' : current_time})
 
 def rulespage(request):
     create_session(request.user, 'rulespage')
@@ -1505,6 +1507,24 @@ def teamcapsituationpage(request):
     team_json1 = []
 
     for x in b1:
+        print(x)
+        try:
+            d = PlayerNote.objects.filter(user=request.user).get(player_id=int(x[0]))
+            notes = d.notes
+            n1 = d.n1
+            n2 = d.n2
+            n3 = d.n3
+            if int(n1) == n1:
+                n1 = int(n1)
+            if int(n2) == n2:
+                n2 = int(n2)
+            if int(n3) == n3:
+                n3 = int(n3)
+        except:
+            notes = ''
+            n1 = ''
+            n2 = ''
+            n3 = ''
         avail_ro_1 = avail_roles(con, cur, team, x[1], x[2], 1)
         avail_ro_2 = avail_roles(con, cur, team, x[1], x[2], 2)
         avail_ro_3 = avail_roles(con, cur, team, x[1], x[2], 3)
@@ -1537,7 +1557,11 @@ def teamcapsituationpage(request):
                           'avail_roles_yr3' : avail_ro_3,
                           'avail_roles_yr4' : avail_ro_4,
                           'avail_roles_yr5' : avail_ro_5,
-                           'age' : age_years})
+                           'age' : age_years,
+                           'n1' : n1,
+                           'n2' : n2,
+                           'n3' : n3,
+                           'player_notes' : notes})
 
     cur.execute('SELECT role, unique_role, applies_to_QB, applies_to_RB, applies_to_WR, applies_to_TE, applies_to_DEF, applies_to_K FROM dyno_availablerole WHERE user=?', [str(request.user)])
     c = cur.fetchall()
@@ -2099,8 +2123,15 @@ def commishofficepage(request):
 
 def commishviewmodel(request):
     create_session(request.user, 'commishviewmodel')
-    a = Player.objects.all().order_by('name')
-    return render(request, 'commish/commish_view_model.html', {'players' : a})
+
+    a = django.apps.apps.get_models()
+    model_list = []
+    for x in a:
+        model_list.append(x.__name__)
+        print(x.__name__)
+    model_list = sorted(model_list)
+
+    return render(request, 'commish/commish_view_model.html', {'model_list' : model_list})
 
 def commisheditmodel(request):
     create_session(request.user, 'commisheditmodel')

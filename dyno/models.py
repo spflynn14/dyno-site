@@ -522,6 +522,9 @@ class PlayerNote(models.Model):
     user = models.CharField(max_length=20)
     player_id = models.IntegerField(default=999999)
     notes = models.TextField(blank=True, default='')
+    n1 = models.FloatField(blank=True, default=999999)
+    n2 = models.FloatField(blank=True, default=999999)
+    n3 = models.FloatField(blank=True, default=999999)
 
     def __str__(self):
         return self.user + ' - ' + str(self.player_id)

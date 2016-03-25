@@ -1,0 +1,19 @@
+#display_area {
+    overflow-x: auto;
+}
+
+.header_cell {
+    font-size: x-small;
+    padding: 4px 4px 4px 4px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.data_cell {
+    font-size: x-small;
+    padding: 4px 4px 4px 4px;
+}
+
+.data_cell:hover {
+    border: 1px solid #dcdcdc;
+}

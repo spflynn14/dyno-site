@@ -145,4 +145,6 @@ urlpatterns = [
     url(r'^input_old_transactions$', views.input_old_transactions, name='input old transactions'),
     url(r'^save_old_transactions$', processing.save_old_transactions, name='save old transactions'),
     url(r'^clear_team_emails$', processing.clear_team_emails, name='clear team email address'),
+    url(r'^get_model$', processing.get_model, name='get model - view model page'),
+    url(r'^save_model_cell$', processing.save_model_data, name='save model data - view model page'),
 ]

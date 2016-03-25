@@ -498,33 +498,20 @@ def create_alerts(alert_type, current_user, var_list):
 
 
 def auction_end_routine():
-    def strptime(val):
-        if '.' not in val:
-            return datetime.datetime.strptime(val, '%Y-%m-%d %H:%M:%S')
-
-        nofrag, frag = val.split(".")
-        date = datetime.datetime.strptime(nofrag, '%Y-%m-%d %H:%M:%S')
-
-        frag = frag[:6]  # truncate to microseconds
-        frag += (6 - len(frag)) * '0'  # add 0s
-        return date.replace(microsecond=int(frag))
-
     if working_local == True:
         con = sql3.connect('db.sqlite3')
     else:
         con = sql3.connect('/home/spflynn/dyno-site/db.sqlite3')
     cur = con.cursor()
 
-    cur.execute('SELECT * FROM dyno_auction')
-    e = cur.fetchall()
+    e = Auction.objects.all()
 
     finished_auctions = []
-    time_now = datetime.datetime.now()
-    export_time = time_now + datetime.timedelta(hours=5)
+    time_now = timezone.now()
 
     for x in e:
-        auction_start = strptime(x[5]) - datetime.timedelta(hours=5)
-        auction_end = auction_start + datetime.timedelta(minutes=x[6])
+        auction_start = x.clock_reset
+        auction_end = auction_start + timezone.timedelta(minutes=x.clock_timeout_minutes)
 
         if time_now > auction_end:
             finished_auctions.append(x)
@@ -537,22 +524,22 @@ def auction_end_routine():
     loop_counter = 0
     for x in finished_auctions:
         loop_counter += 1
-        cur.execute('DELETE FROM dyno_auction WHERE player=?', [x[1]])
+        cur.execute('DELETE FROM dyno_auction WHERE player=?', [x.player])
         cur.execute('INSERT INTO dyno_transaction VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [max_id+loop_counter,
-                                                                                          x[1],
+                                                                                          x.player,
                                                                                           '',
-                                                                                          x[2],
+                                                                                          x.high_bidder,
                                                                                           'Auction End',
-                                                                                          x[3],
-                                                                                          x[4],
+                                                                                          x.high_bid,
+                                                                                          x.high_bidder_proxy_bid,
                                                                                           '',
                                                                                           '',
                                                                                           '',
                                                                                           'Pending',
                                                                                           'Unconfirmed',
                                                                                           '',
-                                                                                          export_time])
-        alert_data_list.append([x[1], x[2], x[3]])
+                                                                                          time_now])
+        alert_data_list.append([x.player, x.high_bidder, x.high_bid])
 
     con.commit()
 
@@ -563,9 +550,9 @@ def auction_end_routine():
         create_alerts('Auction - Won', '', [x[0], x[1], x[2]])
 
 def periodic_alerts_routine():
-    date_time = datetime.datetime.now()
+    date_time = timezone.now()
     time_now = date_time.time()
-    today = datetime.datetime.today().weekday()
+    today = timezone.now().weekday()
     days_list = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     today_string = days_list[today]
 
@@ -578,19 +565,18 @@ def periodic_alerts_routine():
             #user gets daily emails
             daily_time = x.daily_emails_time
             #check to see if time_now is between daily_time -5 and daily_time +10 min
-            d = datetime.datetime.today()
-            full_daily = datetime.datetime.combine(d, daily_time)
-            d1 = full_daily - datetime.timedelta(minutes=5)
-            d2 = full_daily + datetime.timedelta(minutes=10)
+            full_daily = timezone.now()
+            d1 = full_daily - timezone.timedelta(minutes=5)
+            d2 = full_daily + timezone.timedelta(minutes=10)
             start = d1.time()
             end = d2.time()
             if time_now > start and time_now < end:
                 #gather alerts
-                day_ago = date_time - datetime.timedelta(days=1)
+                day_ago = date_time - timezone.timedelta(days=1)
                 alert_list = []
                 b = Alert.objects.filter(user=x.user).order_by('alert_type')
                 for y in b:
-                    check_date = y.date.replace(tzinfo=None)
+                    check_date = y.date
                     if check_date > day_ago:
                         alert_list.append(y)
                 #send email
@@ -625,19 +611,18 @@ def periodic_alerts_routine():
             #check to see if today is same as weekly_day
             if weekly_day == today_string:
                 #same day, check to see if time_now is between weekly_time -1 and weekly_time +10 min
-                d = datetime.datetime.today()
-                full_weekly = datetime.datetime.combine(d, weekly_time)
-                d1 = full_weekly - datetime.timedelta(minutes=1)
-                d2 = full_weekly + datetime.timedelta(minutes=10)
+                full_weekly = timezone.now()
+                d1 = full_weekly - timezone.timedelta(minutes=1)
+                d2 = full_weekly + timezone.timedelta(minutes=10)
                 start = d1.time()
                 end = d2.time()
                 if time_now > start and time_now < end:
                     #gather alerts
-                    week_ago = date_time - datetime.timedelta(days=7)
+                    week_ago = date_time - timezone.timedelta(days=7)
                     alert_list = []
                     b = Alert.objects.filter(user=x.user).order_by('alert_type')
                     for y in b:
-                        check_date = y.date.replace(tzinfo=None)
+                        check_date = y.date
                         if check_date > week_ago:
                             alert_list.append(y)
                     #send email
@@ -676,7 +661,7 @@ def commish_pending_transactions_routine():
     num_trans = len(a)
     if num_trans == 0:
         return
-    date_time = datetime.datetime.now()
+    date_time = timezone.now()
     c = date_time.minute
 
     alert_settings_message = '\n\n\n\nYou can change your alert settings under the Team->Alerts->Manage Alerts tab.'
@@ -814,8 +799,14 @@ def player_processing_2(request):
     try:
         d = PlayerNote.objects.filter(user=request.user).get(player_id=a.id)
         notes = d.notes
+        n1 = d.n1
+        n2 = d.n2
+        n3 = d.n3
     except:
         notes = ''
+        n1 = ''
+        n2 = ''
+        n3 = ''
 
     e = Shortlist.objects.filter(user=request.user)
 
@@ -858,6 +849,9 @@ def player_processing_2(request):
                    'trans_list' : serializers.serialize('json', trans_list),
                    'shortlists' : serializers.serialize('json', e),
                    'player_notes' : notes,
+                   'n1' : n1,
+                   'n2' : n2,
+                   'n3' : n3,
                    'player_id' : a.id,
                    'age' : age_years,
                    'birthdate' : birthdate,
@@ -3175,10 +3169,20 @@ def save_transaction_trade(request):
     for player in pro_players:
         b = Player.objects.get(name=player)
         b.team = opp_team
+        b.yr1_role = '--'
+        b.yr2_role = '--'
+        b.yr3_role = '--'
+        b.yr4_role = '--'
+        b.yr5_role = '--'
         b.save()
     for player in opp_players:
         b = Player.objects.get(name=player)
         b.team = pro_team
+        b.yr1_role = '--'
+        b.yr2_role = '--'
+        b.yr3_role = '--'
+        b.yr4_role = '--'
+        b.yr5_role = '--'
         b.save()
 
     for pick in pro_picks:
@@ -3531,7 +3535,7 @@ def create_message_board_post(request):
             replied_post_title = ''
         create_alerts('New Board Post', request.user, [title, is_reply, replied_post_title])
     else:
-        t = datetime.datetime.now()
+        t = timezone.now()
         if t.hour > 12:
             h = t.hour - 12
             f = 'pm'
@@ -3649,6 +3653,18 @@ def create_divisions(request):
 def save_player_notes(request):
     player = request.POST['player']
     notes_text = request.POST['notes_text']
+    try:
+        n1 = float(request.POST['n1'])
+    except:
+        n1 = 999999
+    try:
+        n2 = float(request.POST['n2'])
+    except:
+        n2 = 999999
+    try:
+        n3 = float(request.POST['n3'])
+    except:
+        n3 = 999999
 
     a = Player.objects.get(name=player)
     player_id = a.id
@@ -3656,11 +3672,17 @@ def save_player_notes(request):
     try:
         b = PlayerNote.objects.filter(user=request.user).get(player_id=player_id)
         b.notes = notes_text
+        b.n1 = n1
+        b.n2 = n2
+        b.n3 = n3
         b.save()
     except:
         PlayerNote.objects.create(user=request.user,
                                   player_id=player_id,
-                                  notes=notes_text)
+                                  notes=notes_text,
+                                  n1=n1,
+                                  n2=n2,
+                                  n3=n3)
 
     return JsonResponse('test', safe=False)
 
@@ -4160,8 +4182,23 @@ def get_shortlist_members(request):
             try:
                 c = PlayerNote.objects.filter(user=request.user).get(player_id=int(x))
                 notes = c.notes
+                if c.n1 == 999999:
+                    n1 = ''
+                else:
+                    n1 = c.n1
+                if c.n2 == 999999:
+                    n2 = ''
+                else:
+                    n2 = c.n2
+                if c.n3 == 999999:
+                    n3 = ''
+                else:
+                    n3 = c.n3
             except:
                 notes = ''
+                n1 = ''
+                n2 = ''
+                n3 = ''
             players.append({'pos' : b.position,
                             'name' : b.name,
                             'team' : b.team,
@@ -4169,7 +4206,10 @@ def get_shortlist_members(request):
                             'avg_yearly_cost' : b.average_yearly_cost(),
                             'cap_hit' : b.current_year_cap_hit(),
                             'years_left' : b.years_remaining(),
-                            'notes' : notes
+                            'notes' : notes,
+                            'n1' : n1,
+                            'n2' : n2,
+                            'n3' : n3
                             })
 
     players = sorted(players, key=lambda a: a['name'])
@@ -4268,3 +4308,293 @@ def clear_team_emails(request):
         x.save()
 
     return HttpResponseRedirect('/')
+
+def get_data_and_column_headers(model):
+    if working_local == True:
+        con = sql3.connect('db.sqlite3')
+    else:
+        con = sql3.connect('/home/spflynn/dyno-site/db.sqlite3')
+    cur = con.cursor()
+
+    data = ''
+    column_headers = ''
+
+    if model == 'ADP':
+        cur.execute('SELECT * FROM dyno_adp')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Alert':
+        cur.execute('SELECT * FROM dyno_alert')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'AlertSetting':
+        cur.execute('SELECT * FROM dyno_alertsetting')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Asset':
+        cur.execute('SELECT * FROM dyno_asset')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Auction':
+        cur.execute('SELECT * FROM dyno_auction')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'AvailableRole':
+        cur.execute('SELECT * FROM dyno_availablerole')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Board_Post':
+        cur.execute('SELECT * FROM dyno_board_post')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Bug':
+        cur.execute('SELECT * FROM dyno_bug')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Cap_Penalty_Entry':
+        cur.execute('SELECT * FROM dyno_cap_penalty_entry')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'ContentType':
+        cur.execute('SELECT * FROM django_content_type')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Draft_Pick':
+        cur.execute('SELECT * FROM dyno_draft_pick')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Group':
+        cur.execute('SELECT * FROM auth_group')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'LogEntry':
+        cur.execute('SELECT * FROM django_admin_log')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Message':
+        cur.execute('SELECT * FROM dyno_message')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Performance_Yr1':
+        cur.execute('SELECT * FROM dyno_performance_yr1')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Performance_Yr2':
+        cur.execute('SELECT * FROM dyno_performance_yr2')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Permission':
+        cur.execute('SELECT * FROM auth_permission')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Player':
+        cur.execute('SELECT * FROM dyno_player')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'PlayerNote':
+        cur.execute('SELECT * FROM dyno_playernote')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'RequestedFeature':
+        cur.execute('SELECT * FROM dyno_requestedfeature')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Role':
+        cur.execute('SELECT * FROM dyno_role')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'SalaryListing':
+        cur.execute('SELECT * FROM dyno_salarylisting')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Session':
+        cur.execute('SELECT * FROM dyno_session')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Shortlist':
+        cur.execute('SELECT * FROM dyno_shortlist')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Team':
+        cur.execute('SELECT * FROM dyno_team')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'TeamVariable':
+        cur.execute('SELECT * FROM dyno_teamvariable')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Trade':
+        cur.execute('SELECT * FROM dyno_trade')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Transaction':
+        cur.execute('SELECT * FROM dyno_transaction')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'User':
+        cur.execute('SELECT * FROM auth_user')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'Variable':
+        cur.execute('SELECT * FROM dyno_variable')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'YearlyStats':
+        cur.execute('SELECT * FROM dyno_yearlystats')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'YearlyStatsDefense':
+        cur.execute('SELECT * FROM dyno_yearlystatsdefense')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+    elif model == 'YearlyStatsKicker':
+        cur.execute('SELECT * FROM dyno_yearlystatskicker')
+        data = cur.fetchall()
+        column_headers = [description[0] for description in cur.description]
+
+    return data, column_headers
+
+def get_model(request):
+    model = request.POST['model']
+
+    data, column_headers = get_data_and_column_headers(model)
+
+    return JsonResponse({'data' : data, 'column_headers' : column_headers}, safe=False)
+
+def save_model_data(request):
+    model = request.POST['model']
+    id = request.POST['id']
+    cell_ref = request.POST['cell_ref']
+    cell_data = request.POST['cell_data']
+
+    # print(model, id, cell_ref, cell_data)
+
+    data, column_headers = get_data_and_column_headers(model)
+
+    working_header = column_headers[int(cell_ref)]
+
+    if model == 'ADP':
+        a = ADP.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'Alert':
+        a = Alert.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'AlertSetting':
+        a = AlertSetting.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'Asset':
+        a = Asset.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'Auction':
+        a = Auction.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'AvailableRole':
+        a = AvailableRole.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'Board_Post':
+        a = Board_Post.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'Bug':
+        a = Bug.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'Cap_Penalty_Entry':
+        a = Cap_Penalty_Entry.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'ContentType':
+        pass
+    elif model == 'Draft_Pick':
+        a = Draft_Pick.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'Group':
+        pass
+    elif model == 'LogEntry':
+        pass
+    elif model == 'Message':
+        a = Message.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'Performance_Yr1':
+        a = Performance_Yr1.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'Performance_Yr2':
+        a = Performance_Yr2.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'Permission':
+        pass
+    elif model == 'Player':
+        a = Player.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'PlayerNote':
+        a = PlayerNote.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'RequestedFeature':
+        a = RequestedFeature.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'Role':
+        a = Role.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'SalaryListing':
+        a = SalaryListing.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'Session':
+        a = Session.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'Shortlist':
+        a = Shortlist.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'Team':
+        a = Team.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'TeamVariable':
+        a = TeamVariable.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'Trade':
+        a = Trade.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'Transaction':
+        a = Transaction.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'User':
+        pass
+    elif model == 'Variable':
+        a = Variable.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'YearlyStats':
+        a = YearlyStats.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'YearlyStatsDefense':
+        a = YearlyStatsDefense.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+    elif model == 'YearlyStatsKicker':
+        a = YearlyStatsKicker.objects.get(id=int(id))
+        setattr(a, working_header, cell_data)
+        a.save()
+
+    return JsonResponse('done', safe=False)
+

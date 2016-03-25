@@ -509,10 +509,16 @@ $(document).ready(function() {
         }
     }
 
-    function fill_notes_card (notes, player_id, shortlists) {
+    function fill_notes_card (notes, player_id, shortlists, n1, n2, n3) {
         $('#shortlists_tbody').empty();
         $('#notes_label').text(notes);
         $('#notes_text').val(notes);
+        $('#n1_label').text(n1);
+        $('#n2_label').text(n2);
+        $('#n3_label').text(n3);
+        $('#n1_text').val(n1).hide();
+        $('#n2_text').val(n2).hide();
+        $('#n3_text').val(n3).hide();
 
         $.each(shortlists, function(index, value) {
             var tr = $('<tr>');
@@ -541,6 +547,12 @@ $(document).ready(function() {
         $('.save_button').show();
         $('#notes_label').hide();
         $('#notes_text').show();
+        $('#n1_label').hide();
+        $('#n1_text').show();
+        $('#n2_label').hide();
+        $('#n2_text').show();
+        $('#n3_label').hide();
+        $('#n3_text').show();
 
         $('.cancel_button').on('click', function () {
             $(this).hide();
@@ -548,21 +560,51 @@ $(document).ready(function() {
             $('.save_button').hide();
             $('#notes_label').show();
             $('#notes_text').hide().val($('#notes_label').text());
+            $('#n1_label').show();
+            $('#n1_text').hide().val($('#n1_label').text()).css({'border' : '1px solid #dcdcdc'});
+            $('#n2_label').show();
+            $('#n2_text').hide().val($('#n2_label').text()).css({'border' : '1px solid #dcdcdc'});
+            $('#n3_label').show();
+            $('#n3_text').hide().val($('#n3_label').text()).css({'border' : '1px solid #dcdcdc'});
         });
 
         $('.save_button').on('click', function() {
+            var n1_text = $('#n1_text').val();
+            var n2_text = $('#n2_text').val();
+            var n3_text = $('#n3_text').val();
+            if ($.isNumeric(Number(n1_text)) == false) {
+                $('#n1_text').css({'border' : '1px solid red'});
+                return;
+            }
+            if ($.isNumeric(Number(n2_text)) == false) {
+                $('#n2_text').css({'border' : '1px solid red'});
+                return;
+            }
+            if ($.isNumeric(Number(n3_text)) == false) {
+                $('#n3_text').css({'border' : '1px solid red'});
+                return;
+            }
             $(this).hide();
             $('.edit_button').show();
             $('.cancel_button').hide();
             $('#notes_label').show().text($('#notes_text').val());
             $('#notes_text').hide();
+            $('#n1_label').show().text($('#n1_text').val());
+            $('#n1_text').hide().css({'border' : '1px solid #dcdcdc'});
+            $('#n2_label').show().text($('#n2_text').val());
+            $('#n2_text').hide().css({'border' : '1px solid #dcdcdc'});
+            $('#n3_label').show().text($('#n3_text').val());
+            $('#n3_text').hide().css({'border' : '1px solid #dcdcdc'});
             $.ajax({
                 url: '/save_player_notes',
                 type: 'POST',
                 data: {
                     csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
                     'player' : $player_selected,
-                    'notes_text' : $('#notes_text').val()
+                    'notes_text' : $('#notes_text').val(),
+                    'n1' : n1_text,
+                    'n2' : n2_text,
+                    'n3' : n3_text
                 },
                 dataType: 'json',
                 success: function (data) {
@@ -736,7 +778,25 @@ $(document).ready(function() {
                 var notes = data.player_notes;
                 var player_id = data.player_id;
                 var shortlists = JSON.parse(data.shortlists);
-                fill_notes_card(notes, player_id, shortlists);
+                var n1 = '';
+                var n2 = '';
+                var n3 = '';
+                if (data.n1 == 999999) {
+                    n1 = '';
+                } else {
+                    n1 = data.n1
+                }
+                if (data.n2 == 999999) {
+                    n2 = '';
+                } else {
+                    n2 = data.n2
+                }
+                if (data.n3 == 999999) {
+                    n3 = '';
+                } else {
+                    n3 = data.n3
+                }
+                fill_notes_card(notes, player_id, shortlists, n1, n2, n3);
 
                 //fill career stats card
                 var career_stats = JSON.parse(data.career_stats);

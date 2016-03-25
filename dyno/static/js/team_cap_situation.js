@@ -89,7 +89,12 @@ $(document).ready(function() {
             'avail_roles_yr3': a_r_3,
             'avail_roles_yr4': a_r_4,
             'avail_roles_yr5': a_r_5,
-            'age': Number($(this).find('#vw_1-25').text())});
+            'age': Number($(this).find('#vw_1-25').text()),
+            'n1': $(this).find('#vw_1-26').text(),
+            'n2': $(this).find('#vw_1-27').text(),
+            'n3': $(this).find('#vw_1-28').text(),
+            'player_notes': $(this).find('#vw_1-29').text(),
+        });
         $(this).remove();
     });
 
@@ -178,6 +183,7 @@ $(document).ready(function() {
     }
 
     function populate_yr1_table (data) {
+        console.log(data);
         var cap_hit = data.yr1_salary + data.yr1_sb;
         if ($.inArray(data.yr1_role, filtered_tags) == -1) {
             var tr = $('<tr>');
@@ -189,6 +195,9 @@ $(document).ready(function() {
             var td_cap = $('<td>');
             var td_salary = $('<td>');
             var td_signing_bonus = $('<td>');
+            var td_n1 = $('<td>').css({'text-align' : 'center'});
+            var td_n2 = $('<td>').css({'text-align' : 'center'});
+            var td_n3 = $('<td>').css({'text-align' : 'center'});
             var td_notes = $('<td>');
 
             td_pos.text(data.pos).attr('align','center');
@@ -203,7 +212,10 @@ $(document).ready(function() {
             td_cap.text('$' + cap_hit.toFixed(2)).attr('align','center');
             td_salary.text('$' + data.yr1_salary.toFixed(2)).attr('align','center');
             td_signing_bonus.text('$' + data.yr1_sb.toFixed(2)).attr('align','center');
-            td_notes.text(data.notes);
+            td_n1.text(data.n1);
+            td_n2.text(data.n2);
+            td_n3.text(data.n3);
+            td_notes.text(data.player_notes);
 
             var role_select = $('<select>').addClass('role_selects').css({'height' : '100%', 'width' : '100%', 'border' : '0', 'background' : 'inherit'});
             $.each(data.avail_roles_yr1, function (index, value) {
@@ -230,6 +242,9 @@ $(document).ready(function() {
             tr.append(td_cap);
             tr.append(td_salary);
             tr.append(td_signing_bonus);
+            tr.append(td_n1);
+            tr.append(td_n2);
+            tr.append(td_n3);
             tr.append(td_notes);
             tr.appendTo('#team_cap_body');
         }
@@ -250,6 +265,9 @@ $(document).ready(function() {
                 var td_cap = $('<td>');
                 var td_salary = $('<td>');
                 var td_signing_bonus = $('<td>');
+                var td_n1 = $('<td>').css({'text-align' : 'center'});
+                var td_n2 = $('<td>').css({'text-align' : 'center'});
+                var td_n3 = $('<td>').css({'text-align' : 'center'});
                 var td_notes = $('<td>');
 
                 td_pos.text(data.pos).attr('align','center');
@@ -265,7 +283,10 @@ $(document).ready(function() {
                 td_cap.text('$' + cap_hit.toFixed(2)).attr('align', 'center');
                 td_salary.text('$' + data.yr2_salary.toFixed(2)).attr('align', 'center');
                 td_signing_bonus.text('$' + data.yr2_sb.toFixed(2)).attr('align', 'center');
-                td_notes.text(data.notes);
+                td_n1.text(data.n1);
+                td_n2.text(data.n2);
+                td_n3.text(data.n3);
+                td_notes.text(data.player_notes);
 
                 var role_select = $('<select>').addClass('role_selects').css({
                     'height': '100%',
@@ -297,6 +318,9 @@ $(document).ready(function() {
                 tr.append(td_cap);
                 tr.append(td_salary);
                 tr.append(td_signing_bonus);
+                tr.append(td_n1);
+                tr.append(td_n2);
+                tr.append(td_n3);
                 tr.append(td_notes);
                 tr.appendTo('#team_cap_body');
             }
@@ -320,6 +344,9 @@ $(document).ready(function() {
                 var td_cap = $('<td>');
                 var td_salary = $('<td>');
                 var td_signing_bonus = $('<td>');
+                var td_n1 = $('<td>').css({'text-align' : 'center'});
+                var td_n2 = $('<td>').css({'text-align' : 'center'});
+                var td_n3 = $('<td>').css({'text-align' : 'center'});
                 var td_notes = $('<td>');
 
                 td_pos.text(data.pos).attr('align','center');
@@ -335,7 +362,10 @@ $(document).ready(function() {
                 td_cap.text('$' + cap_hit.toFixed(2)).attr('align', 'center');
                 td_salary.text('$' + data.yr3_salary.toFixed(2)).attr('align', 'center');
                 td_signing_bonus.text('$' + data.yr3_sb.toFixed(2)).attr('align', 'center');
-                td_notes.text(data.notes);
+                td_n1.text(data.n1);
+                td_n2.text(data.n2);
+                td_n3.text(data.n3);
+                td_notes.text(data.player_notes);
 
                 var role_select = $('<select>').addClass('role_selects').css({
                     'height': '100%',
@@ -367,6 +397,9 @@ $(document).ready(function() {
                 tr.append(td_cap);
                 tr.append(td_salary);
                 tr.append(td_signing_bonus);
+                tr.append(td_n1);
+                tr.append(td_n2);
+                tr.append(td_n3);
                 tr.append(td_notes);
                 tr.appendTo('#team_cap_body');
             }
@@ -390,6 +423,9 @@ $(document).ready(function() {
                 var td_cap = $('<td>');
                 var td_salary = $('<td>');
                 var td_signing_bonus = $('<td>');
+                var td_n1 = $('<td>').css({'text-align' : 'center'});
+                var td_n2 = $('<td>').css({'text-align' : 'center'});
+                var td_n3 = $('<td>').css({'text-align' : 'center'});
                 var td_notes = $('<td>');
 
                 td_pos.text(data.pos).attr('align','center');
@@ -405,7 +441,10 @@ $(document).ready(function() {
                 td_cap.text('$' + cap_hit.toFixed(2)).attr('align', 'center');
                 td_salary.text('$' + data.yr4_salary.toFixed(2)).attr('align', 'center');
                 td_signing_bonus.text('$' + data.yr4_sb.toFixed(2)).attr('align', 'center');
-                td_notes.text(data.notes);
+                td_n1.text(data.n1);
+                td_n2.text(data.n2);
+                td_n3.text(data.n3);
+                td_notes.text(data.player_notes);
 
                 var role_select = $('<select>').addClass('role_selects').css({
                     'height': '100%',
@@ -437,6 +476,9 @@ $(document).ready(function() {
                 tr.append(td_cap);
                 tr.append(td_salary);
                 tr.append(td_signing_bonus);
+                tr.append(td_n1);
+                tr.append(td_n2);
+                tr.append(td_n3);
                 tr.append(td_notes);
                 tr.appendTo('#team_cap_body');
             }
@@ -460,6 +502,9 @@ $(document).ready(function() {
                 var td_cap = $('<td>');
                 var td_salary = $('<td>');
                 var td_signing_bonus = $('<td>');
+                var td_n1 = $('<td>').css({'text-align' : 'center'});
+                var td_n2 = $('<td>').css({'text-align' : 'center'});
+                var td_n3 = $('<td>').css({'text-align' : 'center'});
                 var td_notes = $('<td>');
 
                 td_pos.text(data.pos).attr('align','center');
@@ -475,7 +520,10 @@ $(document).ready(function() {
                 td_cap.text('$' + cap_hit.toFixed(2)).attr('align', 'center');
                 td_salary.text('$' + data.yr5_salary.toFixed(2)).attr('align', 'center');
                 td_signing_bonus.text('$' + data.yr5_sb.toFixed(2)).attr('align', 'center');
-                td_notes.text(data.notes);
+                td_n1.text(data.n1);
+                td_n2.text(data.n2);
+                td_n3.text(data.n3);
+                td_notes.text(data.player_notes);
 
                 var role_select = $('<select>').addClass('role_selects').css({
                     'height': '100%',
@@ -507,6 +555,9 @@ $(document).ready(function() {
                 tr.append(td_cap);
                 tr.append(td_salary);
                 tr.append(td_signing_bonus);
+                tr.append(td_n1);
+                tr.append(td_n2);
+                tr.append(td_n3);
                 tr.append(td_notes);
                 tr.appendTo('#team_cap_body');
             }
@@ -1178,7 +1229,7 @@ $(document).ready(function() {
         $.each(sorted_QB_list, function(index, value) {
             populate_yr1_table(value);
         });
-        $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+        $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();
         }
@@ -1188,7 +1239,7 @@ $(document).ready(function() {
         $.each(sorted_RB_list, function(index, value) {
             populate_yr1_table(value);
         });
-        $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+        $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();
         }
@@ -1198,7 +1249,7 @@ $(document).ready(function() {
         $.each(sorted_WR_list, function(index, value) {
             populate_yr1_table(value);
         });
-        $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+        $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();
         }
@@ -1208,7 +1259,7 @@ $(document).ready(function() {
         $.each(sorted_TE_list, function(index, value) {
             populate_yr1_table(value);
         });
-        $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+        $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();
         }
@@ -1236,7 +1287,7 @@ $(document).ready(function() {
             total_sal = total_sal + value.yr2_salary
         });
         if (total_sal != 0) {
-            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         }
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();
@@ -1252,7 +1303,7 @@ $(document).ready(function() {
             total_sal = total_sal + value.yr2_salary
         });
         if (total_sal != 0) {
-            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         }
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();
@@ -1268,7 +1319,7 @@ $(document).ready(function() {
             total_sal = total_sal + value.yr2_salary
         });
         if (total_sal != 0) {
-             $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+             $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         }
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();
@@ -1284,7 +1335,7 @@ $(document).ready(function() {
             total_sal = total_sal + value.yr2_salary
         });
         if (total_sal != 0) {
-            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         }
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();
@@ -1313,7 +1364,7 @@ $(document).ready(function() {
             total_sal = total_sal + value.yr3_salary
         });
         if (total_sal != 0) {
-            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         }
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();
@@ -1329,7 +1380,7 @@ $(document).ready(function() {
             total_sal = total_sal + value.yr3_salary
         });
         if (total_sal != 0) {
-            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         }
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();
@@ -1345,7 +1396,7 @@ $(document).ready(function() {
             total_sal = total_sal + value.yr3_salary
         });
         if (total_sal != 0) {
-            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         }
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();
@@ -1361,7 +1412,7 @@ $(document).ready(function() {
             total_sal = total_sal + value.yr3_salary
         });
         if (total_sal != 0) {
-             $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+             $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         }
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();
@@ -1390,7 +1441,7 @@ $(document).ready(function() {
             total_sal = total_sal + value.yr4_salary
         });
         if (total_sal != 0) {
-            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         }
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();
@@ -1406,7 +1457,7 @@ $(document).ready(function() {
             total_sal = total_sal + value.yr4_salary
         });
         if (total_sal != 0) {
-            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         }
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();
@@ -1422,7 +1473,7 @@ $(document).ready(function() {
             total_sal = total_sal + value.yr4_salary
         });
         if (total_sal != 0) {
-            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         }
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();
@@ -1438,7 +1489,7 @@ $(document).ready(function() {
             total_sal = total_sal + value.yr4_salary
         });
         if (total_sal != 0) {
-            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         }
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();
@@ -1467,7 +1518,7 @@ $(document).ready(function() {
             total_sal = total_sal + value.yr5_salary
         });
         if (total_sal != 0) {
-            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         }
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();
@@ -1483,7 +1534,7 @@ $(document).ready(function() {
             total_sal = total_sal + value.yr5_salary
         });
         if (total_sal != 0) {
-            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         }
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();
@@ -1499,7 +1550,7 @@ $(document).ready(function() {
             total_sal = total_sal + value.yr5_salary
         });
         if (total_sal != 0) {
-            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         }
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();
@@ -1515,7 +1566,7 @@ $(document).ready(function() {
             total_sal = total_sal + value.yr5_salary
         });
         if (total_sal != 0) {
-            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
+            $('<tr>').attr('style', 'height: 20px').appendTo('#team_cap_body').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>').append('<td>');
         }
         if (total_cost == 0) {
             $('#team_cap_body tr:first').remove();

@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    console.log('ready 2');
+    console.log('ready 3');
     var $display_bottom = $('#display_area').position().top+$('#display_area').height();
     var $threshhold_dropup = $display_bottom;
 
@@ -56,6 +56,9 @@ $(document).ready(function() {
             var td_avg_yearly_cost = $('<td>').css({'text-align' : 'center'});
             var td_cap_hit = $('<td>').css({'text-align' : 'center'});
             var td_years_left = $('<td>').css({'text-align' : 'center'});
+            var td_n1 = $('<td>').css({'text-align' : 'center', 'width' : '100%'});
+            var td_n2 = $('<td>').css({'text-align' : 'center', 'width' : '100%'});
+            var td_n3 = $('<td>').css({'text-align' : 'center', 'width' : '100%'});
             var td_notes = $('<td>');
             var td_actions = $('<td>').css({'text-align' : 'center', 'padding-top' : '10px', 'padding-bottom' : '10px'});
 
@@ -67,6 +70,15 @@ $(document).ready(function() {
             td_avg_yearly_cost.text('$' + Number(value.avg_yearly_cost).toFixed(2));
             td_cap_hit.text('$' + Number(value.cap_hit).toFixed(2));
             td_years_left.text(value.years_left);
+            var n1_label = $('<p>').text(value.n1).css({'vertical-align' : 'middle', 'display' : 'inherit', 'align' : 'center', 'width' : td_n1.width()});
+            var n1_edit = $('<textarea>').val(value.n1).prop('hidden', true).css({'height' : '100%', 'width' : '100%'});
+            td_n1.append(n1_label).append(n1_edit);
+            var n2_label = $('<p>').text(value.n2).css({'vertical-align' : 'middle', 'display' : 'inherit', 'align' : 'center', 'width' : td_n2.width()});
+            var n2_edit = $('<textarea>').val(value.n2).prop('hidden', true).css({'height' : '100%', 'width' : '100%'});
+            td_n2.append(n2_label).append(n2_edit);
+            var n3_label = $('<p>').text(value.n3).css({'vertical-align' : 'middle', 'display' : 'inherit', 'align' : 'center', 'width' : td_n3.width()});
+            var n3_edit = $('<textarea>').val(value.n3).prop('hidden', true).css({'height' : '100%', 'width' : '100%'});
+            td_n3.append(n3_label).append(n3_edit);
             var notes_label = $('<p>').text(value.notes).css({'vertical-align' : 'middle', 'display' : 'inherit'});
             var notes_edit = $('<textarea>').val(value.notes).prop('hidden', true).css({'height' : '100%', 'width' : '100%'});
             td_notes.append(notes_label).append(notes_edit);
@@ -132,6 +144,9 @@ $(document).ready(function() {
             tr.append(td_avg_yearly_cost);
             tr.append(td_cap_hit);
             tr.append(td_years_left);
+            tr.append(td_n1);
+            tr.append(td_n2);
+            tr.append(td_n3);
             tr.append(td_notes);
             tr.appendTo('#notes_table_tbody');
         });
@@ -164,14 +179,32 @@ $(document).ready(function() {
 
     $(document).on('click', '.edit_note_action', function() {
         var $this_cell = $(this).parent().parent().parent();
-        var $notes_cell = $(this).parent().parent().parent().next().next().next().next().next().next().next().next();
+        var $n1_cell = $(this).parent().parent().parent().next().next().next().next().next().next().next().next();
+        var $n2_cell = $(this).parent().parent().parent().next().next().next().next().next().next().next().next().next();
+        var $n3_cell = $(this).parent().parent().parent().next().next().next().next().next().next().next().next().next().next();
+        var $notes_cell = $(this).parent().parent().parent().next().next().next().next().next().next().next().next().next().next().next();
+        $n1_cell.find('p').hide();
+        $n1_cell.find('textarea').show();
+        $n2_cell.find('p').hide();
+        $n2_cell.find('textarea').show();
+        $n3_cell.find('p').hide();
+        $n3_cell.find('textarea').show();
         $notes_cell.find('p').hide();
         $notes_cell.find('textarea').show();
         $this_cell.find('.action_dropdown').hide();
         $this_cell.find('button').show();
 
         $('.cancel_button').on('click', function () {
+            var n1_text = $n1_cell.find('p').text();
+            var n2_text = $n2_cell.find('p').text();
+            var n3_text = $n3_cell.find('p').text();
             var text = $notes_cell.find('p').text();
+            $n1_cell.find('p').show();
+            $n1_cell.find('textarea').hide().val(n1_text);
+            $n2_cell.find('p').show();
+            $n2_cell.find('textarea').hide().val(n2_text);
+            $n3_cell.find('p').show();
+            $n3_cell.find('textarea').hide().val(n3_text);
             $notes_cell.find('p').show();
             $notes_cell.find('textarea').hide().val(text);
             $this_cell.find('.action_dropdown').show();
@@ -180,7 +213,31 @@ $(document).ready(function() {
 
         $('.save_button').on('click', function() {
             var player = $this_cell.next().next().text();
+            var n1_text = $n1_cell.find('textarea').val();
+            var n2_text = $n2_cell.find('textarea').val();
+            var n3_text = $n3_cell.find('textarea').val();
             var text = $notes_cell.find('textarea').val();
+            if ($.isNumeric(Number(n1_text)) == false) {
+                $n1_cell.css({'border' : '1px solid red'});
+                return;
+            }
+            if ($.isNumeric(Number(n2_text)) == false) {
+                $n2_cell.css({'border' : '1px solid red'});
+                return;
+            }
+            if ($.isNumeric(Number(n3_text)) == false) {
+                $n3_cell.css({'border' : '1px solid red'});
+                return;
+            }
+            $n1_cell.find('p').show().text(n1_text);
+            $n1_cell.find('textarea').hide();
+            $n2_cell.find('p').show().text(n2_text);
+            $n2_cell.find('textarea').hide();
+            $n3_cell.find('p').show().text(n3_text);
+            $n3_cell.find('textarea').hide();
+            $n1_cell.css({'border-left' : '1px solid #E1EEF4'});
+            $n2_cell.css({'border-left' : '1px solid #E1EEF4'});
+            $n3_cell.css({'border-left' : '1px solid #E1EEF4'});
             $notes_cell.find('p').show().text(text);
             $notes_cell.find('textarea').hide();
             $this_cell.find('.action_dropdown').show();
@@ -191,7 +248,10 @@ $(document).ready(function() {
                 data: {
                     csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
                     'player' : player,
-                    'notes_text' : text
+                    'notes_text' : text,
+                    'n1' : n1_text,
+                    'n2' : n2_text,
+                    'n3' : n3_text
                 },
                 dataType: 'json',
                 success: function (data) {

@@ -72,10 +72,37 @@
 }
 
 #notes_label, #notes_text {
-    height: 80%;
+    height: 68%;
     width: 100%;
     margin-right: 25px;
     overflow-y: auto;
+}
+
+#n1_label, #n1_text {
+    display: inline-block;
+    height: 12%;
+    width: 32%;
+    border: 1px solid #dcdcdc;
+    padding: 5px 5px 5px 5px;
+    border-radius: 5px;
+}
+
+#n2_label, #n2_text {
+    display: inline-block;
+    height: 12%;
+    width: 32%;
+    border: 1px solid #dcdcdc;
+    padding: 5px 5px 5px 5px;
+    border-radius: 5px;
+}
+
+#n3_label, #n3_text {
+    display: inline-block;
+    height: 12%;
+    width: 32%;
+    border: 1px solid #dcdcdc;
+    padding: 5px 5px 5px 5px;
+    border-radius: 5px;
 }
 
 #shortlist_table {

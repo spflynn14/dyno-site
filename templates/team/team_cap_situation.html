@@ -17,7 +17,7 @@
         <div class="third_tab_button_team" id="yr5_cap_situation">{{ year_list.4 }}</div>
     </div>
 
-    <div id="display_area" style="padding: 1% 15% 0px 14%">
+    <div id="display_area" style="padding: 1% 2% 0px 2%">
         <div id="team_info_div">
             <div id="num_players_cap_sit_div">
                 <h6 style="font-weight: bold">Players</h6>
@@ -41,15 +41,18 @@
             <table>
                 <thead>
                     <tr>
-                        <th width="9%" >Role</th>
-                        <th width="7%" style="text-align: center">Pos</th>
-                        <th width="14%">Name</th>
-                        <th width="4%" style="text-align: center">Age</th>
-                        <th width="12%" style="text-align: center">Contract Type</th>
-                        <th width="10%" style="text-align: center">Cap Hit</th>
-                        <th width="10%" style="text-align: center">Salary</th>
-                        <th width="10%" style="text-align: center">Signing Bonus</th>
-                        <th width="24%">Notes</th>
+                        <th width="7%" >Role</th>
+                        <th width="5%" style="text-align: center">Pos</th>
+                        <th width="11%">Name</th>
+                        <th width="3%" style="text-align: center">Age</th>
+                        <th width="8%" style="text-align: center">Contract Type</th>
+                        <th width="7%" style="text-align: center">Cap Hit</th>
+                        <th width="7%" style="text-align: center">Salary</th>
+                        <th width="7%" style="text-align: center">Signing Bonus</th>
+                        <th width="7%" style="text-align: center">Notes - n1</th>
+                        <th width="7%" style="text-align: center">Notes - n2</th>
+                        <th width="7%" style="text-align: center">Notes - n3</th>
+                        <th width="24%">Notes - text</th>
                     </tr>
                 </thead>
                 <tbody id="team_cap_body">
@@ -108,6 +111,10 @@
                     {% endfor %}
                     </td>
                     <td id="vw_1-25">{{ x.age }}</td>
+                    <td id="vw_1-26">{{ x.n1 }}</td>
+                    <td id="vw_1-27">{{ x.n2 }}</td>
+                    <td id="vw_1-28">{{ x.n3 }}</td>
+                    <td id="vw_1-29">{{ x.player_notes }}</td>
                 </tr>
             </table>
         {% endfor %}

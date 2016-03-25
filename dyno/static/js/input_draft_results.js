@@ -31,7 +31,7 @@ $(document).ready(function() {
                 },
                 dataType: 'json',
                 success: function (data) {
-                    location.href('/batch');
+                    location.href = '/batch';
                 }
             });
         });

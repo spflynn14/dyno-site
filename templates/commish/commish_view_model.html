@@ -4,22 +4,31 @@
 
 {% block head %}
     <script src="{% static 'js/commish_view_model.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.tablesorter.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/commish_view_model.css' %}">
 {% endblock %}
 
 {% block content %}
     {% csrf_token %}
 
     <div class="tab_area" id="second_tab_area">
-
+        <select id="model_select" style="display: inline-block">
+            {% for x in model_list %}
+                <option>{{ x }}</option>
+            {% endfor %}
+        </select>
+        <h5 id="message_text" style="display: inline-block; margin-left: 50px"></h5>
     </div>
 
     <div id="display_area">
-        <select id="player_select">
-            {% for x in players %}
-                <option>{{ x.name }}</option>
-            {% endfor %}
-        </select>
-        <button class="commish_view_model_button" id="view_model_player">Player</button>
+        <table>
+            <thead id="table_header">
+
+            </thead>
+            <tbody id="table_body">
+
+            </tbody>
+        </table>
     </div>
 
 {% endblock %}
