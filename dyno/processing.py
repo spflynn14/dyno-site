@@ -1,7 +1,7 @@
 import os, platform
 import sqlite3 as sql3
 from django.utils import timezone
-from django.utils.dateparse import parse_datetime
+from django.utils.dateparse import parse_datetime, parse_time
 from django.db.models import Q, Sum
 from decimal import *
 from django.contrib.auth import authenticate, login
@@ -511,7 +511,7 @@ def auction_end_routine():
 
     for x in e:
         auction_start = x.clock_reset
-        auction_end = auction_start + timezone.timedelta(minutes=x.clock_timeout_minutes)
+        auction_end = auction_start + datetime.timedelta(minutes=x.clock_timeout_minutes)
 
         if time_now > auction_end:
             finished_auctions.append(x)
@@ -550,9 +550,9 @@ def auction_end_routine():
         create_alerts('Auction - Won', '', [x[0], x[1], x[2]])
 
 def periodic_alerts_routine():
-    date_time = timezone.now()
+    date_time = datetime.datetime.now()
     time_now = date_time.time()
-    today = timezone.now().weekday()
+    today = date_time.weekday()
     days_list = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     today_string = days_list[today]
 
@@ -565,7 +565,7 @@ def periodic_alerts_routine():
             #user gets daily emails
             daily_time = x.daily_emails_time
             #check to see if time_now is between daily_time -5 and daily_time +10 min
-            full_daily = timezone.now()
+            full_daily = datetime.datetime.combine(datetime.date.today(), daily_time)
             d1 = full_daily - timezone.timedelta(minutes=5)
             d2 = full_daily + timezone.timedelta(minutes=10)
             start = d1.time()
@@ -610,9 +610,10 @@ def periodic_alerts_routine():
             weekly_time = x.weekly_emails_time
             #check to see if today is same as weekly_day
             if weekly_day == today_string:
-                #same day, check to see if time_now is between weekly_time -1 and weekly_time +10 min
-                full_weekly = timezone.now()
-                d1 = full_weekly - timezone.timedelta(minutes=1)
+                #same day, check to see if time_now is between weekly_time -5 and weekly_time +10 min
+                weekly_time = x.daily_emails_time
+                full_weekly = datetime.datetime.combine(datetime.date.today(), weekly_time)
+                d1 = full_weekly - timezone.timedelta(minutes=5)
                 d2 = full_weekly + timezone.timedelta(minutes=10)
                 start = d1.time()
                 end = d2.time()
@@ -3535,7 +3536,8 @@ def create_message_board_post(request):
             replied_post_title = ''
         create_alerts('New Board Post', request.user, [title, is_reply, replied_post_title])
     else:
-        t = timezone.now()
+        t = datetime.datetime.now()
+        print(t, t.hour)
         if t.hour > 12:
             h = t.hour - 12
             f = 'pm'
