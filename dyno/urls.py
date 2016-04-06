@@ -134,6 +134,7 @@ urlpatterns = [
     url(r'^create_divisions$', processing.create_divisions, name='create divisions'),
     url(r'^save_player_notes$', processing.save_player_notes, name='save player notes'),
     url(r'^save_player_shortlist_assignments$', processing.save_player_shortlist_assignments, name='save shortlist assignments - Player page'),
+    url(r'^save_player_shortlist_assignments_batch$', processing.save_player_shortlist_assignments_batch, name='save shortlist assignments - batch from rookie pool page'),
     url(r'^team/team_notes_shortlists$', views.teamnotesandshortlists, name='team - notes and shortlists'),
     url(r'^create_new_shortlist$', processing.create_new_shortlist, name='create new shortlist'),
     url(r'^get_shortlist_details$', processing.get_shortlist_details, name='get shortlist details'),
@@ -147,4 +148,6 @@ urlpatterns = [
     url(r'^clear_team_emails$', processing.clear_team_emails, name='clear team email address'),
     url(r'^get_model$', processing.get_model, name='get model - view model page'),
     url(r'^save_model_cell$', processing.save_model_data, name='save model data - view model page'),
+    url(r'^draft/draft_rookie_pool$', views.draftrookiepool, name='draft rookie pool'),
+    url(r'^deactivate_players$', processing.deactivate_players, name='deactivate players'),
 ]

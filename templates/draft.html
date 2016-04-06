@@ -127,6 +127,8 @@
                             <li><a href="/draft/settings">Draft Info and Settings</a></li>
                             <li class="divider"></li>
                             <li><a href="/draft/future_draft_picks">Future Draft Picks</a></li>
+                            <li class="divider"></li>
+                            <li><a href="/draft/draft_rookie_pool">Rookie Pool</a></li>
                         </ul>
                     </div>
 
@@ -151,6 +153,12 @@
                         <a href="/draft/future_draft_picks" class="second_tab_button_team" style="background-color: #2d99d4; color: white">Future Draft Picks</a>
                     {% else %}
                         <a href="/draft/future_draft_picks" class="second_tab_button_team">Future Draft Picks</a>
+                    {% endif %}
+
+                    {% if request.path == '/draft/draft_rookie_pool' %}
+                        <a href="/draft/draft_rookie_pool" class="second_tab_button_team" style="background-color: #2d99d4; color: white">Rookie Pool</a>
+                    {% else %}
+                        <a href="/draft/draft_rookie_pool" class="second_tab_button_team">Rookie Pool</a>
                     {% endif %}
                 </div>
 

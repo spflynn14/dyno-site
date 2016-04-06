@@ -1,0 +1,131 @@
+#action_cell {
+    background-color: inherit;
+    color: inherit;
+    font-size: small;
+    border-left: 1px solid #cccccc;
+}
+
+.action_dropdown {
+    background-color: inherit;
+    padding: 6px 6px 6px 0;
+}
+
+.dropdown-toggle {
+    color: black;
+}
+
+.dropdown-toggle:hover {
+    cursor: pointer;
+}
+
+.action_li {
+    font-size: small;
+    padding: 6px 6px 6px 6px;
+    width: 200px;
+}
+
+.dropdown-submenu {
+    position:relative;
+    background-color: inherit;
+    text-align: left;
+}
+
+.dropdown-submenu>.dropdown-menu {
+    top:-250%;
+    left:100%;
+    margin-top:-6px;
+    margin-left:-1px;
+    -webkit-border-radius:0 6px 6px 6px;
+    -moz-border-radius:0 6px 6px 6px;
+    border-radius:0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+    display:block;
+}
+.dropdown-submenu>a:after {
+    display:block;
+    content:" ";
+    float:right;
+    width:0;
+    height:0;
+    border-color:transparent;
+    border-style:solid;
+    border-width:5px 0 5px 5px;
+    border-left-color:#cccccc;
+    margin-top:5px;
+    margin-right:-10px;
+}
+.dropdown-submenu:hover>a:after {
+    border-left-color:#ffffff;
+}
+.dropdown-submenu.pull-left {
+    float:none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+    left:-100%;
+    margin-left:10px;
+    -webkit-border-radius:6px 0 6px 6px;
+    -moz-border-radius:6px 0 6px 6px;
+    border-radius:6px 0 6px 6px;
+}
+
+
+.rookie_pool_table_div table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.rookie_pool_table_div {
+    height: 95%;
+    padding-top: 1%;
+    font: normal 0.75em/150% Arial, Helvetica, sans-serif;
+    background: #fff;
+    overflow-y: scroll;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.rookie_pool_table_div table td, .rookie_pool_table_div table th {
+    padding: 4px 4px;
+    font-size: small;
+}
+
+.rookie_pool_table_div table thead th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-size: small;
+    border-left: 1px solid #cccccc;
+}
+
+.rookie_pool_table_div table thead td {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-size: small;
+    border-left: 1px solid #cccccc;
+}
+
+.rookie_pool_table_div table thead th:first-child {
+    border: none;
+}
+.rookie_pool_table_div table tbody td {
+    color: black;
+    border-left: 1px solid #E1EEF4;
+    font-size: 1em;
+    font-weight: normal;
+}
+.rookie_pool_table_div table tbody td:first-child {
+    border-left: none;
+}
+.rookie_pool_table_div table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.rookie_pool_table_div th:hover {
+    cursor: pointer;
+}
+
+.rookie_pool_table_div tbody tr:nth-child(even) {
+    background-color: #dcdcdc;
+}

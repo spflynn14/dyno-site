@@ -44,9 +44,22 @@
         <section id="center_area">
             <div>
                  <div id="display_area">
-                     <a href="/input_draft_results" style="float: left">Input Draft Results</a>
+                     <div style="border: 1px solid #cdcdcd; padding: 15px 15px 15px 15px">
+                         <a href="/input_draft_results" style="float: left">Input Draft Results</a>
+                         <br>
+                     </div>
                      <br><br>
-                     <div>
+                     <div style="border: 1px solid #cdcdcd; padding: 15px 15px 15px 15px">
+                         <form method="post" action="/process_player_contract_batch">
+                             {% csrf_token %}
+                             Use This For "Team": <textarea rows="1" cols="10" name="team"></textarea><br>
+                             Player Batch: <textarea rows="4" cols="120" name="players_text"></textarea><br>
+                             <p style="font-size: smaller">Fields: pos, name, birthdate, pfr_id - divider ":"</p>
+                             <input type="submit" value="Submit">
+                         </form>
+                     </div>
+                     <br><br>
+                     <div style="border: 1px solid #cdcdcd; padding: 15px 15px 15px 15px">
                          <form method="post" action="/input_old_transactions">
                              {% csrf_token %}
                              Transaction Data: <textarea rows="4" cols="120" name="trans_data"></textarea><br>
@@ -54,31 +67,37 @@
                          </form>
                      </div>
                      <br><br>
-                     <form method="post" action="/process_player_stats">
-                         {% csrf_token %}
-                         Year: <textarea rows="1" cols="10" name="year"></textarea><br>
-                         Fantasy Stats Batch: <textarea rows="4" cols="120" name="stats_text"></textarea><br>
-                         Scoring Stats Batch: <textarea rows="4" cols="120" name="scoring_stats_text"></textarea><br>
-                         Rushing Stats Batch: <textarea rows="4" cols="120" name="rushing_stats_text"></textarea><br>
-                         Kicking Stats Batch: <textarea rows="4" cols="120" name="kicking_stats_text"></textarea><br>
-                         Defense Stats Batch: <textarea rows="4" cols="120" name="defense_stats_text"></textarea><br>
-                         <input type="submit" value="Submit">
-                     </form>
+                     <div style="border: 1px solid #cdcdcd; padding: 15px 15px 15px 15px">
+                         <form method="post" action="/process_player_stats">
+                             {% csrf_token %}
+                             Year: <textarea rows="1" cols="10" name="year"></textarea><br>
+                             Fantasy Stats Batch: <textarea rows="4" cols="120" name="stats_text"></textarea><br>
+                             Scoring Stats Batch: <textarea rows="4" cols="120" name="scoring_stats_text"></textarea><br>
+                             Rushing Stats Batch: <textarea rows="4" cols="120" name="rushing_stats_text"></textarea><br>
+                             Kicking Stats Batch: <textarea rows="4" cols="120" name="kicking_stats_text"></textarea><br>
+                             Defense Stats Batch: <textarea rows="4" cols="120" name="defense_stats_text"></textarea><br>
+                             <input type="submit" value="Submit">
+                         </form>
+                     </div>
                      <br><br>
-                     <form method="post" action="/assign_pfr_ids">
-                         {% csrf_token %}
-                         ID List: <textarea rows="4" cols="120" name="id_list"></textarea><br>
-                         <input type="submit" value="Assign PFR Ids">
-                     </form>
+                     <div style="border: 1px solid #cdcdcd; padding: 15px 15px 15px 15px">
+                         <form method="post" action="/assign_pfr_ids">
+                             {% csrf_token %}
+                             ID List: <textarea rows="4" cols="120" name="id_list"></textarea><br>
+                             <input type="submit" value="Assign PFR Ids">
+                         </form>
+                     </div>
+                     <br><br>
+                     <div style="border: 1px solid #cdcdcd; padding: 15px 15px 15px 15px">
+                         <form method="post" action="/deactivate_players">
+                             {% csrf_token %}
+                             Player List: <textarea rows="4" cols="120" name="player_list"></textarea><br>
+                             <input type="submit" value="Deactivate Players">
+                         </form>
+                     </div>
 
                      <br><br><br>************************************<br><br><br><br>
 
-                     <form method="post" action="/process_player_contract_batch">
-                         {% csrf_token %}
-                         Player Contract Batch: <textarea rows="8" cols="120" name="player_contract_text"></textarea><br>
-                         <input type="submit" value="Submit">
-                     </form>
-                    <br>
                      <form method="post" action="/process_salary_lists_batch">
                          {% csrf_token %}
                          Salary Batch: <textarea rows="8" cols="120" name="salary_lists_text"></textarea><br>

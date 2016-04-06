@@ -7,6 +7,7 @@ from django.shortcuts import render
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect, HttpResponse
 from django.db.models import Q, Sum
+from django.contrib.staticfiles.templatetags.staticfiles import static
 import django.apps
 from .forms import *
 from .models import *
@@ -563,7 +564,7 @@ def leagueallplayerspage(request):
     for x in a:
         teams.append(x.internal_name)
 
-    b = Player.objects.order_by('position', '-total_value')
+    b = Player.objects.all().exclude(name='Deactivated').order_by('position', '-total_value')
     table_contents = []
     for x in b:
         if x.team in teams:
@@ -578,7 +579,7 @@ def leagueextensions(request):
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/league/extensions'})
 
-    a = Player.objects.all()
+    a = Player.objects.all().exclude(name='Deactivated')
     b = ADP.objects.all().order_by('rank')
     c = Performance_Yr1.objects.all().order_by('rank')
     d = Performance_Yr2.objects.all().order_by('rank')
@@ -1094,7 +1095,7 @@ def leaguefuturedraftpicks(request):
 
 def leaguecapsummary(request):
     create_session(request.user, 'capsummary')
-    a = Player.objects.all()
+    a = Player.objects.all().exclude(name='Deactivated')
     b = Team.objects.all()
 
     team_list = []
@@ -1969,7 +1970,7 @@ def playerpage(request):
     a.text_variable = ''
     a.save()
 
-    b = Player.objects.order_by('name')
+    b = Player.objects.all().exclude(name='Deactivated').order_by('name')
     player_list = []
     for x in b:
         player_list.append(x.name)
@@ -2859,7 +2860,7 @@ def confirmcutplayers(request):
     a.int_variable = 0
     a.save()
 
-    b = Player.objects.all()
+    b = Player.objects.all().exclude(name='Deactivated')
 
     if from_int == 0:
         player_list = [temp]
@@ -3160,3 +3161,30 @@ def input_old_transactions(request):
                            'player_id' : player_id})
 
     return render (request, 'batch/input_old_transactions.html', {'trans_list' : trans_list})
+
+def draftrookiepool(request):
+    a = Player.objects.filter(team='Rookie')
+
+    ipath = static('content/2016_rookies.csv')
+    i = open('dyno/'+ipath)
+
+    info_list = []
+    while True:
+        line = i.readline()
+        if not line:
+            break
+        name, college, nfl_team, pick = line.strip().split(':')
+        info_list.append({'player' : name, 'college' : college, 'nfl_team' : nfl_team, 'pick' : pick})
+    i.close()
+
+    rookies = []
+    for x in a:
+        for y in info_list:
+            if y['player'] == x.name:
+                rookies.append({'pos' : x.position, 'name' : x.name, 'college' : y['college'], 'nfl_team' : y['nfl_team'], 'pick' : y['pick']})
+
+    b = Shortlist.objects.filter(user=request.user)
+
+
+    return render (request, 'draft/draft_rookie_pool.html', {'rookies' : rookies,
+                                                             'shortlists' : b})

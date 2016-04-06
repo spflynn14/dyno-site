@@ -572,7 +572,7 @@ def periodic_alerts_routine():
             end = d2.time()
             if time_now > start and time_now < end:
                 #gather alerts
-                day_ago = date_time - timezone.timedelta(days=1)
+                day_ago = timezone.now() - timezone.timedelta(days=1)
                 alert_list = []
                 b = Alert.objects.filter(user=x.user).order_by('alert_type')
                 for y in b:
@@ -619,7 +619,7 @@ def periodic_alerts_routine():
                 end = d2.time()
                 if time_now > start and time_now < end:
                     #gather alerts
-                    week_ago = date_time - timezone.timedelta(days=7)
+                    week_ago = timezone.now() - timezone.timedelta(days=7)
                     alert_list = []
                     b = Alert.objects.filter(user=x.user).order_by('alert_type')
                     for y in b:
@@ -996,103 +996,43 @@ def loginView(request):
         return HttpResponseRedirect('/login_failed')
 
 def processplayercontractsbatch(request):
-    c = request.POST['player_contract_text']
-    if c == '':
-        return HttpResponseRedirect('/batch')
-    c_list = c.strip().split('\r\n')
-    for x in range(len(c_list)):
-        c_list[x] = c_list[x].strip().split(':')
+    c = request.POST['players_text']
+    team = request.POST['team']
 
-    for x in range(len(c_list)):
-        c_list[x][4] = Decimal(c_list[x][4])
-        try:
-            c_list[x][5] = Decimal(c_list[x][5])
-        except:
-            c_list[x][5] = 0
-        try:
-            c_list[x][6] = Decimal(c_list[x][6])
-        except:
-            c_list[x][6] = 0
-        try:
-            c_list[x][7] = Decimal(c_list[x][7])
-        except:
-            c_list[x][7] = 0
-        try:
-            c_list[x][8] = Decimal(c_list[x][8])
-        except:
-            c_list[x][8] = 0
-        contract_length = 0
-        for y in range(4,9):
-            if c_list[x][y] == 0:
-                pass
-            else:
-                contract_length += 1
-        position = c_list[x][0]
-        name = c_list[x][1]
-        team = c_list[x][2]
-        contract_type = c_list[x][3]
-        total_value = c_list[x][4]+c_list[x][5]+c_list[x][6]+c_list[x][7]+c_list[x][8]
-        signing_bonus = round((c_list[x][5]+c_list[x][6]+c_list[x][7]+c_list[x][8])*Decimal(0.4),1)
-        salary = total_value - signing_bonus
-        yr1_sal = c_list[x][4]
-        try:
-            yr2_sal = ((c_list[x][5])/(total_value-yr1_sal))*(salary-yr1_sal)
-        except:
-            yr2_sal = 0
-        try:
-            yr3_sal = ((c_list[x][6])/(total_value-yr1_sal))*(salary-yr1_sal)
-        except:
-            yr3_sal = 0
-        try:
-            yr4_sal = ((c_list[x][7])/(total_value-yr1_sal))*(salary-yr1_sal)
-        except:
-            yr4_sal = 0
-        try:
-            yr5_sal = ((c_list[x][8])/(total_value-yr1_sal))*(salary-yr1_sal)
-        except:
-            yr5_sal = 0
-        yr1_sb = 0
-        if yr2_sal == 0:
-            yr2_sb = 0
-        else:
-            yr2_sb = signing_bonus / (contract_length-1)
-        if yr3_sal == 0:
-            yr3_sb = 0
-        else:
-            yr3_sb = signing_bonus / (contract_length-1)
-        if yr4_sal == 0:
-            yr4_sb = 0
-        else:
-            yr4_sb = signing_bonus / (contract_length-1)
-        if yr5_sal == 0:
-            yr5_sb = 0
-        else:
-            yr5_sb = signing_bonus / (contract_length-1)
-        notes = c_list[x][9]
-        Player.objects.create(position=position,
+    c_list = c.split('\r\n')
+
+    for x in c_list:
+        pos, name, birthdate, pfr_id = x.split(':')
+        if len(birthdate) == 0:
+            birthdate = '1900-01-01'
+        Player.objects.create(position=pos,
                               name=name,
                               team=team,
-                              contract_type=contract_type,
-                              total_value=total_value,
-                              signing_bonus=signing_bonus,
-                              salary=salary,
-                              yr1_salary=yr1_sal,
-                              yr2_salary=yr2_sal,
-                              yr3_salary=yr3_sal,
-                              yr4_salary=yr4_sal,
-                              yr5_salary=yr5_sal,
-                              yr1_sb=yr1_sb,
-                              yr2_sb=yr2_sb,
-                              yr3_sb=yr3_sb,
-                              yr4_sb=yr4_sb,
-                              yr5_sb=yr5_sb,
-                              notes=notes,
+                              contract_type='none',
+                              birthdate=birthdate,
+                              pfr_id=pfr_id,
+                              total_value=0,
+                              signing_bonus=0,
+                              salary=0,
+                              yr1_salary=0,
+                              yr2_salary=0,
+                              yr3_salary=0,
+                              yr4_salary=0,
+                              yr5_salary=0,
+                              yr1_sb=0,
+                              yr2_sb=0,
+                              yr3_sb=0,
+                              yr4_sb=0,
+                              yr5_sb=0,
+                              notes='',
                               yr1_role='--',
                               yr2_role='--',
                               yr3_role='--',
                               yr4_role='--',
-                              yr5_role='--',)
-        print(x)
+                              yr5_role='--',
+                              )
+
+
     return HttpResponseRedirect('/batch')
 
 def processsalarylistsbatch(request):
@@ -3727,6 +3667,45 @@ def save_player_shortlist_assignments(request):
 
     return JsonResponse('test', safe=False)
 
+def save_player_shortlist_assignments_batch(request):
+    players = request.POST.getlist('players[]')
+    shortlist_id = int(request.POST['shortlist_id'])
+    which = request.POST['which']
+
+    if shortlist_id == 999999:
+        a = Shortlist.objects.filter(user=request.user)
+        current_shortlist = a[0]
+    else:
+        current_shortlist = Shortlist.objects.get(pk=shortlist_id)
+    m = current_shortlist.members
+    members = m.split(',')
+
+    output = members
+    output_string = ''
+
+    for x in players:
+        b = Player.objects.get(name=x)
+        player_id = b.id
+
+        if which == 'add':
+            if str(player_id) in members:
+                pass
+            else:
+                output.append(player_id)
+        else:
+            output = []
+            for x in members:
+                if x != str(player_id):
+                    output.append(x)
+
+    for x in output:
+        output_string = output_string + str(x) + ','
+    output_string = output_string[:-1]
+    current_shortlist.members = output_string
+    current_shortlist.save()
+
+    return JsonResponse('test', safe=False)
+
 def process_player_stats(request):
     def convert_to_int(data):
         pfr_id, team, age, g, gs, pass_comp, pass_att, pass_yds, pass_td, pass_int, rush_att, rush_yds, rush_ypa, rush_td, rec_targets, rec, rec_yds, rec_ypr, rec_td, a, b, c, d, e, f, i = data
@@ -4600,3 +4579,14 @@ def save_model_data(request):
 
     return JsonResponse('done', safe=False)
 
+def deactivate_players(request):
+    p = request.POST['player_list']
+
+    player_list = p.split('\r\n')
+
+    for x in player_list:
+        a = Player.objects.get(name=x)
+        a.team = 'Deactivated'
+        a.save()
+
+    return HttpResponseRedirect('/')

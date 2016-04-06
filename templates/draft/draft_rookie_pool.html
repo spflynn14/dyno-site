@@ -1,0 +1,56 @@
+{% extends 'draft.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/draft_rookie_pool.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.tablesorter.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/draft_rookie_pool.css' %}">
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="third_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        <div class="rookie_pool_table_div">
+            <table id="rookie_pool_table" style="width: 50%; table-layout: fixed">
+                <thead>
+                    <tr>
+                        <th width="8%" style="text-align: center">Pos</th>
+                        <th width="25%">Player</th>
+                        <th width="16%">College</th>
+                        <th width="15%" style="text-align: center">NFL Team</th>
+                        <th width="18%" style="text-align: center">Selection (Overall)</th>
+                        <td width="8%" style="text-align: center">
+                            <input type="checkbox" id="check_uncheck_all"/>
+                        </td>
+                        <td width="10%" style="text-align: center" id="action_cell"></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for x in rookies %}
+                        <tr>
+                            <td style="text-align: center">{{ x.pos }}</td>
+                            <td>{{ x.name }}</td>
+                            <td>{{ x.college }}</td>
+                            <td style="text-align: center">{{ x.nfl_team }}</td>
+                            <td style="text-align: center">{{ x.pick }}</td>
+                            <td style="text-align: center">
+                                <input type="checkbox" class="add_checkbox"/>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="vw_2" hidden>
+        {% for x in shortlists %}
+            <p id="{{ x.id }}">{{ x.title }}</p>
+        {% endfor %}
+    </div>
+{% endblock %}

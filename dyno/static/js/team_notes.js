@@ -66,7 +66,11 @@ $(document).ready(function() {
             var name_link = $('<div>').addClass('name_link').text(value.name);
             td_name.append(name_link);
             td_team.text(value.team);
-            td_age.text(value.age);
+            if (value.age > 100) {
+                td_age.text('');
+            } else {
+                td_age.text(value.age);
+            }
             td_avg_yearly_cost.text('$' + Number(value.avg_yearly_cost).toFixed(2));
             td_cap_hit.text('$' + Number(value.cap_hit).toFixed(2));
             td_years_left.text(value.years_left);
