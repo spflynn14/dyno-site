@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    console.log('ready 2');
+    console.log('ready 3');
 
     var d = new Date();
     var today = format_date(d);
@@ -117,6 +117,20 @@ $(document).ready(function() {
                 return_text = 'A reply was made "' + data.var_t1 + '" to the post titled: "' + data.var_t3 + '"';
             } else {
                 return_text = 'A post was created titled: "' + data.var_t1 + '"'
+            }
+            return return_text;
+        } else if (data.alert_type == 'Draft Pick Made') {
+            var verbose_pick = '';
+            var temp = data.var_t3.split(',');
+            if (Number(temp[1]) >= 10) {
+                verbose_pick = temp[0] + '.' + temp[1]
+            } else{
+                verbose_pick = temp[0] + '.0' + temp[1]
+            }
+            if (data.var_t1 == 'pick passed') {
+                return_text = data.var_t2 + ' passed on pick ' + verbose_pick + '.'
+            } else {
+                return_text = data.var_t1 + ' was selected by ' + data.var_t2 + ' with pick ' + verbose_pick + '.'
             }
             return return_text;
         }

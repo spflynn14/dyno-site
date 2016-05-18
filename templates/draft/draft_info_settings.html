@@ -5,75 +5,243 @@
 {% block head %}
     <script src="{% static 'js/draft_info_settings.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jquery.tablesorter.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/draft_info_settings.css' %}">
 {% endblock %}
 
 {% block content %}
-    <div class="tab_area" id="third_tab_area"; style="margin-top: 30px">
-        <table style="width: 60%; table-layout: fixed">
-            <thead>
-                <tr>
-                    <th style="width: 40%">Select Team To See Total Cost of Picks</th>
-                    <th style="width: 15%; text-align: center">2016 Cost</th>
-                    <th style="width: 15%; text-align: center">2017 Cost</th>
-                    <th style="width: 15%; text-align: center">2018 Cost</th>
-                    <th style="width: 15%; text-align: center">2019 Cost</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <select id="team_pick_sum_select">
-                            <option></option>
-                            {% for x in team_list %}
-                                <option>{{ x.internal_name }}</option>
-                            {% endfor %}
-                        </select>
-                    </td>
-                    <td style='text-align: center' id="pick_sum_label_yr1"></td>
-                    <td style='text-align: center' id="pick_sum_label_yr2"></td>
-                    <td style='text-align: center' id="pick_sum_label_yr3"></td>
-                    <td style='text-align: center' id="pick_sum_label_yr4"></td>
-                </tr>
-            </tbody>
-        </table>
+    {% csrf_token %}
+    <div class="tab_area" id="third_tab_area" style="height: 88%">
+        <div id="autopick_settings_area">
+            <h4 style="text-decoration: underline">Draft Picks and Autopick Settings</h4>
+            <div id="autopick_settings_table_div">
+                <table id='autopick_settings_table'>
+                    <thead>
+                        <tr>
+                            <th width="8%">Pick</th>
+                            <th width="5%"></th>
+                            <th width="20%"></th>
+                            <th width="27%"></th>
+                            <th width="40%"></th>
+                        </tr>
+                    </thead>
+                    <tbody id='autopick_table_tbody'>
+
+                    </tbody>
+                </table>
+            </div>
+            <div id="autopick_notifications_area">
+                <table style="table-layout: fixed; width: 100%;">
+                    <tr>
+                        <td style="width: 60%; text-align: left">Turn Off Autopick For Trade Offer &nbsp&nbsp<i class="glyphicon glyphicon-question-sign" title='If you are on the clock and autopick is active, setting this to "Yes" will turn off the autopick if you receive a trade offer. After resolving the trade offer, you must then make your pick manually.'></i></td>
+                        <td style="width: 20%; text-align: center"><input type="radio" name="turn_off_autopick_trade" value="yes"> &nbsp&nbspYes</td>
+                        <td style="width: 20%; text-align: center"><input type="radio" name="turn_off_autopick_trade" value="no"> &nbsp&nbspNo</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center; color: white">.</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 60%; text-align: left">Alert - Draft Update &nbsp&nbsp<i class="glyphicon glyphicon-question-sign" title='When set to "Yes" you will receive an alert email after every draft pick'></i></td>
+                        <td style="width: 20%; text-align: center"><input type="radio" name="alert_draft_update" value="yes"> &nbsp&nbspYes</td>
+                        <td style="width: 20%; text-align: center"><input type="radio" name="alert_draft_update" value="no"> &nbsp&nbspNo</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 60%; text-align: left">Alert - On The Clock With Autopick &nbsp&nbsp<i class="glyphicon glyphicon-question-sign" title='When set to "Yes" you will receive an alert email when it is your turn to pick even if you have chosen to autopick your selection. When set to "No" you will NOT receive notification that you are on the clock when autopick is turned on.'></i></td>
+                        <td style="width: 20%; text-align: center"><input type="radio" name="alert_with_autopick" value="yes"> &nbsp&nbspYes</td>
+                        <td style="width: 20%; text-align: center"><input type="radio" name="alert_with_autopick" value="no"> &nbsp&nbspNo</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div id="draft_board_area">
+            <h4 style="text-decoration: underline">Draft Board</h4>
+            <div id="add_player_to_board_div">
+                <table>
+                    <tr style="height: 40px">
+                        <td style="padding-left: 5px; padding-right: 5px">
+                            <select id="add_individual_select">
+                                <option value="_blank_"></option>
+                                {% for x in rookies %}
+                                    <option>{{ x.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td style="padding-left: 5px; padding-right: 5px">
+                            <button id="add_individual_button">Add Player to Board</button>
+                        </td>
+                    </tr>
+                    <tr style="height: 40px" id="closed">
+                        <td id="click_to_import" style="font-size: smaller">Click Here To Import From Shortlist</td>
+                    </tr>
+                    <tr style="height: 30px" class="import_rows" hidden>
+                        <td>Shortlist to Import: </td>
+                        <td>
+                            <select id="shortlist_select">
+                                {% for x in shortlists %}
+                                    <option value="{{ x.id }}">{{ x.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                    </tr>
+                    <tr style="height: 30px" class="import_rows" hidden>
+                        <td>Sort by Column:</td>
+                        <td>
+                            <select id="sort_column_select">
+                                <option value="pos">Position</option>
+                                <option value="name" selected>Name</option>
+                                <option value="n1">Notes - n1</option>
+                                <option value="n2">Notes - n2</option>
+                                <option value="n3">Notes - n3</option>
+                                <option value="text">Notes - text</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select id="sort_column_direction">
+                                <option value="ascending">Ascending</option>
+                                <option value="descending">Descending</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr style="height: 30px" class="import_rows" hidden>
+                        <td style="color: red; font-size: x-small" colspan="2">Caution: importing this shortlist will empty the existing Draft Board</td>
+                    </tr>
+                    <tr style="height: 30px" class="import_rows" hidden>
+                        <td>
+                            <button style="color: red" id="cancel_import_button">Cancel</button>
+                        </td>
+                        <td>
+                            <button style="color: blue" id='process_import_button'>Import</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id='draft_board'>
+                <table id="draft_board_table">
+                    <thead>
+                        <tr>
+                            <th width="6%"></th>
+                            <th width="10%">Pos</th>
+                            <th width="24%">Player</th>
+                            <th width="22%">College</th>
+                            <th width="14%">NFL Team</th>
+                        </tr>
+                    </thead>
+                    <tbody id="draft_board_tbody">
+
+                    </tbody>
+                </table>
+                <div id="board_movement_area" style="width: 10%; display: inline-block; float: right; padding-left: 10px">
+                    <div style="text-align: right"><i class="glyphicon glyphicon-question-sign" title="Select a player and use the buttons below to move him up or down the board. The red X button removes the player from the board. The blue trashcan button clears the board"></i></div>
+                    <div style="width: 100%; text-align: center; margin-top: 20px"><button id="move_up"><i class="glyphicon glyphicon-chevron-up" title="Move Up"></i></button></div>
+                    <div style="width: 100%; text-align: center; margin-top: 20px"><button id="move_down"><i class="glyphicon glyphicon-chevron-down" title="Move Down"></i></button></div>
+                    <div style="width: 100%; text-align: center; margin-top: 50px"><button id="move_delete"><i class="glyphicon glyphicon-remove" style="color: red" title="Remove Player"></i></button></div>
+                    <div class='confirm_clear' style="width: 100%; text-align: center; margin-top: 10px; font-size: x-small" hidden>Are you sure?</div>
+                    <div class='confirm_clear' style="width: 100%; text-align: center; margin-top: 10px; font-size: x-small" hidden><button id="clear_board_no">No</button><button id="clear_board_yes">Yes</button></div>
+                    <div class='clear_board_button' style="width: 100%; text-align: center; margin-top: 50px"><button id="move_clear"><i class="glyphicon glyphicon-trash" style="color: blue" title="Clear Board"></i></button></div>
+                </div>
+            </div>
+        </div>
+        <div id="draft_cost_area">
+            <div class="draft_cost_table_div">
+                <h5 style="text-decoration: underline">Cost of Remaining Draft Picks</h5>
+                <table id="draft_cost_table">
+                    <thead>
+                        <tr>
+                            <th width="20%" style="text-align: center">Pick</th>
+                            <th width="20%" style="text-align: center">{{ year_list.0 }} Cost</th>
+                            <th width="20%" style="text-align: center">{{ year_list.1 }} Cost</th>
+                            <th width="20%" style="text-align: center">{{ year_list.2 }} Cost</th>
+                            <th width="20%" style="text-align: center">{{ year_list.3 }} Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody id="draft_cost_tbody">
+                        {% for x in draft_picks %}
+                            <tr>
+                                <td style="text-align: center">{{ x.pick }}</td>
+                                <td style="text-align: center">${{ x.yr1|floatformat:2 }}</td>
+                                <td style="text-align: center">${{ x.yr2|floatformat:2 }}</td>
+                                {% if x.yr3 == 0 %}
+                                    <td style="text-align: center" hidden>${{ x.yr3|floatformat:2 }}</td>
+                                {% else %}
+                                    <td style="text-align: center">${{ x.yr3|floatformat:2 }}</td>
+                                {% endif %}
+                                {% if x.yr4 == 0 %}
+                                    <td style="text-align: center" hidden>${{ x.yr4|floatformat:2 }}</td>
+                                {% else %}
+                                    <td style="text-align: center">${{ x.yr4|floatformat:2 }}</td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <td style="text-align: center; color: white">.</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center">Total</td>
+                            <td style="text-align: center" id="yr1_pick_cost">${{ draft_picks_cost_list.0|floatformat:2 }}</td>
+                            <td style="text-align: center" id="yr2_pick_cost">${{ draft_picks_cost_list.1|floatformat:2 }}</td>
+                            <td style="text-align: center" id="yr3_pick_cost">${{ draft_picks_cost_list.2|floatformat:2 }}</td>
+                            <td style="text-align: center" id="yr4_pick_cost">${{ draft_picks_cost_list.3|floatformat:2 }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="cap_summary_table_div">
+                <h5 style="text-decoration: underline">Cap Summary</h5>
+                <table id="cap_summary_table">
+                    <thead>
+                        <tr>
+                            <th width="25%" style="text-align: center"></th>
+                            <th width="25%" style="text-align: center">Total Player Cost</th>
+                            <th width="25%" style="text-align: center">Cap Penalties</th>
+                            <th width="25%" style="text-align: center">Cap Space</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cap_summary_tbody">
+                        <tr>
+                            <td>{{ year_list.0 }}</td>
+                            <td id="yr1_cost"></td>
+                            <td id="yr1_pen" style="color: red"></td>
+                            <td id="yr1_space" style="color: green"></td>
+                        </tr>
+                        <tr>
+                            <td>{{ year_list.1 }}</td>
+                            <td id="yr2_cost"></td>
+                            <td id="yr2_pen" style="color: red"></td>
+                            <td id="yr2_space" style="color: green"></td>
+                        </tr>
+                        <tr>
+                            <td>{{ year_list.2 }}</td>
+                            <td id="yr3_cost"></td>
+                            <td id="yr3_pen" style="color: red"></td>
+                            <td id="yr3_space" style="color: green"></td>
+                        </tr>
+                        <tr>
+                            <td>{{ year_list.3 }}</td>
+                            <td id="yr4_cost"></td>
+                            <td id="yr4_pen" style="color: red"></td>
+                            <td id="yr4_space" style="color: green"></td>
+                        </tr>
+                        <tr>
+                            <td>{{ year_list.4 }}</td>
+                            <td id="yr5_cost"></td>
+                            <td id="yr5_pen" style="color: red"></td>
+                            <td id="yr5_space" style="color: green"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center; color: white">.</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center; color: white">.</td>
+                            <td colspan="3" style="text-align: left">
+                                <input type="checkbox" id="include_remaining_picks_checkbox">&nbsp&nbsp Include Draft Picks Remaining
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
-    <div id="display_area" style="overflow-y: auto; margin-top: 40px; height: 70%">
-        <table style="width: 60%; table-layout: fixed">
-            <thead>
-                <tr>
-                    <th style="width: 10%; text-align: center">Overall Pick</th>
-                    <th style="width: 10%; text-align: center">Round</th>
-                    <th style="width: 10%; text-align: center">Pick</th>
-                    <th style="width: 22%">Team</th>
-                    <th style="width: 12%; text-align: center">2016 Cost</th>
-                    <th style="width: 12%; text-align: center">2017 Cost</th>
-                    <th style="width: 12%; text-align: center">2018 Cost</th>
-                    <th style="width: 12%; text-align: center">2019 Cost</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for x in draft_picks %}
-                    <tr>
-                        <td style="text-align: center">{{ x.pick_overall }}</td>
-                        <td style="text-align: center">{{ x.round }}</td>
-                        <td style="text-align: center">{{ x.pick_in_round }}</td>
-                        <td class="pick_owner">{{ x.owner }}</td>
-                        <td style="text-align: center">{{ x.yr1_sal }}</td>
-                        <td style="text-align: center">{{ x.yr2_sal }}</td>
-                        {% if x.yr3_sal != 0 %}
-                            <td style="text-align: center">{{ x.yr3_sal }}</td>
-                        {% else %}
-                            <td style="text-align: center" hidden>{{ x.yr3_sal }}</td>
-                        {% endif %}
-                        {% if x.yr4_sal != 0 %}
-                            <td style="text-align: center">{{ x.yr4_sal }}</td>
-                        {% else %}
-                            <td style="text-align: center" hidden>{{ x.yr4_sal }}</td>
-                        {% endif %}
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div id="display_area">
+
     </div>
 {% endblock %}

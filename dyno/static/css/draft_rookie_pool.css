@@ -109,6 +109,7 @@
 .rookie_pool_table_div table thead th:first-child {
     border: none;
 }
+
 .rookie_pool_table_div table tbody td {
     color: black;
     border-left: 1px solid #E1EEF4;

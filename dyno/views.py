@@ -384,12 +384,15 @@ def create_session(user, page):
 
     date_now = timezone.now()
 
-    cur.execute('INSERT INTO dyno_session(user, date, page) VALUES (?, ?, ?)', [str(user), date_now, page])
+    try:
+        cur.execute('INSERT INTO dyno_session(user, date, page) VALUES (?, ?, ?)', [str(user), date_now, page])
 
-    con.commit()
+        con.commit()
 
-    cur.close()
-    con.close()
+        cur.close()
+        con.close()
+    except:
+        pass
 
 
 
@@ -489,7 +492,61 @@ def draftpage(request):
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/draft'})
 
-    return render(request, 'draft.html', {})
+    a = Draft_Pick.objects.filter(year=year_list[0]).order_by('pick_overall')
+    on_clock = 1
+    for x in a:
+        if len(x.player_selected) == 0:
+            on_clock = x.pick_overall
+            break
+
+    b = Player.objects.filter(team='Rookie').order_by('name')
+
+    c = TeamVariable.objects.filter(user=request.user).get(name='DraftBoard')
+    draft_board = c.text_variable
+
+    playername_list = []
+    try:
+        board_list = draft_board.split(',')
+    except:
+        board_list = []
+    # print(board_list)
+    if len(board_list) > 0 and len(board_list[0]) > 0:
+        for x in board_list:
+            d = Player.objects.get(id=int(x))
+            if d.team == 'Rookie':
+                playername_list.append({'name': d.name,
+                                        'pos': d.position,
+                                        'id' : d.id})
+
+        ipath = static('content/2016_rookies.csv')
+        if working_local == True:
+            i = open('dyno/' + ipath)
+        else:
+            i = open('/home/spflynn/dyno-site/dyno' + ipath)
+
+        info_list = []
+        while True:
+            line = i.readline()
+            if not line:
+                break
+            name, college, nfl_team, pick = line.strip().split(':')
+            info_list.append({'player': name, 'college': college, 'nfl_team': nfl_team, 'pick': pick})
+        i.close()
+
+    draft_board_info = []
+    for x in playername_list:
+        for y in info_list:
+            if y['player'] == x['name']:
+                draft_board_info.append({'pos': x['pos'],
+                                         'player': x['name'],
+                                         'college': y['college'],
+                                         'nfl_team': y['nfl_team'],
+                                         'id' : x['id']})
+
+    return render(request, 'draft/draft_draft.html', {'draft_order' : a,
+                                                      'on_clock' : on_clock,
+                                                      'players' : b,
+                                                      'draft_board' : draft_board_info})
 
 def draftinfoandsettings(request):
     create_session(request.user, 'draftinfo')
@@ -497,12 +554,58 @@ def draftinfoandsettings(request):
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/draft/settings'})
 
-    a = Draft_Pick.objects.filter(year='2016').order_by('pick_overall')
+    team = Team.objects.get(user=request.user)
+    a = Draft_Pick.objects.filter(owner=team).filter(year=year_list[0]).order_by('round','pick_in_round')
 
-    b = Team.objects.all()
+    num_teams = Team.objects.all().count()
+    pick_dict = []
+    for x in a:
+        if len(x.player_selected) == 0:
+            if x.pick_overall > 48:
+                yr1 = 1.00
+                yr2 = 1.50
+                yr3 = 0
+                yr4 = 0
+            else:
+                yr1 = draft_pick_salary_list[x.pick_overall][0]
+                yr2 = draft_pick_salary_list[x.pick_overall][1]
+                try:
+                    yr3 = draft_pick_salary_list[x.pick_overall][2]
+                except:
+                    yr3 = 0
+                try:
+                    yr4 = draft_pick_salary_list[x.pick_overall][3]
+                except:
+                    yr4 = 0
 
-    return render(request, 'draft/draft_info_settings.html', {'draft_picks' : a,
-                                                              'team_list' : b})
+            pick_string = ''
+            if x.pick_in_round >= 10:
+                pick_string = str(x.round) + '.' + str(x.pick_in_round)
+            else:
+                pick_string = str(x.round) + '.0' + str(x.pick_in_round)
+
+            pick_dict.append({'pick' : pick_string,
+                              'yr1': yr1,
+                              'yr2': yr2,
+                              'yr3': yr3,
+                              'yr4': yr4,})
+
+    draft_picks_cost_list = [0,0,0,0]
+    for x in pick_dict:
+        draft_picks_cost_list[0] += x['yr1']
+        draft_picks_cost_list[1] += x['yr2']
+        draft_picks_cost_list[2] += x['yr3']
+        draft_picks_cost_list[3] += x['yr4']
+
+    b = Player.objects.filter(team='Rookie').order_by('name')
+
+    c = Shortlist.objects.filter(user=request.user)
+
+    return render(request, 'draft/draft_info_settings.html', {'draft_picks' : pick_dict,
+                                                              'year_list' : year_list,
+                                                              'draft_picks_cost_list' : draft_picks_cost_list,
+                                                              'rookies' : b,
+                                                              'shortlists' : c})
 
 def auctionpage(request):
     create_session(request.user, 'auction')
@@ -1091,7 +1194,20 @@ def performancepage(request):
 
 def leaguefuturedraftpicks(request):
     create_session(request.user, 'futuredraftpicks')
-    return render(request, 'draft/league_future_draft_picks.html', {})
+
+    a = Draft_Pick.objects.filter(Q(year=year_list[1]) | Q(year=year_list[2]) | Q(year=year_list[3]) | Q(year=year_list[4]))
+    draft_years = []
+    for x in a:
+        if x.year not in draft_years:
+            draft_years.append(x.year)
+
+    b = Team.objects.all()
+    team_list = []
+    for x in b:
+        team_list.append(x.internal_name)
+
+    return render(request, 'draft/league_future_draft_picks.html', {'team_list' : team_list,
+                                                                    'year_list' : draft_years})
 
 def leaguecapsummary(request):
     create_session(request.user, 'capsummary')
@@ -1782,7 +1898,7 @@ def teamalertspage(request):
                                               'redirect' : '/team/alerts'})
 
     type_list = ['Auction - Outbid', 'Auction - New Auction', 'Auction - Won', 'Trade Offer', 'Trade Rejected', 'Trade Accepted',
-                 'Trade Withdrawn', 'New Board Post']
+                 'Trade Withdrawn', 'New Board Post', 'Draft Pick Made']
     a = Alert.objects.filter(user=request.user).order_by('-date')
     b = []
     for x in a:
@@ -1885,6 +2001,10 @@ def teamtrades(request):
                  Decimal(200) - yr5_cap_pen - yr5_salary,]
 
     b = Draft_Pick.objects.filter(owner=team).order_by('year', 'round', 'pick_in_round')
+    draft_picks = []
+    for x in b:
+        if x.year in year_list and x.player_selected == '':
+            draft_picks.append(x)
 
     c = Asset.objects.filter(team=team).order_by('asset_type', 'date')
 
@@ -1941,7 +2061,7 @@ def teamtrades(request):
 
 
     return render(request, 'team/team_trade.html', {'year_list' : year_list,
-                                                    'draft_picks' : b,
+                                                    'draft_picks' : draft_picks,
                                                     'assets' : c,
                                                     'cap_space' : cap_space,
                                                     'team_list' : team_list,
@@ -2113,6 +2233,18 @@ def commishofficepage(request):
             last_action_list.append({'user' : user,
                                      'last_action' : 'none'})
 
+    h = Variable.objects.get(name='Draft Switch')
+    draft_switch = h.int_variable
+
+    i = Variable.objects.get(name='Default Draft Clock')
+    default_draft_clock = i.int_variable
+
+    j = Variable.objects.get(name='Draft Clock End')
+    draft_clock_end = j.text_variable
+
+    k = Variable.objects.get(name='Draft Suspension')
+    suspension_start, suspension_end = k.text_variable.split(',')
+
 
     return render(request, 'admin/settings.html', {'default_auction_clock' : default_auction_clock,
                                                    'ext_switch' : ext_switch,
@@ -2120,7 +2252,12 @@ def commishofficepage(request):
                                                    'cut_season' : cut_season,
                                                    'new_auctions' : new_auctions,
                                                    'include_impending' : include_impending,
-                                                   'last_action_list' : last_action_list})
+                                                   'last_action_list' : last_action_list,
+                                                   'draft_switch' : draft_switch,
+                                                   'default_draft_clock' : default_draft_clock,
+                                                   'draft_clock_end' : draft_clock_end,
+                                                   'suspension_start' : suspension_start,
+                                                   'suspension_end' : suspension_end})
 
 def commishviewmodel(request):
     create_session(request.user, 'commishviewmodel')
@@ -3166,7 +3303,10 @@ def draftrookiepool(request):
     a = Player.objects.filter(team='Rookie')
 
     ipath = static('content/2016_rookies.csv')
-    i = open('dyno/'+ipath)
+    if working_local == True:
+        i = open('dyno/' + ipath)
+    else:
+        i = open('/home/spflynn/dyno-site/dyno' + ipath)
 
     info_list = []
     while True:
@@ -3182,6 +3322,8 @@ def draftrookiepool(request):
         for y in info_list:
             if y['player'] == x.name:
                 rookies.append({'pos' : x.position, 'name' : x.name, 'college' : y['college'], 'nfl_team' : y['nfl_team'], 'pick' : y['pick']})
+
+    rookies = sorted(rookies, key=lambda b: b['name'])
 
     b = Shortlist.objects.filter(user=request.user)
 

@@ -1,0 +1,106 @@
+{% extends 'draft.html' %}
+
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/draft_draft.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.tablesorter.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/draft_draft.css' %}">
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <div class="tab_area" id="third_tab_area">
+
+    </div>
+
+    <div id="display_area">
+        <div id="running_draft_area">
+            <div class="draft_table_div">
+                <table id="draft_table">
+                    <thead>
+                        <tr>
+                            <th width="10%" style="text-align: center">Pick</th>
+                            <th width="12%">Team</th>
+                            <th width="32%">Player Selected</th>
+                            <th width="12%">Position</th>
+                            <th width="17%">College</th>
+                            <th width="17%">NFL Team</th>
+                        </tr>
+                    </thead>
+                    <tbody id="draft_tbody">
+                        {% for x in draft_order %}
+                            <tr>
+                                {% if x.pick_in_round >= 10 %}
+                                    <td style="text-align: center">{{ x.pick_overall }} - {{ x.round }}.{{ x.pick_in_round }}</td>
+                                {% else %}
+                                    <td style="text-align: center">{{ x.pick_overall }} - {{ x.round }}.0{{ x.pick_in_round }}</td>
+                                {% endif %}
+                                <td>{{ x.owner }}</td>
+                                {% if x.pick_overall == on_clock %}
+                                    <td style="color: blue">on the clock...</td>
+                                {% else %}
+                                    <td id="player_selected">{{ x.player_selected }}</td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="draft_selection_area">
+            <div id="manual_selection_area">
+                <h3 style="text-align: center; width: 100%" id="clock_display_all"><span id="draft_clock_hours" class="draft_clock_large"></span><span class="draft_clock_small">h</span><span class="draft_clock_large">:</span><span id="draft_clock_minutes" class="draft_clock_large"></span><span class="draft_clock_small">m</span><span class="draft_clock_small">&nbsp&nbsp&nbsp&nbsp left to make selection</span></h3>
+                <br>
+                <p style="font-size: smaller">To make a pick, either select a player from the dropdown or click on a player from your draft board, then click the "Draft Player" button. </p>
+                <br>
+                <table width="100%" style="table-layout: fixed">
+                    <tr>
+                        <td width="50%">
+                            <select id="manual_player_select">
+                                <option value="_blank_"></option>
+                                {% for x in players %}
+                                    <option value="{{ x.id }}">{{ x.name }}</option>
+                                {% endfor %}
+                                <option value="_pass_">--Pass Pick--</option>
+                            </select>
+                        </td>
+                        <td width="50%">
+                            <button id="draft_player_button">Draft Player</button>
+                            <div style="text-align: center" id="confirmation_div" hidden>
+                                <p style="font-size: x-small; color: red">Are you sure you wish to draft this player?</p>
+                                <button style="font-size: x-small" id="confirmation_no">No</button><button style="font-size: x-small; margin-left: 10px" id="confirmation_yes">Yes</button>
+                            </div>
+                            <div id="pending_message" style="color: blue; font-size: small" hidden>Pick is processing (could take a couple minutes), please wait...</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="draft_board_area">
+                <h4 style="text-decoration: underline">Draft Board</h4>
+                <table id="draft_board">
+                    <thead>
+                        <tr>
+                            <th width="6%" style="text-align: center"></th>
+                            <th width="12%" style="text-align: center">Pos</th>
+                            <th width="22%">Player</th>
+                            <th width="22%">College</th>
+                            <th width="14%">NFL Team</th>
+                        </tr>
+                    </thead>
+                    <tbody id="draft_board_tbody">
+                        {% for x in draft_board %}
+                            <tr>
+                                <td style="text-align: center">{{ forloop.counter }}</td>
+                                <td style="text-align: center">{{ x.pos }}</td>
+                                <td class="board_player_cell" id="{{ x.id }}">{{ x.player }}</td>
+                                <td>{{ x.college }}</td>
+                                <td>{{ x.nfl_team }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

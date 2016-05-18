@@ -155,5 +155,105 @@ $(document).ready(function() {
             }
         });
     });
+    
+    $(document.body).on('click', 'input[name="draft-onoff"]', function() {
+        var draft_switch = 99;
+        if ($("input[name='draft-onoff'][value='on']").prop('checked') == true) {
+            // console.log('include_impending on');
+            draft_switch = 1;
+        } else {
+            // console.log('include_impending off');
+            draft_switch = 0;
+        }
+        
+        $.ajax({
+            url: '/save_draft_switch_flag',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                'draft_switch' : draft_switch
+            },
+            dataType: 'json',
+            success: function (data) {
+                //do nothing
+            }
+        });
+    });
+    
+    $('#draft_clock_submit').on('click', function() {
+        var temp = Number($('#draft_clock_input').val());
+        console.log(temp);
+        $.ajax({
+            url: '/save_default_draft_clock',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                'default_draft_clock' : temp
+            },
+            dataType: 'json',
+            success: function (data) {
+                $('#auction_default_clock_message').text('save successful').show();
+            }
+        });
+    });
+    
+    $('#clock_end_submit').on('click', function() {
+        var temp = Number($('#clock_end_input').val());
+        console.log(temp);
+        $.ajax({
+            url: '/save_draft_clock_end',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                'draft_clock_end' : temp
+            },
+            dataType: 'json',
+            success: function (data) {
+                $('#auction_default_clock_message').text('save successful').show();
+            }
+        });
+    });
+    
+    function save_clock_suspension () {
+        var start = $('#clock_suspend_start').val();
+        var end = $('#clock_suspend_end').val();
+        console.log(start, end);
+        $.ajax({
+            url: '/save_clock_suspension',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                'start' : start,
+                'end' : end
+            },
+            dataType: 'json',
+            success: function (data) {
+            }
+        });
+    }
+    
+    $('#clock_suspend_start').on('change', function() {
+        save_clock_suspension();
+    });
+    
+    $('#clock_suspend_end').on('change', function() {
+        save_clock_suspension();
+    });
 
+    $('#skip_to_pick_submit').on('click', function() {
+        var temp = Number($('#skip_to_pick_input').val());
+        console.log(temp);
+        $.ajax({
+            url: '/skip_to_pick',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                'pick' : temp
+            },
+            dataType: 'json',
+            success: function (data) {
+                $('#auction_default_clock_message').text('DONE!').show();
+            }
+        });
+    });
 });

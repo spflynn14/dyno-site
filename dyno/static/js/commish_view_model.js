@@ -1,6 +1,8 @@
 $(document).ready(function() {
     console.log('ready');
 
+    $('#model_table').tablesorter();
+
     $('#message_text').hide();
     get_model_data();
     $('#message_text').show();
@@ -17,7 +19,7 @@ $(document).ready(function() {
             },
             dataType: 'json',
             success: function (data) {
-                console.log(data);
+                // console.log(data);
                 fill_table(data);
             }
         });
@@ -44,7 +46,8 @@ $(document).ready(function() {
                 $('#table_body').append(tr);
             });
         }
-        $('table').tablesorter();
+
+        $('#model_table').trigger('update');
         $('#message_text').text('');
     }
 

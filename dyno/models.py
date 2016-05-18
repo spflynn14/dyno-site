@@ -447,6 +447,7 @@ class Draft_Pick(models.Model):
     compensatory = models.CharField(max_length=20, default='none')
     pick_in_round = models.IntegerField(default=0)
     pick_overall = models.IntegerField(default=0)
+    pick_for_cost = models.IntegerField(default=0)
     yr1_sal = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     yr2_sal = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     yr3_sal = models.DecimalField(max_digits=5, decimal_places=2, default=0)

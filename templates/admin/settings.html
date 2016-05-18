@@ -103,8 +103,114 @@
 
         <div id="commish_office_third_column">
             <button type="button" id="configure_draft" style="font-size: small">Configure Rookie Draft</button>
+            <br><br><br><br>
+            <div>
+                <h5 style="display: inline-block">Draft  &nbsp&nbsp</h5>
+                {% if draft_switch == 1 %}
+                    <input type="radio" style="display: inline-block" name="draft-onoff" value="on" checked> &nbsp&nbspOn</td>
+                    <input type="radio" style="display: inline-block; margin-left: 20px" name="draft-onoff" value="off"> &nbsp&nbspOff</td>
+                {% else %}
+                    <input type="radio" style="display: inline-block" name="draft-onoff" value="on"> &nbsp&nbspOn</td>
+                    <input type="radio" style="display: inline-block; margin-left: 20px" name="draft-onoff" value="off" checked> &nbsp&nbspOff</td>
+                {% endif %}
+            </div>
+            <div>
+                <h5 style="display: inline-block">Draft Clock (minutes) &nbsp&nbsp</h5>
+                <input type="text" id="draft_clock_input" style="display: inline-block" size="6" value="{{ default_draft_clock }}"/>
+                <button type="submit" id='draft_clock_submit' style="display: inline-block">Submit</button>
+            </div>
+            <div>
+                <h5 style="display: inline-block">Current Clock End &nbsp&nbsp</h5>
+                <input type="datetime" id="clock_end_input" style="display: inline-block" size="20" value="{{ draft_clock_end }}"/>
+                <button type="submit" id='clock_end_submit' style="display: inline-block">Submit</button>
+            </div>
+            <div>
+                <h5 style="display: inline-block">Clock Suspension Start &nbsp&nbsp</h5>
+                <select id="clock_suspend_start" style="display: inline-block">
+                    {% if suspension_start == '6' %}
+                        <option value="6" selected>6 pm</option>
+                    {% else %}
+                        <option value="6">6 pm</option>
+                    {% endif %}
+                    {% if suspension_start == '7' %}
+                        <option value="7" selected>7 pm</option>
+                    {% else %}
+                        <option value="7">7 pm</option>
+                    {% endif %}
+                    {% if suspension_start == '8' %}
+                        <option value="8" selected>8 pm</option>
+                    {% else %}
+                        <option value="8">8 pm</option>
+                    {% endif %}
+                    {% if suspension_start == '9' %}
+                        <option value="9" selected>9 pm</option>
+                    {% else %}
+                        <option value="9">9 pm</option>
+                    {% endif %}
+                    {% if suspension_start == '10' %}
+                        <option value="10" selected>10 pm</option>
+                    {% else %}
+                        <option value="10">10 pm</option>
+                    {% endif %}
+                    {% if suspension_start == '11' %}
+                        <option value="11" selected>11 pm</option>
+                    {% else %}
+                        <option value="11">11 pm</option>
+                    {% endif %}
+                    {% if suspension_start == '12' %}
+                        <option value="12" selected>12 am</option>
+                    {% else %}
+                        <option value="12">12 am</option>
+                    {% endif %}
+                </select>
+            </div>
+            <div>
+                <h5 style="display: inline-block">Clock Suspension End &nbsp&nbsp</h5>
+                <select id="clock_suspend_end" style="display: inline-block">
+                    {% if suspension_end == '6' %}
+                        <option value="6" selected>6 am</option>
+                    {% else %}
+                        <option value="6">6 am</option>
+                    {% endif %}
+                    {% if suspension_end == '7' %}
+                        <option value="7" selected>7 am</option>
+                    {% else %}
+                        <option value="7">7 am</option>
+                    {% endif %}
+                    {% if suspension_end == '8' %}
+                        <option value="8" selected>8 am</option>
+                    {% else %}
+                        <option value="8">8 am</option>
+                    {% endif %}
+                    {% if suspension_end == '9' %}
+                        <option value="9" selected>9 am</option>
+                    {% else %}
+                        <option value="9">9 am</option>
+                    {% endif %}
+                    {% if suspension_end == '10' %}
+                        <option value="10" selected>10 am</option>
+                    {% else %}
+                        <option value="10">10 am</option>
+                    {% endif %}
+                    {% if suspension_end == '11' %}
+                        <option value="11" selected>11 am</option>
+                    {% else %}
+                        <option value="11">11 am</option>
+                    {% endif %}
+                    {% if suspension_end == '12' %}
+                        <option value="12" selected>12 pm</option>
+                    {% else %}
+                        <option value="12">12 pm</option>
+                    {% endif %}
+                </select>
+            </div>
+            <br>
+            <div>
+                <h5 style="display: inline-block">Skip to... &nbsp&nbsp</h5>
+                <input type="text" id="skip_to_pick_input" style="display: inline-block" size="4" value=""/>
+                <button type="submit" id='skip_to_pick_submit' style="display: inline-block">pick. GO!</button>
+            </div>
         </div>
-
     </div>
 
 {% endblock %}

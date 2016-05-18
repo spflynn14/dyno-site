@@ -1,0 +1,169 @@
+#autopick_settings_area {
+    width: 50%;
+    height: 65%;
+    display: inline-block;
+    float: left;
+    padding: 5px 10px 5px 10px;
+}
+
+#draft_board_area {
+    /*border: 1px solid green;*/
+    width: 50%;
+    height: 65%;
+    display: inline-block;
+    padding: 5px 10px 5px 10px;
+}
+
+#add_player_to_board_div {
+    border: 1px solid #cdcdcd;
+    width: 100%;
+    height: 20%;
+    padding: 5px 10px 5px 10px;
+}
+
+#draft_board {
+    border: 1px solid #cdcdcd;
+    width: 100%;
+    height: 65%;
+    padding: 5px 10px 5px 10px;
+    margin-top: 10px;
+}
+
+#draft_cost_area {
+    /*border: 1px solid purple;*/
+    width: 100%;
+    height: 35%;
+    float: left;
+}
+
+
+
+
+
+.draft_cost_table_div {
+    float: left;
+    height: 100%;
+    width: 50%;
+    overflow-y: auto;
+    border: 1px solid #cdcdcd;
+    border-right: none;
+    display: inline-block;
+    padding: 5px 10px 5px 10px;
+}
+
+#draft_cost_table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+#draft_cost_table td {
+    text-align: center;
+    font-size: small;
+    height: 20px;
+}
+
+#draft_cost_table th {
+    text-align: center;
+    font-size: small;
+    text-decoration: underline;
+    height: 20px;
+}
+
+.cap_summary_table_div {
+    height: 100%;
+    width: 50%;
+    border: 1px solid #cdcdcd;
+    display: inline-block;
+    padding: 5px 10px 5px 10px;
+}
+
+#cap_summary_table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+#cap_summary_table td {
+    text-align: center;
+    font-size: small;
+    height: 20px;
+}
+
+#cap_summary_table th {
+    text-align: center;
+    font-size: small;
+    text-decoration: underline;
+    height: 20px;
+}
+
+#draft_board_table {
+    width: 90%;
+    height: 100%;
+    overflow-y: auto;
+    display: inline-block;
+    table-layout: fixed;
+    /*border: 1px solid red;*/
+}
+
+#draft_board_table td {
+    font-size: small;
+    height: 20px;
+}
+
+#draft_board_table th {
+    font-size: small;
+    text-decoration: underline;
+    height: 20px;
+    /*border: 1px solid blue;*/
+}
+
+.draft_board_cell:hover {
+    cursor: pointer;
+}
+
+#autopick_settings_table_div {
+    padding: 5px 10px 5px 10px;
+    border: 1px solid #cdcdcd;
+    border-bottom: none;
+    height: 60%;
+    width: 100%;
+    overflow-y: auto;
+}
+
+#autopick_settings_table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+#autopick_settings_table th {
+    font-size: small;
+    text-decoration: underline;
+    height: 20px;
+}
+
+#autopick_settings_table td {
+    font-size: small;
+    height: 20px;
+}
+
+#autopick_notifications_area {
+    padding: 5px 10px 5px 10px;
+    border: 1px solid #cdcdcd;
+    border-top: none;
+    height: 28%;
+    width: 100%;
+    overflow-y: auto;
+}
+
+#autopick_notifications_area td {
+    font-size: small;
+    height: 20px;
+}
+
+
+
+
+#click_to_import:hover {
+    text-decoration: underline;
+    cursor: pointer;
+    color: #2d99d4;
+}

@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    console.log('ready 3');
+    console.log('ready 4');
     var $display_bottom = $('#display_area').position().top+$('#display_area').height();
     var $threshhold_dropup = $display_bottom;
 
@@ -22,7 +22,7 @@ $(document).ready(function() {
     //console.log(default_shortlist);
     get_players(default_shortlist);
 
-    $("#notes_table").tablesorter();
+    $("#notes_table").tablesorter({emptyTo: 'bottom'});
 
     var current_shortlist = default_shortlist;
 

@@ -1,0 +1,103 @@
+#running_draft_area {
+    /*border: 1px solid red;*/
+    padding-right: 10px;
+    width: 60%;
+    height: 96%;
+    float: left;
+    display: inline-block;
+}
+
+#draft_selection_area {
+    /*border: 1px solid blue;*/
+    width: 40%;
+    height: 100%;
+    display: inline-block;
+}
+
+#manual_selection_area {
+    /*border: 1px solid green;*/
+    /*padding: 0 10px 5px 50px;*/
+    width: 100%;
+    height: 35%;
+    float: left;
+}
+
+#draft_board_area {
+    /*border: 1px solid rebeccapurple;*/
+    width: 100%;
+    height: 65%;
+    float: left;
+    overflow-y: auto;
+}
+
+
+
+.draft_table_div {
+    /*padding: 5px 10px 5px 10px;*/
+    /*border: 1px solid #dcdcdc;*/
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+}
+
+#draft_table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+#draft_table th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-size: small;
+    border-left: 1px solid #cccccc;
+}
+
+#draft_table td {
+    font-size: small;
+}
+
+.draft_table_div th:hover {
+    cursor: pointer;
+}
+
+.draft_table_div tbody tr:nth-child(even) {
+    background-color: #dcdcdc;
+}
+
+.draft_clock_large {
+    font-family: "Lucida Grande", Monaco, monospace;
+    font-size: xx-large;
+}
+
+.draft_clock_small {
+    font-size: 0.60em;
+}
+
+
+
+
+
+#draft_board {
+    table-layout: fixed;
+    width: 100%;
+}
+
+#draft_board th {
+    background-color:#2d99d4;
+    color:#FFFFFF;
+    font-size: small;
+    border-left: 1px solid #cccccc;
+}
+
+#draft_board td {
+    font-size: small;
+    cursor: pointer;
+}
+
+#draft_board_area th:hover {
+    cursor: pointer;
+}
+
+#draft_board_area tbody tr:nth-child(even) {
+    background-color: #dcdcdc;
+}

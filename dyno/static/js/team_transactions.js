@@ -187,9 +187,9 @@ $(document).ready(function() {
                 return_text = 'Extension submitted: ' + data.var_i1 + ' years, $' + data.var_d2 + ' signing bonus per year, salary structure = ' + fixed_string;
             }
         } else if (data.transaction_type == 'Expansion Draft Pick') {
-            return_text = "Expansion Draft Pick: taken by " + data.team2 + ' with pick ' + data.var_i1 + '. Previously owned by ' + data.team1 + '.';
+            return_text = "Taken by " + data.team2 + ' with pick ' + data.var_i1 + '. Previously owned by ' + data.team1 + '.';
         } else if (data.transaction_type == 'Rookie Draft Pick') {
-            return_text = "Rookie Draft Pick: taken by " + data.team2 + ' with pick ' + data.var_d1 + '.';
+            return_text = "Taken by " + data.team2 + ' with pick ' + data.var_d1 + '.';
         } else if (data.transaction_type == 'Player Cut') {
             if (Number(data.var_i1) == -1) {
                 return_text = "Set to be released";

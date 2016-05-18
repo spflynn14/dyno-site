@@ -1,11 +1,49 @@
 {% extends 'draft.html' %}
 
+{% load staticfiles %}
+
+{% block head %}
+    <script src="{% static 'js/future_draft_picks.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.tablesorter.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/draft_rookie_pool.css' %}">
+{% endblock %}
+
 {% block content %}
+    {% csrf_token %}
     <div class="tab_area" id="third_tab_area">
 
     </div>
 
     <div id="display_area">
-        This won't be completed until the draft tab is finished
+        <div class="rookie_pool_table_div" style="float: left; width: 35%; display: inline-block; padding-left: 10px">
+            <table id="rookie_pool_table" style="width: 100%; table-layout: fixed">
+                <thead>
+                    <tr>
+                        <th width="20%">Year</th>
+                        <th width="40%">Pick</th>
+                        <th width="40%">Team</th>
+                    </tr>
+                </thead>
+                <tbody id="future_pick_tbody">
+
+                </tbody>
+            </table>
+        </div>
+        <div style="width: 50%; display: inline-block; padding-left: 100px">
+            Filters:<br><br><br>
+            <select id="team_select">
+                <option>All</option>
+                {% for x in team_list %}
+                    <option>{{ x }}</option>
+                {% endfor %}
+            </select>
+            <br><br><br>
+            <select id="year_select">
+                <option>All</option>
+                {% for x in year_list %}
+                    <option>{{ x }}</option>
+                {% endfor %}
+            </select>
+        </div>
     </div>
 {% endblock %}
