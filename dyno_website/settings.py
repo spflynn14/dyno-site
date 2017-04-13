@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 import os
 import pytz
-#import raven
+import raven
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #'raven.contrib.django.raven_compat',
+    'raven.contrib.django.raven_compat',
     'dyno'
 ]
 
@@ -135,7 +135,7 @@ EMAIL_HOST = "smtp.gmail.com"
 EMAIL_HOST_USER = "dynastyleague.space@gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_PASSWORD = '6n4J7jzPBreP'
+EMAIL_HOST_PASSWORD = 'UMCH5Chq3v2Y'
 
 DEFAULT_FROM_EMAIL = 'dynastyleague.space@gmail.com'
 SERVER_EMAIL = 'dynastyleague.space@gmail.com'

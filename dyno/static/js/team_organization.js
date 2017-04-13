@@ -979,7 +979,7 @@ $(document).ready(function() {
     });
 
     //change view
-    $(document).on('click', '.organization_view_select', function() {
+    $(document).on('change', '.organization_view_select', function() {
         var new_view = $(this).val();
         if (new_view == $view) {
             return;

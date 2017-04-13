@@ -65,6 +65,7 @@ $(document).ready(function() {
         } else {
             $('#clock_display_all').show();
             var now = new Date($.now());
+            // console.log(draft_clock_end);
             var clock_end = new Date(draft_clock_end);
             var diff = (clock_end - now) / 1000;
             var diff_min = diff / 60;
@@ -102,7 +103,7 @@ $(document).ready(function() {
             // console.log(id, $(this).parent().find('.board_player_cell').prop('id'));
         }
     });
-    
+
     $('#draft_player_button').on('click', function() {
         var player_id = $('#manual_player_select').val();
         if (player_id == '_blank_') {
@@ -117,6 +118,7 @@ $(document).ready(function() {
         });
 
         $('#confirmation_yes').on('click', function() {
+            $(this).prop('disabled', true);
             $('#pending_message').show();
             $('#confirmation_div').hide();
             $('#draft_player_button').hide();
@@ -135,8 +137,6 @@ $(document).ready(function() {
             });
         });
     });
-
-
 
     window.setInterval(function() {
         $.ajax({

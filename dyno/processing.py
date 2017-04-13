@@ -48,6 +48,7 @@ def call_new_draft_pick(user, pick):
 
     c = Variable.objects.get(name='Draft Clock End')
     c.text_variable = timezone.make_aware(current_time)
+    #c.text_variable = '2016-05-22 12:00:00.181673-04:00'
     c.save()
     cc = Variable.objects.get(name='Draft Clock Start')
     cc.text_variable = start_time
@@ -338,7 +339,7 @@ def autopick_trade_interrupter(recipient):
 
 def check_trade_for_dup_assets(trade, pro_players, pro_picks, pro_assets, opp_players, opp_picks, opp_assets):
         trade_invalid = False
-        
+
         trade_pro_players = trade.pro_players.split(':')
         trade_pro_picks = trade.pro_picks.split(':')
         trade_pro_assets = trade.pro_assets.split(':')
@@ -550,11 +551,11 @@ def generate_alert_email_line(source_info, alert_type, var_list):
             return ''
     elif alert_type == 'Draft - On The Clock':
         # var_list = round, pick_in_round, on_autopick
-        if var_list[1] >= 10:
-            verbose_pick = str(var_list[0]) + '.' + str(var_list[1])
-        else:
-            verbose_pick = str(var_list[0]) + '.0' + str(var_list[1])
         if source_info == 'direct':
+            if var_list[1] >= 10:
+                verbose_pick = str(var_list[0]) + '.' + str(var_list[1])
+            else:
+                verbose_pick = str(var_list[0]) + '.0' + str(var_list[1])
             if var_list[2] == True:
                 return 'You are on the clock with pick ' + verbose_pick + '. You have enabled autopick for this selection.'
             else:
@@ -1213,22 +1214,22 @@ def check_draft_clocks():
     except:
         pass
 
-    try:
-        if time_now > draft_clock_end:
-            #pass pick
-            c = Draft_Pick.objects.filter(year=year_list[0]).order_by('pick_overall')
-            on_clock = ''
-            owner = ''
-            for x in c:
-                if len(x.player_selected) == 0:
-                    owner = x.owner
-                    break
-            d = Team.objects.get(internal_name=owner)
-            on_clock = d.user
-            call_process_draft_pick(on_clock, '_pass_', [])
-            print('draft_clock ended')
-    except:
-        pass
+    #try:
+    #    if time_now > draft_clock_end:
+    #        #pass pick
+    #        c = Draft_Pick.objects.filter(year=year_list[0]).order_by('pick_overall')
+    #        on_clock = ''
+    #        owner = ''
+    #        for x in c:
+    #            if len(x.player_selected) == 0:
+    #                owner = x.owner
+    #                break
+    #        d = Team.objects.get(internal_name=owner)
+    #        on_clock = d.user
+    #        call_process_draft_pick(on_clock, '_pass_', [])
+    #        print('draft_clock ended')
+    #except:
+    #    pass
 
 
 
@@ -2105,11 +2106,11 @@ def save_transaction_single_player(request):
     a = Transaction.objects.get(pk=id)
     a.var_t1 = ''
     a.save()
-    
+
     date_time = timezone.now()
-    
+
     salary_string = str(yr1_sal) + ',' + str(yr2_sal) + ',' + str(yr3_sal) + ',' + str(yr4_sal) + ',' + str(yr5_sal)
-    
+
     Transaction.objects.create(player=name,
                                date=date_time,
                                team1=a.team1,
@@ -2392,49 +2393,103 @@ def create_team_variable(request):
 def change_team_name(request):
     old_name = request.POST['change_team_before']
     new_name = request.POST['change_team_after']
-    a = Player.objects.filter(team=old_name)
-    b = TeamVariable.objects.filter(team=old_name)
-    c = Team.objects.get(internal_name=old_name)
-    d = Transaction.objects.filter(team1=old_name)
-    e = Transaction.objects.filter(team2=old_name)
+    old_user = request.POST['change_user_before']
+    new_user = request.POST['change_user_after']
+    # dont need to fix: ADP, Bug, Messages, Perf Yr1, Perf Yr2, Requested features, Roles, Salary Listings, Sessions, Variables, Yearly stats
+    # maybe need to be fixed??: Trades, Transactions
+    alert_settings = AlertSetting.objects.filter(user=old_user)
+    for x in alert_settings:
+        x.user = new_user
+        x.save()
+
+    alerts = Alert.objects.filter(user=old_user)
+    for x in alerts:
+        x.user = new_user
+        x.save()
+
     f = Asset.objects.filter(team=old_name)
-    g = Trade.objects.filter(team1=old_name)
-    h = Trade.objects.filter(team2=old_name)
-    i = Cap_Penalty_Entry.objects.filter(team=old_name)
-
-    for x in a:
-        x.team = new_name
-        x.save()
-
-    for x in b:
-        x.team = new_name
-        x.save()
-
-    c.internal_name = new_name
-    c.save()
-
-    for x in d:
-        x.team1 = new_name
-        x.save()
-
-    for x in e:
-        x.team2 = new_name
-        x.save()
-
     for x in f:
         x.team = new_name
         x.save()
 
+    auctions = Auction.objects.filter(high_bidder=old_name)
+    for x in auctions:
+        x.high_bidder = new_name
+        x.save()
+
+    avail_roles = AvailableRole.objects.filter(user=old_user)
+    for x in avail_roles:
+        x.user = new_user
+        x.save()
+
+    board_posts = Board_Post.objects.filter(user=old_user)
+    for x in board_posts:
+        x.user = new_user
+        x.save()
+
+    i = Cap_Penalty_Entry.objects.filter(team=old_name)
+    for x in i:
+        x.team = new_name
+        x.save()
+
+    draft_picks1 = Draft_Pick.objects.filter(owner=old_name)
+    for x in draft_picks1:
+        x.owner = new_name
+        x.save()
+
+    draft_picks2 = Draft_Pick.objects.filter(original_owner=old_name)
+    for x in draft_picks2:
+        x.original_owner = new_name
+        x.save()
+
+    notes = PlayerNote.objects.filter(user=old_user)
+    for x in notes:
+        x.user = new_user
+        x.save()
+
+    a = Player.objects.filter(team=old_name)
+    for x in a:
+        x.team = new_name
+        x.save()
+
+    shortlists = Shortlist.objects.filter(user=old_user)
+    for x in shortlists:
+        x.user = new_user
+        x.save()
+
+    b = TeamVariable.objects.filter(team=old_name)
+    for x in b:
+        x.team = new_name
+        x.save()
+
+    b2 = TeamVariable.objects.filter(user=old_user)
+    for x in b2:
+        x.user = new_user
+        x.save()
+
+    c = Team.objects.get(internal_name=old_name)
+    c.internal_name = new_name
+    c.user = new_user
+    c.save()
+
+    d = Transaction.objects.filter(team1=old_name)
+    for x in d:
+        x.team1 = new_name
+        x.save()
+
+    e = Transaction.objects.filter(team2=old_name)
+    for x in e:
+        x.team2 = new_name
+        x.save()
+
+    g = Trade.objects.filter(team1=old_name)
     for x in g:
         x.team1 = new_name
         x.save()
 
+    h = Trade.objects.filter(team2=old_name)
     for x in h:
         x.team2 = new_name
-        x.save()
-
-    for x in i:
-        x.team = new_name
         x.save()
 
     return HttpResponseRedirect('/')
@@ -3182,7 +3237,7 @@ def save_trade_data(request):
     except:
         b.int_variable = 999999
     b.save()
-    
+
     return JsonResponse('test', safe=False)
 
 def create_trade_string_for_display(pro_players, pro_picks_verbose, pro_assets_verbose, pro_cash_verbose, opp_players, opp_picks_verbose, opp_assets_verbose, opp_cash_verbose):
@@ -3370,15 +3425,15 @@ def process_trade(request):
     def accept(request):
         trade_id = int(request.POST['trade_id'])
         comments = request.POST['comments']
-        
+
         a = Transaction.objects.filter(player='trade').get(var_i1=trade_id)
         a.var_t1 = 'Accepted'
         a.save()
-        
+
         b = Trade.objects.get(pk=trade_id)
         b.status3 = 'Closed'
         b.save()
-        
+
         Trade.objects.create(team1=b.team1,
                              team2=b.team2,
                              trade_thread=b.trade_thread,
@@ -3395,7 +3450,7 @@ def process_trade(request):
                              message=comments,
                              status1='Accepted',
                              status3='Closed')
-        
+
         pro_players = b.pro_players.split(':')
         pro_picks = b.pro_picks.split(':')
         pro_assets = b.pro_assets.split(':')
@@ -3404,7 +3459,7 @@ def process_trade(request):
         opp_picks = b.opp_picks.split(':')
         opp_assets = b.opp_assets.split(':')
         opp_cash = b.opp_cash.split(':')
-    
+
         if pro_players[0] == '':
             pro_players = []
         if opp_players[0] == '':
@@ -3417,14 +3472,14 @@ def process_trade(request):
             pro_assets = []
         if opp_assets[0] == '':
             opp_assets = []
-        
+
         pro_picks_verbose, pro_assets_verbose, pro_cash_verbose, opp_picks_verbose, opp_assets_verbose, opp_cash_verbose = get_verbose_trade_info(pro_picks, pro_assets, pro_cash, opp_picks, opp_assets, opp_cash)
-        
+
         pro_string, opp_string = create_trade_string_for_display(pro_players, pro_picks_verbose, pro_assets_verbose, pro_cash_verbose, opp_players, opp_picks_verbose, opp_assets_verbose, opp_cash_verbose)
 
         d = Trade.objects.last()
         last_id = d.id
-        
+
         Transaction.objects.create(player='trade',
                                    team1=b.team1,
                                    team2=b.team2,
@@ -3434,10 +3489,10 @@ def process_trade(request):
                                    var_t2=pro_string,
                                    var_t3=opp_string,
                                    date=timezone.now())
-        
+
         e = Team.objects.get(internal_name=b.team1)
         opp_user = e.user
-        
+
         create_alerts('Trade Accepted', request.user, [trade_id, comments])
 
     def withdraw(request):
@@ -3455,7 +3510,7 @@ def process_trade(request):
 
 
     #end functions
-    
+
 
     process_instruction = request.POST['process_instruction']
 
@@ -3513,7 +3568,7 @@ def get_verbose_trade_data(request):
         pro_assets = []
     if opp_assets[0] == '':
         opp_assets = []
-    
+
     pro_picks_verbose, pro_assets_verbose, pro_cash_verbose, opp_picks_verbose, opp_assets_verbose, opp_cash_verbose = get_verbose_trade_info(pro_picks, pro_assets, pro_cash, opp_picks, opp_assets, opp_cash)
 
     return JsonResponse({'pro_players' : pro_players,
@@ -3630,7 +3685,7 @@ def save_redirect_trade_data(request):
 def save_transaction_trade(request):
     trade_id = int(request.POST['trade_id'])
     trans_id = int(request.POST['trans_id'])
-    
+
     a = Trade.objects.get(pk=trade_id)
     pro_team = a.team1
     pro_players = a.pro_players.strip().split(':')
@@ -3692,7 +3747,7 @@ def save_transaction_trade(request):
         d = Asset.objects.get(pk=int(asset))
         d.team = pro_team
         d.save()
-        
+
     e = Team.objects.get(internal_name=pro_team)
     e.yr1_cap_penalty = e.yr1_cap_penalty + Decimal(pro_cash[0]) - Decimal(opp_cash[0])
     e.yr2_cap_penalty = e.yr2_cap_penalty + Decimal(pro_cash[1]) - Decimal(opp_cash[1])
@@ -3700,7 +3755,7 @@ def save_transaction_trade(request):
     e.yr4_cap_penalty = e.yr4_cap_penalty + Decimal(pro_cash[3]) - Decimal(opp_cash[3])
     e.yr5_cap_penalty = e.yr5_cap_penalty + Decimal(pro_cash[4]) - Decimal(opp_cash[4])
     e.save()
-    
+
     f = Team.objects.get(internal_name=opp_team)
     f.yr1_cap_penalty = f.yr1_cap_penalty + Decimal(opp_cash[0]) - Decimal(pro_cash[0])
     f.yr2_cap_penalty = f.yr2_cap_penalty + Decimal(opp_cash[1]) - Decimal(pro_cash[1])
@@ -3759,7 +3814,7 @@ def save_transaction_trade(request):
             j = Transaction.objects.filter(player='trade').get(var_i1=x.id)
             j.var_t1='Invalid'
             j.save()
-    
+
     return JsonResponse('done', safe=False)
 
 def retrieve_ownership_info_trade_transaction(request):
@@ -3809,7 +3864,7 @@ def retrieve_ownership_info_trade_transaction(request):
     for asset in pro_assets:
         d = Asset.objects.get(pk=int(asset))
         team1_assets.append({'asset' : asset, 'owner' : d.team})
-        
+
     for player in opp_players:
         b = Player.objects.get(name=player)
         team2_players.append({'player' : player, 'owner' : b.team})
@@ -3819,21 +3874,21 @@ def retrieve_ownership_info_trade_transaction(request):
     for asset in opp_assets:
         d = Asset.objects.get(pk=int(asset))
         team2_assets.append({'asset' : asset, 'owner' : d.team})
-        
+
     e = Team.objects.get(internal_name=pro_team)
     team1_cap_pen[0] = e.yr1_cap_penalty
     team1_cap_pen[1] = e.yr2_cap_penalty
     team1_cap_pen[2] = e.yr3_cap_penalty
     team1_cap_pen[3] = e.yr4_cap_penalty
     team1_cap_pen[4] = e.yr5_cap_penalty
-    
+
     f = Team.objects.get(internal_name=opp_team)
     team2_cap_pen[0] = f.yr1_cap_penalty
     team2_cap_pen[1] = f.yr2_cap_penalty
     team2_cap_pen[2] = f.yr3_cap_penalty
     team2_cap_pen[3] = f.yr4_cap_penalty
     team2_cap_pen[4] = f.yr5_cap_penalty
-    
+
 
     return JsonResponse({'team1_players': team1_players,
                          'team1_picks': team1_picks,
@@ -3949,7 +4004,7 @@ def process_restructure(request):
 
     yearly_sb = round(total_guar / c.years_remaining() * 100) / 100
     total_sb = yearly_sb * c.years_remaining()
-    
+
     yr1_total = yr1_sal + Decimal(yearly_sb)
     yr2_total = yr2_sal + Decimal(yearly_sb)
     yr3_total = yr3_sal + Decimal(yearly_sb)
@@ -3971,7 +4026,7 @@ def process_restructure(request):
         if salary_list[count] != 0:
             missed_money -= 1
             salary_list[count] += Decimal(.01)
-    
+
     salary_string = str(salary_list[0]) + ',' + str(salary_list[1]) + ',' + str(salary_list[2]) + ',' + str(salary_list[3]) + ',' + str(salary_list[4])
 
     Transaction.objects.create(player=player,
@@ -4258,7 +4313,7 @@ def save_player_shortlist_assignments_batch(request):
 def process_player_stats(request):
     def convert_to_int(data):
         pfr_id, team, age, g, gs, pass_comp, pass_att, pass_yds, pass_td, pass_int, rush_att, rush_yds, rush_ypa, rush_td, rec_targets, rec, rec_yds, rec_ypr, rec_td, a, b, c, d, e, f, i = data
-        
+
         try:
             output_g = int(g)
         except:
@@ -4315,12 +4370,12 @@ def process_player_stats(request):
             output_rec_td = int(rec_td)
         except:
             output_rec_td = 0
-    
+
         return pfr_id, team, output_g, output_gs, output_pass_comp, output_pass_att, output_pass_yds, output_pass_td, output_pass_int, output_rush_att, output_rush_yds, output_rush_td, output_rec_targets, output_rec, output_rec_yds, output_rec_td
 
     def convert_kicking_data(data):
         pfr_id, team, g, gs, fga0, fgm0, fga20, fgm20, fga30, fgm30, fga40, fgm40, fga50, fgm50, fga, fgm, fgpercent, xpa, xpm, xppercent, punts, puntyds, puntlong, puntsblocked, ydsperpunt = data
-        
+
         try:
             output_g = int(g)
         except:
@@ -4373,7 +4428,7 @@ def process_player_stats(request):
             output_xpm = int(xpm)
         except:
             output_xpm = 0
-            
+
         return pfr_id, team, output_g, output_fga0, output_fgm0, output_fga20, output_fgm20, output_fga30, output_fgm30, output_fga40, output_fgm40, output_fga50, output_fgm50, output_xpa, output_xpm
 
     year = request.POST['year']
@@ -5346,6 +5401,13 @@ def edit_draft_board(request):
         b.save()
         return JsonResponse('test', safe=False)
 
+    new_board_list = []
+    for x in board_list:
+        bb = Player.objects.get(pk=x)
+        if bb.team == 'Rookie':
+            new_board_list.append(x)
+    board_list = new_board_list
+
     a = Player.objects.get(name=playername)
     playerid = a.id
 
@@ -5630,7 +5692,8 @@ def draft_data_pull(request):
     draft_switch = a.int_variable
 
     b = Variable.objects.get(name='Draft Clock End')
-    draft_clock_end = b.text_variable
+    draft_clock_end = parse_datetime(b.text_variable)
+    # draft_clock_end = timezone.make_naive(draft_clock_end)
 
     c = Draft_Pick.objects.filter(year=year_list[0]).order_by('pick_overall')
     on_clock = ''
@@ -5641,8 +5704,8 @@ def draft_data_pull(request):
             owner = x.owner
             pick_on_clock = x.pick_overall
             break
-    d = Team.objects.get(internal_name=owner)
-    on_clock = d.user
+    #d = Team.objects.get(internal_name=owner)
+    #on_clock = d.user
 
     ipath = static('content/2016_rookies.csv')
     if working_local == True:
@@ -5656,8 +5719,11 @@ def draft_data_pull(request):
         if not line:
             break
         name, college, nfl_team, pick = line.strip().split(':')
-        e = Player.objects.get(name=name)
-        info_list.append({'player': name, 'college': college, 'nfl_team': nfl_team, 'pos': e.position})
+        try:
+            e = Player.objects.get(name=name)
+            info_list.append({'player': name, 'college': college, 'nfl_team': nfl_team, 'pos': e.position})
+        except:
+            info_list.append({'player': name, 'college': college, 'nfl_team': nfl_team, 'pos': ''})
     i.close()
 
     return JsonResponse({'draft_switch' : draft_switch,
@@ -5714,7 +5780,7 @@ def check_on_the_clock(request):
             pick_on_clock = x.pick_overall
             break
     a = Variable.objects.get(name='Draft Clock End')
-    draft_clock_end = a.text_variable
+    draft_clock_end = parse_datetime(a.text_variable)
 
     return JsonResponse({'pick_on_clock' : pick_on_clock,
                          'clock_end' : draft_clock_end}, safe=False)

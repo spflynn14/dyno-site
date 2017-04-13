@@ -139,7 +139,7 @@ $(document).ready(function() {
     $(document).on('click', '.submit_extension_button', function() {
         $('button').prop('disabled', true);
         $('input').prop('disabled', true);
-        var player = $(this).parent().prev().prev().prev().prev().prev().prev().prev().prev().prev().prev().text();
+        var player = $(this).parent().prev().prev().prev().prev().prev().prev().prev().prev().prev().prev().prev().text();
         var team = user_team;
         var yr1 = $(this).parent().prev().prev().prev().prev().text();
         if (yr1 == '-') {

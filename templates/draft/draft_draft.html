@@ -37,11 +37,7 @@
                                     <td style="text-align: center">{{ x.pick_overall }} - {{ x.round }}.0{{ x.pick_in_round }}</td>
                                 {% endif %}
                                 <td>{{ x.owner }}</td>
-                                {% if x.pick_overall == on_clock %}
-                                    <td style="color: blue">on the clock...</td>
-                                {% else %}
-                                    <td id="player_selected">{{ x.player_selected }}</td>
-                                {% endif %}
+                                <td id="player_selected">{{ x.player_selected }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>

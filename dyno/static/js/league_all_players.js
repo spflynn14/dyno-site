@@ -192,7 +192,7 @@ $(document).ready(function() {
             team_selected_list.push('Pape');
         }
         if ($('#all_players_filter_Riley').prop('checked') == true) {
-            team_selected_list.push('Riley');
+            team_selected_list.push('Walker');
         }
         if ($('#all_players_filter_Runkle').prop('checked') == true) {
             team_selected_list.push('Runkle');

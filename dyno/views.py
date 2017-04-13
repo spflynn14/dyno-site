@@ -12,8 +12,8 @@ import django.apps
 from .forms import *
 from .models import *
 
-working_local = True
-current_league_year = 2016
+working_local = False
+current_league_year = 2017
 year_list = [current_league_year, current_league_year + 1, current_league_year + 2, current_league_year + 3, current_league_year + 4]
 acceptable_trans_list = ['Auction End', 'Waiver Extension', 'Franchise Tag', 'Transition Tag', 'Extension Submitted', 'Expansion Draft Pick',
                  'Player Cut', 'Trade Accepted', 'Rookie Draft Pick']
@@ -850,45 +850,44 @@ def leagueextensions(request):
                                                                    qb_yr2_list, rb_yr2_list, wr_yr2_list, te_yr2_list, def_yr2_list, k_yr2_list,
                                                                    )
 
-            if x.position == 'QB':
-                if base_extension > salary_listing_qb[8]:
-                    max_years = 4
-                elif base_extension > salary_listing_qb[15]:
-                    max_years = 3
-                else:
-                    max_years = 2
-            elif x.position == 'RB':
-                if base_extension > salary_listing_rb[15]:
-                    max_years = 4
-                elif base_extension > salary_listing_rb[30]:
-                    max_years = 3
-                else:
-                    max_years = 2
-            elif x.position == 'WR':
-                if base_extension > salary_listing_wr[20]:
-                    max_years = 4
-                elif base_extension > salary_listing_wr[40]:
-                    max_years = 3
-                else:
-                    max_years = 2
-            elif x.position == 'TE':
-                if base_extension > salary_listing_te[8]:
-                    max_years = 4
-                elif base_extension > salary_listing_te[15]:
-                    max_years = 3
-                else:
-                    max_years = 2
-            else:
-                max_years = 4
-
-            if num_years + max_years > 5:
-                max_years = 5 - num_years
-            else:
-                max_years = max_years - (x.years_remaining() - 1)
-
             if num_years > 1:
                 if (avg_yearly * 1.2) > base_extension:
                     base_extension = avg_yearly * 1.2
+
+            if x.position == 'QB':
+                if base_extension >= salary_listing_qb[8]:
+                    max_years = 5
+                elif base_extension >= salary_listing_qb[15]:
+                    max_years = 4
+                else:
+                    max_years = 3
+            elif x.position == 'RB':
+                if base_extension >= salary_listing_rb[15]:
+                    max_years = 5
+                elif base_extension >= salary_listing_rb[30]:
+                    max_years = 4
+                else:
+                    max_years = 3
+            elif x.position == 'WR':
+                if base_extension >= salary_listing_wr[20]:
+                    max_years = 5
+                elif base_extension >= salary_listing_wr[40]:
+                    max_years = 4
+                else:
+                    max_years = 3
+            elif x.position == 'TE':
+                if base_extension >= salary_listing_te[6]:
+                    max_years = 5
+                elif base_extension >= salary_listing_te[12]:
+                    max_years = 4
+                else:
+                    max_years = 3
+            else:
+                max_years = 5
+
+            max_years = max_years - num_years
+            if max_years < 0:
+                max_years = 0
 
             if max_years > 0:
                 yr1_extension = base_extension * 1.1
@@ -987,7 +986,7 @@ def leaguefreeagents(request):
     if include_impending == 0:
         a = Player.objects.filter(team='Free Agent').order_by('position', 'name')
     else:
-        a = Player.objects.filter(Q(team='Free Agent') | Q(yr2_salary=0)).order_by('position', 'name')
+        a = Player.objects.filter(Q(team='Free Agent') | Q(yr2_salary=0)).order_by('position', 'name').exclude(team='Deactivated')
 
     free_agent_list = []
 
@@ -1136,8 +1135,8 @@ def performancepage(request):
             num_yr1_k += 1
             x.rank = num_yr1_k
             k_yr1_list.append(x)
-            
-            
+
+
     b = Performance_Yr2.objects.all().order_by('rank')
     qb_yr2_list = []
     rb_yr2_list = []
@@ -1177,8 +1176,8 @@ def performancepage(request):
         elif x.position == 'K':
             num_yr2_k += 1
             x.rank = num_yr2_k
-            k_yr2_list.append(x)        
-            
+            k_yr2_list.append(x)
+
     return render(request, 'league/league_performance.html', {'qb_yr1_list' : qb_yr1_list,
                                                               'rb_yr1_list' : rb_yr1_list,
                                                               'wr_yr1_list' : wr_yr1_list,
@@ -1647,7 +1646,7 @@ def teamcapsituationpage(request):
         avail_ro_3 = avail_roles(con, cur, team, x[1], x[2], 3)
         avail_ro_4 = avail_roles(con, cur, team, x[1], x[2], 4)
         avail_ro_5 = avail_roles(con, cur, team, x[1], x[2], 5)
-        full_age = timezone.now().date() - parse_date(x[25])
+        full_age = timezone.now().date() - parse_date(x[24])
         age_days = full_age.days
         age_years = floor(age_days / 364 * 10) / 10
         team_json1.append({'yr1_role': x[19],
@@ -2490,7 +2489,7 @@ def confirmrestructurepage(request):
 
     yearly_sb = round(total_guar / b.years_remaining() * 100) / 100
     total_sb = yearly_sb * b.years_remaining()
-    
+
     yr1_total = yr1_sal + Decimal(yearly_sb)
     yr2_total = yr2_sal + Decimal(yearly_sb)
     yr3_total = yr3_sal + Decimal(yearly_sb)
@@ -2506,7 +2505,7 @@ def confirmrestructurepage(request):
         if salary_list[count] != 0:
             missed_money -= 1
             salary_list[count] += Decimal(.01)
-    
+
     totals = [yr1_total, yr2_total, yr3_total, yr4_total, yr5_total]
 
     total_sal = round(sum(salary_list)*100) / 100
@@ -2568,7 +2567,7 @@ def transactiontrade(request):
     a.save()
 
     b = Transaction.objects.get(pk=id_selected)
-    
+
     c = Trade.objects.get(pk=int(b.var_i1))
     pro_team = c.team1
     pro_players = c.pro_players.strip().split(':')
@@ -2597,14 +2596,14 @@ def transactiontrade(request):
 
     pro_cap_pen = [0,0,0,0,0]
     opp_cap_pen = [0,0,0,0,0]
-    
+
     d = Team.objects.get(internal_name=pro_team)
     pro_cap_pen[0] = d.yr1_cap_penalty
     pro_cap_pen[1] = d.yr2_cap_penalty
     pro_cap_pen[2] = d.yr3_cap_penalty
     pro_cap_pen[3] = d.yr4_cap_penalty
     pro_cap_pen[4] = d.yr5_cap_penalty
-    
+
     e = Team.objects.get(internal_name=opp_team)
     opp_cap_pen[0] = e.yr1_cap_penalty
     opp_cap_pen[1] = e.yr2_cap_penalty
@@ -2817,7 +2816,7 @@ def tagspage(request):
                 transition_tag = twenty_percent
 
         if waiver_extension_flag == '1':
-            if x.notes != 'In-season pickup':
+            if x.inseason_pickup != 1:
                 waiver_exception = 'not eligible'
             else:
                 base_extension, avg_yearly, num_years = extension_calc(x,
@@ -3026,7 +3025,7 @@ def confirmtradepage(request):
     create_session(request.user, 'confirmtrade')
     a = TeamVariable.objects.filter(name='TradeData').get(user=request.user)
     temp = a.text_variable
-    
+
     temp1 = temp.split('\n')
     opp_team = temp1[0]
     pro_players = temp1[1].strip().split(':')

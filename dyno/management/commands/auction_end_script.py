@@ -33,5 +33,5 @@ class Command(BaseCommand):
             periodic_alerts_routine()
             commish_pending_transactions_routine()
             check_expired_trades()
-            check_expired_set_contracts()
+            #check_expired_set_contracts()
             self.stdout.write(self.style.SUCCESS('Successfully ran script'))
