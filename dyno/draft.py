@@ -70,33 +70,38 @@ def create_import_player_all(request):
     for player in player_list:
         if player.id == -1:
             # create player in Player model
-            Player.objects.create(
-                position=player.pos,
-                name=player.name,
-                team='Rookie',
-                contract_type='none',
-                birthdate=player.dob,
-                pfr_id='',
-                total_value=0,
-                signing_bonus=0,
-                salary=0,
-                yr1_salary=0,
-                yr2_salary=0,
-                yr3_salary=0,
-                yr4_salary=0,
-                yr5_salary=0,
-                yr1_sb=0,
-                yr2_sb=0,
-                yr3_sb=0,
-                yr4_sb=0,
-                yr5_sb=0,
-                notes='',
-                yr1_role='--',
-                yr2_role='--',
-                yr3_role='--',
-                yr4_role='--',
-                yr5_role='--',
-            )
+            try:
+                p = Player.objects.get(name=player.name,
+                                       position=player.pos,
+                                       team='Rookie')
+            except:
+                Player.objects.create(
+                    position=player.pos,
+                    name=player.name,
+                    team='Rookie',
+                    contract_type='none',
+                    birthdate=player.dob,
+                    pfr_id='',
+                    total_value=0,
+                    signing_bonus=0,
+                    salary=0,
+                    yr1_salary=0,
+                    yr2_salary=0,
+                    yr3_salary=0,
+                    yr4_salary=0,
+                    yr5_salary=0,
+                    yr1_sb=0,
+                    yr2_sb=0,
+                    yr3_sb=0,
+                    yr4_sb=0,
+                    yr5_sb=0,
+                    notes='',
+                    yr1_role='--',
+                    yr2_role='--',
+                    yr3_role='--',
+                    yr4_role='--',
+                    yr5_role='--',
+                )
             # add to list for creating rookie file
             write_to_file_list.append(player.export_json_for_rookie_file())
 
