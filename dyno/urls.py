@@ -1,6 +1,7 @@
 from django.conf.urls import url
 from . import views
 from . import processing
+from . import draft
 
 urlpatterns = [
     url(r'^$', views.mainpage, name='main page'),
@@ -165,4 +166,10 @@ urlpatterns = [
     url(r'^process_draft_pick$', processing.process_draft_pick, name='process draft pick'),
     url(r'^skip_to_pick$', processing.skip_to_pick, name='skip to pick - draft'),
     url(r'^check_on_the_clock$', processing.check_on_the_clock, name='check which pick is the current pick'),
+]
+
+# new draft urls
+urlpatterns += [
+    url(r'^create_import_player_id$', draft.create_import_player_id, name='create_import_player_id'),
+    url(r'^create_import_player_all$', draft.create_import_player_all, name='create_import_player_all'),
 ]

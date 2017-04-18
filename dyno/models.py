@@ -453,6 +453,7 @@ class Draft_Pick(models.Model):
     yr3_sal = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     yr4_sal = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     player_selected = models.CharField(max_length=60, default='', blank=True)
+    pick_used = models.BooleanField(default=False)
 
     def __str__(self):
         return_string = self.owner + ' - ' + self.original_owner + ' - ' + str(self.pick_overall)

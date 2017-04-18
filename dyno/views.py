@@ -12,7 +12,7 @@ import django.apps
 from .forms import *
 from .models import *
 
-working_local = False
+working_local = True
 current_league_year = 2017
 year_list = [current_league_year, current_league_year + 1, current_league_year + 2, current_league_year + 3, current_league_year + 4]
 acceptable_trans_list = ['Auction End', 'Waiver Extension', 'Franchise Tag', 'Transition Tag', 'Extension Submitted', 'Expansion Draft Pick',
@@ -487,65 +487,17 @@ def messageboardpage(request):
                                                   'favs_list' : favs_list})
 
 def draftpage(request):
-    create_session(request.user, 'draft')
     if login_redirect(request) == 'redirect':
         return render(request, 'login.html', {'failed_login': False,
                                               'redirect' : '/draft'})
 
-    a = Draft_Pick.objects.filter(year=year_list[0]).order_by('pick_overall')
-    on_clock = 1
-    for x in a:
-        if len(x.player_selected) == 0:
-            on_clock = x.pick_overall
-            break
+    from .draft import get_info_for_draftpage
 
-    b = Player.objects.filter(team='Rookie').order_by('name')
+    draft_order, on_clock, players, draft_board_info = get_info_for_draftpage(request)
 
-    c = TeamVariable.objects.filter(user=request.user).get(name='DraftBoard')
-    draft_board = c.text_variable
-
-    playername_list = []
-    try:
-        board_list = draft_board.split(',')
-    except:
-        board_list = []
-    # print(board_list)
-    if len(board_list) > 0 and len(board_list[0]) > 0:
-        for x in board_list:
-            d = Player.objects.get(id=int(x))
-            if d.team == 'Rookie':
-                playername_list.append({'name': d.name,
-                                        'pos': d.position,
-                                        'id' : d.id})
-
-        ipath = static('content/2016_rookies.csv')
-        if working_local == True:
-            i = open('dyno/' + ipath)
-        else:
-            i = open('/home/spflynn/dyno-site/dyno' + ipath)
-
-        info_list = []
-        while True:
-            line = i.readline()
-            if not line:
-                break
-            name, college, nfl_team, pick = line.strip().split(':')
-            info_list.append({'player': name, 'college': college, 'nfl_team': nfl_team, 'pick': pick})
-        i.close()
-
-    draft_board_info = []
-    for x in playername_list:
-        for y in info_list:
-            if y['player'] == x['name']:
-                draft_board_info.append({'pos': x['pos'],
-                                         'player': x['name'],
-                                         'college': y['college'],
-                                         'nfl_team': y['nfl_team'],
-                                         'id' : x['id']})
-
-    return render(request, 'draft/draft_draft.html', {'draft_order' : a,
+    return render(request, 'draft/draft_draft.html', {'draft_order' : draft_order,
                                                       'on_clock' : on_clock,
-                                                      'players' : b,
+                                                      'players' : players,
                                                       'draft_board' : draft_board_info})
 
 def draftinfoandsettings(request):
@@ -3299,33 +3251,8 @@ def input_old_transactions(request):
     return render (request, 'batch/input_old_transactions.html', {'trans_list' : trans_list})
 
 def draftrookiepool(request):
-    a = Player.objects.filter(team='Rookie')
+    from .draft import get_info_for_draft_pool_page
 
-    ipath = static('content/2016_rookies.csv')
-    if working_local == True:
-        i = open('dyno/' + ipath)
-    else:
-        i = open('/home/spflynn/dyno-site/dyno' + ipath)
-
-    info_list = []
-    while True:
-        line = i.readline()
-        if not line:
-            break
-        name, college, nfl_team, pick = line.strip().split(':')
-        info_list.append({'player' : name, 'college' : college, 'nfl_team' : nfl_team, 'pick' : pick})
-    i.close()
-
-    rookies = []
-    for x in a:
-        for y in info_list:
-            if y['player'] == x.name:
-                rookies.append({'pos' : x.position, 'name' : x.name, 'college' : y['college'], 'nfl_team' : y['nfl_team'], 'pick' : y['pick']})
-
-    rookies = sorted(rookies, key=lambda b: b['name'])
-
-    b = Shortlist.objects.filter(user=request.user)
-
-
+    rookies, shortlists = get_info_for_draft_pool_page(request)
     return render (request, 'draft/draft_rookie_pool.html', {'rookies' : rookies,
-                                                             'shortlists' : b})
+                                                             'shortlists' : shortlists})

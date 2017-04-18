@@ -5201,138 +5201,21 @@ def future_draft_pick_data_pull(request):
     return JsonResponse({'draft_picks': serializers.serialize('json', a)}, safe=False)
 
 def draft_info_settings_data_pull(request):
-    a = Draft_Pick.objects.filter(Q(year=year_list[1]) | Q(year=year_list[2]) | Q(year=year_list[3]) | Q(year=year_list[4]))
+    from .draft import get_info_draft_info_settings_data
 
-    current_user = str(request.user)
-    a = Team.objects.get(user=current_user)
-    team = a.internal_name
-    cap_pen_yr1 = a.yr1_cap_penalty
-    cap_pen_yr2 = a.yr2_cap_penalty
-    cap_pen_yr3 = a.yr3_cap_penalty
-    cap_pen_yr4 = a.yr4_cap_penalty
-    cap_pen_yr5 = a.yr5_cap_penalty
-
-    b = Player.objects.filter(team=team)
-    cost_yr1 = 0
-    cost_yr2 = 0
-    cost_yr3 = 0
-    cost_yr4 = 0
-    cost_yr5 = 0
-    for x in b:
-        cost_yr1 += x.yr1_salary
-        cost_yr1 += x.yr1_sb
-        cost_yr2 += x.yr2_salary
-        cost_yr2 += x.yr2_sb
-        cost_yr3 += x.yr3_salary
-        cost_yr3 += x.yr3_sb
-        cost_yr4 += x.yr4_salary
-        cost_yr4 += x.yr4_sb
-        cost_yr5 += x.yr5_salary
-        cost_yr5 += x.yr5_sb
-
-    c = TeamVariable.objects.filter(user=request.user).get(name='DraftBoard')
-    draft_board = c.text_variable
-
-    playername_list = []
-    try:
-        board_list = draft_board.split(',')
-    except:
-        board_list = []
-    # print(board_list)
-    if len(board_list) > 0 and len(board_list[0]) > 0:
-        for x in board_list:
-            d = Player.objects.get(id=int(x))
-            if d.team == 'Rookie':
-                playername_list.append({'name' : d.name,
-                                        'pos' : d.position})
-
-        ipath = static('content/2016_rookies.csv')
-        if working_local == True:
-            i = open('dyno/' + ipath)
-        else:
-            i = open('/home/spflynn/dyno-site/dyno' + ipath)
-
-        info_list = []
-        while True:
-            line = i.readline()
-            if not line:
-                break
-            name, college, nfl_team, pick = line.strip().split(':')
-            info_list.append({'player': name, 'college': college, 'nfl_team': nfl_team, 'pick': pick})
-        i.close()
-
-    draft_board_info = []
-    for x in playername_list:
-        for y in info_list:
-            if y['player'] == x['name']:
-                draft_board_info.append({'pos' : x['pos'],
-                                         'player' : x['name'],
-                                         'college' : y['college'],
-                                         'nfl_team' : y['nfl_team']})
-
-    team = Team.objects.get(user=request.user)
-    d = Draft_Pick.objects.filter(year=year_list[0]).filter(owner=team).order_by('pick_overall')
-    e = TeamVariable.objects.filter(user=request.user).get(name='AutopickSettings')
-    if e.text_variable == '':
-        autopick_list = []
-    else:
-        try:
-            autopick_list = e.text_variable.strip().split(':')
-        except:
-            autopick_list = []
-
-    autopick_info = []
-    # print(autopick_list)
-    for x in d:
-        temp_delay = ''
-        temp_skip_pick = ''
-        for y in autopick_list:
-            try:
-                pick, delay, skip_pick_flag = y.split(',')
-                if x.pick_overall == int(pick):
-                    temp_delay = delay
-                    temp_skip_pick = skip_pick_flag
-            except:
-                pass
-        pick_string = ''
-        if x.pick_in_round >= 10:
-            pick_string = str(x.round) + '.' + str(x.pick_in_round)
-        else:
-            pick_string = str(x.round) + '.0' + str(x.pick_in_round)
-        autopick_info.append({'pick' : pick_string,
-                              'pick_overall' : x.pick_overall,
-                              'delay' : temp_delay,
-                              'skip_pick_flag' : temp_skip_pick,
-                              'player_selected' : x.player_selected})
-
-    f = TeamVariable.objects.filter(user=request.user).get(name='DraftSettings')
-    settings_code = f.text_variable
-    try:
-        set1, set2, set3 = settings_code.strip().split(',')
-    except:
-        set1 = '1'
-        set2 = '1'
-        set3 = '0'
-    draft_settings = [set1, set2, set3]
-
-    g = Draft_Pick.objects.filter(year=year_list[0]).order_by('pick_overall')
-    current_pick = 0
-    for x in g:
-        if len(x.player_selected) == 0:
-            current_pick = x.pick_overall
-            break
+    cost_by_year, cap_pen_by_year, draft_board_info, autopick_info, draft_settings, current_pick = get_info_draft_info_settings_data(request)
 
 
-    return JsonResponse({'cost_yr1': cost_yr1,
-                         'cost_yr2': cost_yr2,
-                         'cost_yr3': cost_yr3,
-                         'cost_yr4': cost_yr4,
-                         'cost_yr5': cost_yr5,
-                         'pen_yr1' : cap_pen_yr1,
-                         'pen_yr2': cap_pen_yr2,
-                         'pen_yr3': cap_pen_yr3,
-                         'pen_yr4': cap_pen_yr4,
-                         'pen_yr5': cap_pen_yr5,
+    return JsonResponse({'cost_yr1': cost_by_year[0],
+                         'cost_yr2': cost_by_year[1],
+                         'cost_yr3': cost_by_year[2],
+                         'cost_yr4': cost_by_year[3],
+                         'cost_yr5': cost_by_year[4],
+                         'pen_yr1': cap_pen_by_year[0],
+                         'pen_yr2': cap_pen_by_year[1],
+                         'pen_yr3': cap_pen_by_year[2],
+                         'pen_yr4': cap_pen_by_year[3],
+                         'pen_yr5': cap_pen_by_year[4],
                          'draft_board' : draft_board_info,
                          'autopick_info' : autopick_info,
                          'draft_settings' : draft_settings,
@@ -5340,47 +5223,9 @@ def draft_info_settings_data_pull(request):
                          }, safe=False)
 
 def add_player_to_draft_board(request):
-    playername = request.POST['player']
-    a = Player.objects.get(name=playername)
-    playerid = a.id
+    from .draft import get_info_add_player_to_draft_board
 
-    b = TeamVariable.objects.filter(user=request.user).get(name='DraftBoard')
-    if b.text_variable is None:
-        b.text_variable = ''
-        b.save()
-    if str(playerid) in b.text_variable:
-        add_player_bool = False
-        draft_board_info = ''
-    else:
-        if len(b.text_variable) == 0:
-            b.text_variable = playerid
-        else:
-            b.text_variable = b.text_variable + ',' + str(playerid)
-        b.save()
-
-        ipath = static('content/2016_rookies.csv')
-        if working_local == True:
-            i = open('dyno/' + ipath)
-        else:
-            i = open('/home/spflynn/dyno-site/dyno' + ipath)
-
-        info_list = []
-        while True:
-            line = i.readline()
-            if not line:
-                break
-            name, college, nfl_team, pick = line.strip().split(':')
-            info_list.append({'player': name, 'college': college, 'nfl_team': nfl_team, 'pick': pick})
-        i.close()
-
-        draft_board_info = {}
-        for y in info_list:
-            if y['player'] == playername:
-                draft_board_info = {'pos': a.position,
-                                         'player': a.name,
-                                         'college': y['college'],
-                                         'nfl_team': y['nfl_team']}
-        add_player_bool = True
+    draft_board_info, add_player_bool = get_info_add_player_to_draft_board(request)
 
     return JsonResponse({'player_info' : draft_board_info,
                          'add_player_bool' : add_player_bool}, safe=False)
@@ -5688,43 +5533,9 @@ def save_clock_suspension(request):
     return JsonResponse('done', safe=False)
 
 def draft_data_pull(request):
-    a = Variable.objects.get(name='Draft Switch')
-    draft_switch = a.int_variable
+    from .draft import get_info_for_draftdatapull
 
-    b = Variable.objects.get(name='Draft Clock End')
-    draft_clock_end = parse_datetime(b.text_variable)
-    # draft_clock_end = timezone.make_naive(draft_clock_end)
-
-    c = Draft_Pick.objects.filter(year=year_list[0]).order_by('pick_overall')
-    on_clock = ''
-    owner = ''
-    pick_on_clock = 0
-    for x in c:
-        if len(x.player_selected) == 0:
-            owner = x.owner
-            pick_on_clock = x.pick_overall
-            break
-    #d = Team.objects.get(internal_name=owner)
-    #on_clock = d.user
-
-    ipath = static('content/2016_rookies.csv')
-    if working_local == True:
-        i = open('dyno/' + ipath)
-    else:
-        i = open('/home/spflynn/dyno-site/dyno' + ipath)
-
-    info_list = []
-    while True:
-        line = i.readline()
-        if not line:
-            break
-        name, college, nfl_team, pick = line.strip().split(':')
-        try:
-            e = Player.objects.get(name=name)
-            info_list.append({'player': name, 'college': college, 'nfl_team': nfl_team, 'pos': e.position})
-        except:
-            info_list.append({'player': name, 'college': college, 'nfl_team': nfl_team, 'pos': ''})
-    i.close()
+    draft_switch, draft_clock_end, on_clock, info_list, pick_on_clock = get_info_for_draftdatapull(request)
 
     return JsonResponse({'draft_switch' : draft_switch,
                          'draft_clock_end' : draft_clock_end,
