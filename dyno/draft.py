@@ -32,6 +32,7 @@ def get_allpicks_and_current_pick():
     return all_picks, on_clock
 
 def create_player_list():
+    # must use ipath
     ipath = static('content/test_players.json')
     if working_local == True:
         full_path = 'dyno/' + ipath
