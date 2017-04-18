@@ -101,7 +101,12 @@ def create_import_player_all(request):
             write_to_file_list.append(player.export_json_for_rookie_file())
 
     # write rookie file
-    with open('dyno/static/content/2017_rookies.json', 'w') as f:
+    ipath = static('content/2017_rookies.json')
+    if working_local == True:
+        full_path = 'dyno/' + ipath
+    else:
+        full_path = '/home/spflynn/dyno-site/dyno' + ipath
+    with open(full_path, 'w') as f:
         json.dump(write_to_file_list, f)
     return HttpResponseRedirect('/batch')
 
