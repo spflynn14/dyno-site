@@ -32,7 +32,12 @@ def get_allpicks_and_current_pick():
     return all_picks, on_clock
 
 def create_player_list():
-    with open('dyno/static/content/test_players.json') as f:
+    ipath = static('content/test_players.json')
+    if working_local == True:
+        full_path = 'dyno/' + ipath
+    else:
+        full_path = '/home/spflynn/dyno-site/dyno' + ipath
+    with open(full_path) as f:
         data = json.loads(f.read())
     all_players = Player.objects.all()
     player_list = []
