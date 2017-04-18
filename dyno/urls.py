@@ -172,4 +172,5 @@ urlpatterns = [
 urlpatterns += [
     url(r'^create_import_player_id$', draft.create_import_player_id, name='create_import_player_id'),
     url(r'^create_import_player_all$', draft.create_import_player_all, name='create_import_player_all'),
+    url(r'^add_draft_year$', draft.add_draft_year, name='add_draft_year'),
 ]

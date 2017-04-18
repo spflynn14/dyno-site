@@ -56,6 +56,14 @@
                      </div>
                      <br><br>
                      <div style="border: 1px solid #cdcdcd; padding: 15px 15px 15px 15px">
+                         <form method="post" action="/add_draft_year">
+                             {% csrf_token %}
+                             Draft Year: <textarea rows="1" cols="10" name="year"></textarea><br>
+                             <input type="submit" value="Go">
+                         </form>
+                     </div>
+                     <br><br>
+                     <div style="border: 1px solid #cdcdcd; padding: 15px 15px 15px 15px">
                          <a href="/input_draft_results" style="float: left">Input Draft Results</a>
                          <br>
                      </div>

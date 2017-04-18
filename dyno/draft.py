@@ -333,3 +333,19 @@ def get_info_add_player_to_draft_board(request):
         add_player_bool = True
 
     return draft_board_info, add_player_bool
+
+def add_draft_year(request):
+    year = request.POST['year']
+
+    all_teams = Team.objects.all()
+
+    for team in all_teams:
+        for round in range(1,6):
+            Draft_Pick.objects.create(
+                owner=team,
+                original_owner=team,
+                year=int(year),
+                round=round
+            )
+
+    return HttpResponseRedirect('/batch')
