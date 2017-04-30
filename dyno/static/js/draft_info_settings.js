@@ -21,7 +21,7 @@ $(document).ready(function() {
             current_pick = data.current_pick;
             // console.log(cost_list);
             // console.log(pen_list);
-            if (data.draft_board == null) {
+            if (data.draft_board === null) {
                 console.log('null');
             } else {
                 // console.log(data.draft_board);
@@ -36,19 +36,19 @@ $(document).ready(function() {
     });
 
     function set_draft_settings () {
-        if (draft_settings[0] == '1') {
+        if (draft_settings[0] === '1') {
             $("input[name=turn_off_autopick_trade][value='yes']").prop('checked', true);
         } else {
             $("input[name=turn_off_autopick_trade][value='no']").prop('checked', true);
         }
 
-        if (draft_settings[1] == '1') {
+        if (draft_settings[1] === '1') {
             $("input[name=alert_draft_update][value='yes']").prop('checked', true);
         } else {
             $("input[name=alert_draft_update][value='no']").prop('checked', true);
         }
 
-        if (draft_settings[2] == '1') {
+        if (draft_settings[2] === '1') {
             $("input[name=alert_with_autopick][value='yes']").prop('checked', true);
         } else {
             $("input[name=alert_with_autopick][value='no']").prop('checked', true);
@@ -56,7 +56,7 @@ $(document).ready(function() {
     }
 
     function fill_cap_summary (add_remaining_bool) {
-        if (add_remaining_bool == false) {
+        if (add_remaining_bool === false) {
             $('#yr1_cost').text('$' + cost_list[0]);
             $('#yr2_cost').text('$' + cost_list[1]);
             $('#yr3_cost').text('$' + cost_list[2]);
@@ -108,6 +108,7 @@ $(document).ready(function() {
         $('#autopick_table_tbody').empty();
 
         $.each(data, function(index, value) {
+            console.log(value);
             var tr = $('<tr>');
             var td_pick = $('<td>');
             var td_autopick1 = $('<td>').css({'text-align' : 'right'});
@@ -120,8 +121,8 @@ $(document).ready(function() {
             var chkbox = $('<input />', {type: 'checkbox'}).addClass('autopick_checkbox');
             td_autopick1.append(chkbox);
             td_autopick2.html('&nbsp&nbspAutopick');
-            console.log(current_pick, value.pick_overall);
-            if (current_pick == value.pick_overall) {
+            // console.log(current_pick, value.pick_overall);
+            if (current_pick === value.pick_overall) {
                 chkbox.prop('disabled', true);
             }
             var delay_select = $('<select>').addClass('delay_select');
@@ -140,35 +141,35 @@ $(document).ready(function() {
             var pass = $('<option>', {value: 'pass'}).text('Pass pick').appendTo(pickorpass_select);
             td_pickorpass.append(pickorpass_select);
 
-            if (value.player_selected == '') {
-                if (value.delay == '') {
+            if (value.player_selected === '') {
+                if (value.delay === '') {
                     td_timeframe.hide();
                     td_pickorpass.hide();
                     delay15.prop('selected', true);
                 } else {
                     chkbox.prop('checked', true);
-                    if (value.delay == '0') {
+                    if (value.delay === 0) {
                         delay0.prop('selected', true);
-                    } else if (value.delay == '5') {
+                    } else if (value.delay === 5) {
                         delay5.prop('selected', true);
-                    } else if (value.delay == '10') {
+                    } else if (value.delay === 10) {
                         delay10.prop('selected', true);
-                    } else if (value.delay == '15') {
+                    } else if (value.delay === 15) {
                         delay15.prop('selected', true);
-                    } else if (value.delay == '20') {
+                    } else if (value.delay === 20) {
                         delay20.prop('selected', true);
-                    } else if (value.delay == '30') {
+                    } else if (value.delay === 30) {
                         delay30.prop('selected', true);
-                    } else if (value.delay == '45') {
+                    } else if (value.delay === 45) {
                         delay45.prop('selected', true);
-                    } else if (value.delay == '60') {
+                    } else if (value.delay === 60) {
                         delay60.prop('selected', true);
-                    } else if (value.delay == 'end') {
+                    } else if (value.delay === 'end') {
                         delayend.prop('selected', true);
                     }
-                    if (value.skip_pick_flag == 'pick') {
+                    if (value.skip_pick_flag === 'pick') {
                         pick.prop('selected', true);
-                    } else if (value.skip_pick_flag == 'pass') {
+                    } else if (value.skip_pick_flag === 'pass') {
                         pass.prop('selected', true);
                     }
                 }
@@ -176,7 +177,7 @@ $(document).ready(function() {
                 td_autopick1.empty();
                 td_autopick2.empty();
                 td_timeframe.empty();
-                if (value.player_selected == 'pick passed') {
+                if (value.player_selected === 'pick passed') {
                     td_pickorpass.text('Pick Passed');
                 } else {
                     td_pickorpass.text('You selected ' + value.player_selected);
@@ -351,7 +352,7 @@ $(document).ready(function() {
     $('#add_individual_button').on('click', function() {
         var player_selected = $('#add_individual_select').val();
         // console.log(player_selected);
-        if (player_selected != '_blank_') {
+        if (player_selected !== '_blank_') {
             $.ajax({
                 url : '/add_player_to_draft_board',
                 type: "POST",
@@ -360,8 +361,8 @@ $(document).ready(function() {
                 },
                 dataType: 'json',
                 success: function(data){
-                    if (data.add_player_bool == true) {
-                        draft_board.push(data.player_info);
+                    if (data.add_player_bool === true) {
+                        draft_board = data.player_info;
                         fill_draft_board(draft_board);
                     }
                 }

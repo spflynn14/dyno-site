@@ -5231,61 +5231,69 @@ def add_player_to_draft_board(request):
                          'add_player_bool' : add_player_bool}, safe=False)
 
 def edit_draft_board(request):
-    playername = request.POST['player']
-    action = request.POST['action']
+    from .classes import DraftBoardObject
+    dbo = DraftBoardObject(request)
+    dbo.make_draft_board_action_variables()
 
-    b = TeamVariable.objects.filter(user=request.user).get(name='DraftBoard')
-    board_list = b.text_variable.strip().split(',')
-    try:
-        board_list = list(map(int, board_list))
-    except:
-        pass
+    # playername = request.POST['player']
+    # action = request.POST['action']
+    #
+    # b = TeamVariable.objects.filter(user=request.user).get(name='DraftBoard')
+    # board_list = b.text_variable.strip().split(',')
+    # try:
+    #     board_list = list(map(int, board_list))
+    # except:
+    #     pass
 
-    if action == 'clear':
-        b.text_variable = ''
-        b.save()
-        return JsonResponse('test', safe=False)
+    if dbo.action == 'clear':
+        dbo.clear_draft_board()
+    elif dbo.action == 'remove':
+        dbo.remove_player_from_draft_board()
+    elif dbo.action == 'up':
+        dbo.move_player_up_draft_board()
+    elif dbo.action == 'down':
+        dbo.move_player_down_draft_board()
 
-    new_board_list = []
-    for x in board_list:
-        bb = Player.objects.get(pk=x)
-        if bb.team == 'Rookie':
-            new_board_list.append(x)
-    board_list = new_board_list
-
-    a = Player.objects.get(name=playername)
-    playerid = a.id
-
+    # new_board_list = []
+    # for x in board_list:
+    #     bb = Player.objects.get(pk=x)
+    #     if bb.team == 'Rookie':
+    #         new_board_list.append(x)
+    # board_list = new_board_list
+    #
+    # a = Player.objects.get(name=playername)
+    # playerid = a.id
+    #
     # print(board_list)
-    i = board_list.index(playerid)
-
-    output = []
-    count = -1
-    for x in board_list:
-        count += 1
-        if action == 'up' and count == i-1:
-            output.append(playerid)
-            output.append(x)
-        elif action == 'down' and count == i+1:
-            output.append(x)
-            output.append(playerid)
-        elif count == i:
-            pass
-        else:
-            output.append(x)
-
+    # i = board_list.index(playerid)
+    #
+    # output = []
+    # count = -1
+    # for x in board_list:
+    #     count += 1
+    #     if action == 'up' and count == i-1:
+    #         output.append(playerid)
+    #         output.append(x)
+    #     elif action == 'down' and count == i+1:
+    #         output.append(x)
+    #         output.append(playerid)
+    #     elif count == i:
+    #         pass
+    #     else:
+    #         output.append(x)
+    #
     # print(output)
-    writeout = ''
-    count = 0
-    for x in output:
-        count += 1
-        if count == 1:
-            writeout = str(x)
-        else:
-            writeout = writeout + ',' + str(x)
+    # writeout = ''
+    # count = 0
+    # for x in output:
+    #     count += 1
+    #     if count == 1:
+    #         writeout = str(x)
+    #     else:
+    #         writeout = writeout + ',' + str(x)
     # print(writeout)
-    b.text_variable = writeout
-    b.save()
+    # b.text_variable = writeout
+    # b.save()
 
     return JsonResponse('test', safe=False)
 
@@ -5385,18 +5393,23 @@ def import_shortlist_to_draft_board(request):
         player_list = sorted(player_list, key=lambda d: d['text'], reverse=True)
     print(player_list)
 
-    e = TeamVariable.objects.filter(user=request.user).get(name='DraftBoard')
-    writeout = ''
-    count = 0
-    for x in player_list:
-        count += 1
-        if count == 1:
-            writeout = str(x['id'])
-        else:
-            writeout = writeout + ',' + str(x['id'])
+    from .classes import DraftBoardObject
+    dbo = DraftBoardObject(request)
+    dbo.write_player_list_to_draft_board(player_list)
+    #########################
+    # e = TeamVariable.objects.filter(user=request.user).get(name='DraftBoard')
+    # writeout = ''
+    # count = 0
+    # for x in player_list:
+    #     count += 1
+    #     if count == 1:
+    #         writeout = str(x['id'])
+    #     else:
+    #         writeout = writeout + ',' + str(x['id'])
     # print(writeout)
-    e.text_variable = writeout
-    e.save()
+    # e.text_variable = writeout
+    # e.save()
+    #######################
 
     return JsonResponse('test', safe=False)
 
@@ -5417,53 +5430,9 @@ def save_autopick_settings(request):
         b.text_variable = new_date
         b.save()
 
-    pick_to_edit = request.POST['pick']
-    delay_to_edit = request.POST['delay']
-    pickorpass = request.POST['pickorpass']
-    current_pick = request.POST['current_pick']
-
-    a = TeamVariable.objects.filter(user=request.user).get(name='AutopickSettings')
-    if a.text_variable == '':
-        autopick_list = []
-    else:
-        try:
-            autopick_list = a.text_variable.strip().split(':')
-        except:
-            autopick_list = []
-    # print(4937, autopick_list)
-
-    found_in_list = False
-    output_string = ''
-    count = 0
-    for x in autopick_list:
-        count += 1
-        pick, delay, skip_pick_flag = x.split(',')
-        # print(4945, pick, '-', pick_to_edit)
-        if pick == pick_to_edit:
-            found_in_list = True
-            # print(4948, count)
-            if count == 1:
-                output_string = pick + ',' + delay_to_edit + ',' + pickorpass
-            else:
-                output_string = output_string + ':' + pick + ',' + delay_to_edit + ',' + pickorpass
-        else:
-            if count == 1:
-                output_string = x
-            else:
-                output_string = output_string + ':' + x
-        # print(4958, output_string)
-    # print(4959, found_in_list, '-', output_string)
-    if found_in_list == False:
-        if len(autopick_list) == 0:
-            output_string = pick_to_edit + ',' + delay_to_edit + ',' + pickorpass
-        else:
-            output_string = output_string + ':' + pick_to_edit + ',' + delay_to_edit + ',' + pickorpass
-    # print(4965, output_string)
-
-    if pick_to_edit == current_pick:
-        fix_autopick_clock_end(delay, delay_to_edit)
-    a.text_variable = output_string
-    a.save()
+    from .classes import AutopickSettingsObject
+    aso = AutopickSettingsObject(request)
+    aso.save_or_delete_autopick_settings()
 
     return JsonResponse('test', safe=False)
 

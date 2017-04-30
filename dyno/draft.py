@@ -5,7 +5,7 @@ from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.utils.dateparse import parse_datetime
 from django.db.models import Q, Sum
 
-from .classes import ImportPlayer
+from .classes import ImportPlayer, AutopickSettingsObject, DraftBoardObject
 
 from .models import Player, Shortlist, Draft_Pick, TeamVariable, Variable, Team
 from .views import working_local, year_list
@@ -40,6 +40,7 @@ def create_player_list():
         full_path = '/home/spflynn/dyno-site/dyno' + ipath
     with open(full_path) as f:
         data = json.loads(f.read())
+
     all_players = Player.objects.all()
     player_list = []
     for p in data:
@@ -102,6 +103,7 @@ def create_import_player_all(request):
                     yr4_role='--',
                     yr5_role='--',
                 )
+                print('**New Player', player.name, ',', player.pos)
             # add to list for creating rookie file
             write_to_file_list.append(player.export_json_for_rookie_file())
 
@@ -113,7 +115,7 @@ def create_import_player_all(request):
         full_path = '/home/spflynn/dyno-site/dyno' + ipath
     with open(full_path, 'w') as f:
         json.dump(write_to_file_list, f)
-    return HttpResponseRedirect('/batch')
+    return HttpResponseRedirect('/')
 
 def get_info_for_draft_pool_page(request):
     info_list = pull_draft_data_from_file()
@@ -221,67 +223,39 @@ def get_info_draft_info_settings_data(request):
         cost_yr5
     ]
 
-    c = TeamVariable.objects.filter(user=request.user).get(name='DraftBoard')
-    draft_board = c.text_variable
-
-    playername_list = []
-    try:
-        board_list = draft_board.split(',')
-    except:
-        board_list = []
+    dpo = DraftBoardObject(request)
+    draft_board_info = dpo.return_draft_board_info()
+    ############################
+    # c = TeamVariable.objects.filter(user=request.user).get(name='DraftBoard')
+    # draft_board = c.text_variable
+    #
+    # playername_list = []
+    # try:
+    #     board_list = draft_board.split(',')
+    # except:
+    #     board_list = []
     # print(board_list)
-    if len(board_list) > 0 and len(board_list[0]) > 0:
-        for x in board_list:
-            d = Player.objects.get(id=int(x))
-            if d.team == 'Rookie':
-                playername_list.append({'name': d.name,
-                                        'pos': d.position})
+    # if len(board_list) > 0 and len(board_list[0]) > 0:
+    #     for x in board_list:
+    #         d = Player.objects.get(id=int(x))
+    #         if d.team == 'Rookie':
+    #             playername_list.append({'name': d.name,
+    #                                     'pos': d.position})
+    #
+    #     info_list = pull_draft_data_from_file()
+    #
+    # draft_board_info = []
+    # for x in playername_list:
+    #     for y in info_list:
+    #         if y['name'] == x['name']:
+    #             draft_board_info.append({'pos': x['pos'],
+    #                                      'player': x['name'],
+    #                                      'college': y['college'],
+    #                                      'nfl_team': y['nfl_team']})
+    #############################
 
-        info_list = pull_draft_data_from_file()
-
-    draft_board_info = []
-    for x in playername_list:
-        for y in info_list:
-            if y['name'] == x['name']:
-                draft_board_info.append({'pos': x['pos'],
-                                         'player': x['name'],
-                                         'college': y['college'],
-                                         'nfl_team': y['nfl_team']})
-
-    team = Team.objects.get(user=request.user)
-    d = Draft_Pick.objects.filter(year=year_list[0]).filter(owner=team).order_by('pick_overall')
-    e = TeamVariable.objects.filter(user=request.user).get(name='AutopickSettings')
-    if e.text_variable == '':
-        autopick_list = []
-    else:
-        try:
-            autopick_list = e.text_variable.strip().split(':')
-        except:
-            autopick_list = []
-
-    autopick_info = []
-    # print(autopick_list)
-    for x in d:
-        temp_delay = ''
-        temp_skip_pick = ''
-        for y in autopick_list:
-            try:
-                pick, delay, skip_pick_flag = y.split(',')
-                if x.pick_overall == int(pick):
-                    temp_delay = delay
-                    temp_skip_pick = skip_pick_flag
-            except:
-                pass
-        pick_string = ''
-        if x.pick_in_round >= 10:
-            pick_string = str(x.round) + '.' + str(x.pick_in_round)
-        else:
-            pick_string = str(x.round) + '.0' + str(x.pick_in_round)
-        autopick_info.append({'pick': pick_string,
-                              'pick_overall': x.pick_overall,
-                              'delay': temp_delay,
-                              'skip_pick_flag': temp_skip_pick,
-                              'player_selected': x.player_selected})
+    apo = AutopickSettingsObject(request)
+    autopick_info = apo.return_autopick_info()
 
     f = TeamVariable.objects.filter(user=request.user).get(name='DraftSettings')
     settings_code = f.text_variable
@@ -303,34 +277,41 @@ def get_info_draft_info_settings_data(request):
     return cost_by_year, cap_pen_by_year, draft_board_info, autopick_info, draft_settings, current_pick
 
 def get_info_add_player_to_draft_board(request):
-    playername = request.POST['player']
-    a = Player.objects.get(name=playername)
-    playerid = a.id
+    dbo = DraftBoardObject(request)
+    dbo.make_draft_board_action_variables()
 
-    b = TeamVariable.objects.filter(user=request.user).get(name='DraftBoard')
-    if b.text_variable is None:
-        b.text_variable = ''
-        b.save()
-    if str(playerid) in b.text_variable:
-        add_player_bool = False
-        draft_board_info = ''
-    else:
-        if len(b.text_variable) == 0:
-            b.text_variable = playerid
-        else:
-            b.text_variable = b.text_variable + ',' + str(playerid)
-        b.save()
+    add_player_bool = dbo.add_player_to_draft_board()
 
-        info_list = pull_draft_data_from_file()
+    draft_board_info = dbo.return_draft_board_info()
 
-        draft_board_info = {}
-        for y in info_list:
-            if y['name'] == playername:
-                draft_board_info = {'pos': a.position,
-                                    'player': a.name,
-                                    'college': y['college'],
-                                    'nfl_team': y['nfl_team']}
-        add_player_bool = True
+    # playername = request.POST['player']
+    # a = Player.objects.get(name=playername)
+    # playerid = a.id
+    #
+    # b = TeamVariable.objects.filter(user=request.user).get(name='DraftBoard')
+    # if b.text_variable is None:
+    #     b.text_variable = ''
+    #     b.save()
+    # if str(playerid) in b.text_variable:
+    #     add_player_bool = False
+    #     draft_board_info = ''
+    # else:
+    #     if len(b.text_variable) == 0:
+    #         b.text_variable = playerid
+    #     else:
+    #         b.text_variable = b.text_variable + ',' + str(playerid)
+    #     b.save()
+    #
+    #     info_list = pull_draft_data_from_file()
+    #
+    #     draft_board_info = {}
+    #     for y in info_list:
+    #         if y['name'] == playername:
+    #             draft_board_info = {'pos': a.position,
+    #                                 'player': a.name,
+    #                                 'college': y['college'],
+    #                                 'nfl_team': y['nfl_team']}
+    #     add_player_bool = True
 
     return draft_board_info, add_player_bool
 

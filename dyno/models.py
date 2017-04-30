@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils import timezone
 from math import floor
+from django.conf import settings
 
 class Player(models.Model):
     position = models.CharField(max_length=3)
@@ -599,3 +600,25 @@ class YearlyStatsDefense(models.Model):
 
     def __str__(self):
         return str(self.player_id) + ' - ' + str(self.year)
+
+class AutopickSettings(models.Model):
+    AUTOPICK_ACTIONS = (
+        (0, 'Pass Pick'),
+        (1, 'Take player at top of draft board')
+    )
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    pick = models.ForeignKey('Draft_Pick', on_delete=models.CASCADE)
+    delay = models.IntegerField(default=999)  # in minutes, 999=when clock expires
+    action = models.IntegerField(choices=AUTOPICK_ACTIONS, default=1)
+
+    def __str__(self):
+        return str(self.user) + ' - ' + str(self.pick)
+
+class DraftBoard(models.Model):
+    team = models.ForeignKey('Team', on_delete=models.CASCADE)
+    player = models.ForeignKey('Player', on_delete=models.CASCADE)
+    rank = models.DecimalField(decimal_places=2, max_digits=5, default=999.99)
+
+    def __str__(self):
+        return str(self.team) + ' - ' + str(self.player) + ' - ' + str(self.rank)
