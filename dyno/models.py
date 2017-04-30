@@ -457,7 +457,7 @@ class Draft_Pick(models.Model):
     pick_used = models.BooleanField(default=False)
 
     def __str__(self):
-        return_string = self.owner + ' - ' + self.original_owner + ' - ' + str(self.pick_overall)
+        return_string = self.owner + ' - ' + self.original_owner + ' - ' + str(self.pick_overall) + ' - ' + str(self.year)
         return return_string
 
 class Trade(models.Model):
