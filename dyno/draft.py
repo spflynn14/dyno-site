@@ -81,6 +81,8 @@ def create_import_player_all(request):
                 p = Player.objects.get(name=player.name,
                                        position=player.pos,
                                        team='Rookie')
+                p.dob = player.dob
+                p.save()
             except:
                 Player.objects.create(
                     position=player.pos,
