@@ -2,4 +2,31 @@
 __pycache__
 /.idea
 /db.sqlite3
+/dyno/migrations/
+/dyno_website/settings.py
 
+.DS_Store
+backup.sqlite3
+backup2.sqlite3
+db.sqlite3 copy
+db.sqlite3 draft testing
+db.sqlite3 draft testing 2
+db.sqlite3 mock draft
+db.sqlite3_OLD3
+db.sqlite3_o
+db.sqlite3_old
+db.sqlite3_old2
+db.sqlite3_old_090816
+draft_fives.sh
+dyno/.DS_Store
+dyno/factories.py
+dyno/management/.DS_Store
+dyno/static/.DS_Store
+dyno/static/content/
+dyno/static/favicon.ico
+dyno/static/js/jquery-latest.js
+dyno/static/js/jquery.tablesorter.js
+dyno/tests/
+schedule_script.sh
+templates/.DS_Store
+templates/player/

@@ -210,6 +210,37 @@
                 <input type="text" id="skip_to_pick_input" style="display: inline-block" size="4" value=""/>
                 <button type="submit" id='skip_to_pick_submit' style="display: inline-block">pick. GO!</button>
             </div>
+            <br>
+            <div>
+                <h5 style="display: inline-block">Manually Enter Draft Pick &nbsp&nbsp</h5>
+                <select id="manual_pick_input">
+                    <option value="_pass_">**Pass Pick**</option>
+                    {% for p in all_players %}
+                        <option value="{{ p.id }}">{{ p.name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" id='manual_pick_submit' style="display: inline-block">GO!</button>
+            </div>
+            <br>
+            <div>
+                <h5 style="display: inline-block">Revert Draft Pick &nbsp&nbsp</h5>
+                <input type="text" id="revert_pick_input" style="display: inline-block" size="4" value=""/>
+                <button type="submit" id='revert_pick_submit' style="display: inline-block">GO!</button>
+            </div>
+        </div>
+        <br><br>
+        <div id="draft_grid">
+            <table style="width: 35%">
+                {% for pick in all_draft_picks_with_autopick_settings %}
+                    <tr>
+                        <td style="padding: 6px 6px 6px 6px">{{ pick.pick_overall }}</td>
+                        <td style="padding: 6px 6px 6px 6px">{{ pick.owner }}</td>
+                        <td style="padding: 6px 6px 6px 6px">{{ pick.player_selected }}</td>
+                        <td style="padding: 6px 6px 6px 6px">{{ pick.autopick_delay }}</td>
+                        <td style="padding: 6px 6px 6px 6px">{{ pick.autopick_action }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
         </div>
     </div>
 

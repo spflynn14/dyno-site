@@ -48,10 +48,10 @@ $(document).ready(function() {
     }
 
     function enable_draft_player_button () {
-        if (draft_switch == '0') {
+        if (draft_switch === '0') {
             $('#draft_player_button').prop('disabled', true).fadeTo('fast', 0.5);
         } else {
-            if (current_user == on_clock) {
+            if (current_user === on_clock) {
                 $('#draft_player_button').prop('disabled', false).fadeTo('fast', 1.0);
             } else {
                 $('#draft_player_button').prop('disabled', true).fadeTo('fast', 0.5);
@@ -155,5 +155,5 @@ $(document).ready(function() {
             }
         });
         set_clock();
-    }, 10000);
+    }, 60000);
 });

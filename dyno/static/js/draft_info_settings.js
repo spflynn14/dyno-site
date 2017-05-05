@@ -108,7 +108,6 @@ $(document).ready(function() {
         $('#autopick_table_tbody').empty();
 
         $.each(data, function(index, value) {
-            console.log(value);
             var tr = $('<tr>');
             var td_pick = $('<td>');
             var td_autopick1 = $('<td>').css({'text-align' : 'right'});

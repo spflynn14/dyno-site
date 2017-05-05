@@ -256,4 +256,37 @@ $(document).ready(function() {
             }
         });
     });
+
+    $('#manual_pick_submit').on('click', function() {
+        var player_id = $('#manual_pick_input').val();
+        $.ajax({
+            url: '/manual_draft_pick',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                'player_id' : player_id
+            },
+            dataType: 'json',
+            success: function (data) {
+                alert('Pick Made');
+            }
+        });
+    });
+
+    $('#revert_pick_submit').on('click', function() {
+        var pick_id = $('#revert_pick_input').val();
+        $.ajax({
+            url: '/revert_draft_pick',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                'pick_id' : pick_id
+            },
+            dataType: 'json',
+            success: function (data) {
+                alert('Pick Reverted. Trades involving this pick that were cancelled will not revert. This player ' +
+                    'was also removed from all draft boards. Check to be sure Transaction deleted.');
+            }
+        });
+    });
 });

@@ -494,11 +494,15 @@ def draftpage(request):
     from .draft import get_info_for_draftpage
 
     draft_order, on_clock, players, draft_board_info = get_info_for_draftpage(request)
+    from .classes import Draft
+    draft = Draft()
+    current_pick = draft.current_pick
 
     return render(request, 'draft/draft_draft.html', {'draft_order' : draft_order,
                                                       'on_clock' : on_clock,
                                                       'players' : players,
-                                                      'draft_board' : draft_board_info})
+                                                      'draft_board' : draft_board_info,
+                                                      'current_pick': current_pick})
 
 def draftinfoandsettings(request):
     create_session(request.user, 'draftinfo')
@@ -2196,6 +2200,29 @@ def commishofficepage(request):
     k = Variable.objects.get(name='Draft Suspension')
     suspension_start, suspension_end = k.text_variable.split(',')
 
+    all_players = Player.objects.all().order_by('name')
+
+    all_draft_picks_with_autopick_settings = []
+    all_draft_picks = Draft_Pick.objects.filter(year=year_list[0]).order_by('pick_overall')
+    for pick in all_draft_picks:
+        try:
+            autopick = AutopickSettings.objects.get(pick=pick)
+            all_draft_picks_with_autopick_settings.append({
+                'pick_overall': pick.pick_overall,
+                'owner': pick.owner,
+                'player_selected': pick.player_selected,
+                'autopick_delay': autopick.delay,
+                'autopick_action': autopick.action
+            })
+        except:
+            all_draft_picks_with_autopick_settings.append({
+                'pick_overall': pick.pick_overall,
+                'owner': pick.owner,
+                'player_selected': pick.player_selected,
+                'autopick_delay': '',
+                'autopick_action': ''
+            })
+
 
     return render(request, 'admin/settings.html', {'default_auction_clock' : default_auction_clock,
                                                    'ext_switch' : ext_switch,
@@ -2208,7 +2235,9 @@ def commishofficepage(request):
                                                    'default_draft_clock' : default_draft_clock,
                                                    'draft_clock_end' : draft_clock_end,
                                                    'suspension_start' : suspension_start,
-                                                   'suspension_end' : suspension_end})
+                                                   'suspension_end' : suspension_end,
+                                                   'all_players': all_players,
+                                                   'all_draft_picks_with_autopick_settings': all_draft_picks_with_autopick_settings})
 
 def commishviewmodel(request):
     create_session(request.user, 'commishviewmodel')
@@ -2217,7 +2246,7 @@ def commishviewmodel(request):
     model_list = []
     for x in a:
         model_list.append(x.__name__)
-        print(x.__name__)
+        # print(x.__name__)
     model_list = sorted(model_list)
 
     return render(request, 'commish/commish_view_model.html', {'model_list' : model_list})

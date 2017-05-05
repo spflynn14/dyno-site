@@ -1,4 +1,4 @@
-import os, platform
+import os, platform, traceback
 import sqlite3 as sql3
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime, parse_time
@@ -17,154 +17,184 @@ from .forms import *
 from .views import working_local, year_list, draft_pick_salary_list, get_verbose_trade_info, acceptable_trans_list
 
 
-def call_new_draft_pick(user, pick):
-    a = Draft_Pick.objects.filter(year=year_list[0]).get(pick_overall=pick)
-    team_on_clock = a.owner
-    aa = Team.objects.get(internal_name=team_on_clock)
-    user_on_clock = aa.user
+def call_new_draft_pick():
+    from .classes import Draft
+    draft = Draft()
+    draft.new_draft_pick_loop()
 
-    b = Variable.objects.get(name='Default Draft Clock')
-    default_draft_clock = b.int_variable
-    d = Variable.objects.get(name='Draft Suspension')
-    suspend_start, suspend_end = d.text_variable.split(',')
-    if suspend_start == '12':
-        suspend_start = 0
-    else:
-        suspend_start = int(suspend_start) + 12
-    suspend_end = int(suspend_end)
-    start_time = datetime.datetime.now()
-    current_time = datetime.datetime.now()
 
-    for x in range(0, 99999):
-        current_time += datetime.timedelta(minutes=1)
-        hour = current_time.hour
+    ##### GET OWNER OF TEAM ON CLOCK
+    # a = Draft_Pick.objects.filter(year=year_list[0]).get(pick_overall=pick)
+    # team_on_clock = a.owner
+    ##### GET USER OF TEAM ON CLOCK
+    # aa = Team.objects.get(internal_name=team_on_clock)
+    # user_on_clock = aa.user
+    #
+    ##### GET DEFAULT DRAFT CLOCK SETTING
+    # b = Variable.objects.get(name='Default Draft Clock')
+    # default_draft_clock = b.int_variable
+    ##### GET CLOCK SUSPENSION SETTINGS
+    # d = Variable.objects.get(name='Draft Suspension')
+    # suspend_start, suspend_end = d.text_variable.split(',')
+    # if suspend_start == '12':
+    #     suspend_start = 0
+    # else:
+    #     suspend_start = int(suspend_start) + 12
+    # suspend_end = int(suspend_end)
+    # start_time = datetime.datetime.now()
+    # current_time = datetime.datetime.now()
+    #
+    ##### STEP THRU MINUTES USING SUSPENSION TO GET DRAFT CLOCK END
+    # for x in range(0, 99999):
+    #     current_time += datetime.timedelta(minutes=1)
+    #     hour = current_time.hour
         # print(hour, suspend_start)
-        if hour >= suspend_start or hour < suspend_end:
-            pass
-        else:
-            default_draft_clock -= 1
-            if default_draft_clock <= 0:
-                break
-
-    c = Variable.objects.get(name='Draft Clock End')
-    c.text_variable = timezone.make_aware(current_time)
+        # if hour >= suspend_start or hour < suspend_end:
+        #     pass
+        # else:
+        #     default_draft_clock -= 1
+        #     if default_draft_clock <= 0:
+        #         break
+    #
+    ###### SAVE DRAFT CLOCK END AND DRAFT CLOCK START
+    # c = Variable.objects.get(name='Draft Clock End')
+    # c.text_variable = timezone.make_aware(current_time)
     #c.text_variable = '2016-05-22 12:00:00.181673-04:00'
-    c.save()
-    cc = Variable.objects.get(name='Draft Clock Start')
-    cc.text_variable = start_time
-    cc.save()
-
+    # c.save()
+    # cc = Variable.objects.get(name='Draft Clock Start')
+    # cc.text_variable = start_time
+    # cc.save()
+    #
+    ##### DETERMINE IF THERE IS ACTIVE AUTOPICK SETTING FOR THIS PICK
     # check autopick settings
-    on_autopick = False
-    e = TeamVariable.objects.filter(user=user_on_clock).get(name='AutopickSettings')
-    if e.text_variable == '':
-        autopick_list = []
-    else:
-        try:
-            autopick_list = e.text_variable.strip().split(':')
-        except:
-            autopick_list = []
-    skip_pick_settings = ''
-    for x in autopick_list:
-        try:
-            auto_pick, delay, skip_pick_flag = x.split(',')
-            if int(auto_pick) == pick:
-                skip_pick_settings = skip_pick_flag
-                on_autopick = True
-                if delay == '0':
-                    if skip_pick_flag == 'pick':
-                        # find player at top of board
-                        g = TeamVariable.objects.filter(user=user).get(name='DraftBoard')
-                        player_list = g.text_variable.split(',')
-                        for x in player_list:
-                            h = Player.objects.get(pk=int(x))
-                            if h.team == 'Rookie':
-                                player_model_info = Player.objects.get(pk=int(x))
-                                call_process_draft_pick(user, int(x), player_model_info)
-                                break
-                    else:
+    # on_autopick = False
+    # e = TeamVariable.objects.filter(user=user_on_clock).get(name='AutopickSettings')
+    # if e.text_variable == '':
+    #     autopick_list = []
+    # else:
+    #     try:
+    #         autopick_list = e.text_variable.strip().split(':')
+    #     except:
+    #         autopick_list = []
+    # skip_pick_settings = ''
+    # for x in autopick_list:
+    #     try:
+    #         auto_pick, delay, skip_pick_flag = x.split(',')
+    #         if int(auto_pick) == pick:
+    #             skip_pick_settings = skip_pick_flag
+    #             on_autopick = True
+    #             if delay == '0':
+    #                 if skip_pick_flag == 'pick':
+    #                     find player at top of board
+    #                     g = TeamVariable.objects.filter(user=user).get(name='DraftBoard')
+    #                     player_list = g.text_variable.split(',')
+    #                     for x in player_list:
+    #                         h = Player.objects.get(pk=int(x))
+    #                         if h.team == 'Rookie':
+                                ##### IF DELAY IS ZERO AND DRAFT BOARD IS VALID, PICK PLAYER
+                                # player_model_info = Player.objects.get(pk=int(x))
+                                # call_process_draft_pick(user, int(x), player_model_info)
+                                # break
+                    # else:
+                        ##### PASS PICK
                         # pass pick
-                        call_process_draft_pick(user, '_pass_', [])
-                elif delay == 'end':
-                    f = Variable.objects.get(name='Autopick End')
-                    f.text_variable = timezone.make_aware(current_time)
-                    f.save()
-                else:
-                    delay = int(delay)
-                    f = Variable.objects.get(name='Autopick End')
-                    end_time = start_time + datetime.timedelta(minutes=delay)
-                    f.text_variable = timezone.make_aware(end_time)
-                    f.save()
-        except:
-            pass
-
-    if on_autopick:
-        h = TeamVariable.objects.filter(user=user_on_clock).get(name='DraftBoard')
-        try:
-            player_list = h.text_variable.split(',')
-        except:
-            player_list = []
-        board_blank = True
-        for x in player_list:
-            i = Player.objects.get(pk=int(x))
-            if i.team == 'Rookie':
-                board_blank = False
-                break
+                        # call_process_draft_pick(user, '_pass_', [])
+                ##### IF DELAY IS OTHER THAN ZERO, NEED TO SET AUTOPICK END
+                # elif delay == 'end':
+                #     f = Variable.objects.get(name='Autopick End')
+                #     f.text_variable = timezone.make_aware(current_time)
+                #     f.save()
+                # else:
+                #     delay = int(delay)
+                #     f = Variable.objects.get(name='Autopick End')
+                #     end_time = start_time + datetime.timedelta(minutes=delay)
+                #     f.text_variable = timezone.make_aware(end_time)
+                #     f.save()
+        # except:
+        #     pass
+    #
+    ##### IF ON AUTOPICK->
+    # if on_autopick:
+        ##### GET TEAM'S DRAFT BOARD
+        # h = TeamVariable.objects.filter(user=user_on_clock).get(name='DraftBoard')
+        # try:
+        #     player_list = h.text_variable.split(',')
+        # except:
+        #     player_list = []
+        # board_blank = True
+        # for x in player_list:
+        #     i = Player.objects.get(pk=int(x))
+        #     if i.team == 'Rookie':
+        #         board_blank = False
+        #         break
         #if will be skipping pick, do not cancel autopick
-        if skip_pick_settings == 'pass':
-            board_blank = False
-
-        if board_blank:
-            f = Variable.objects.get(name='Autopick End')
-            f.text_variable = ''
-            f.save()
-
+        # if skip_pick_settings == 'pass':
+        #     board_blank = False
+        #
+        ##### IF DRAFT BOARD IS BLANK->
+        # if board_blank:
+            ##### CLEAR AUTOPICK END
+            # f = Variable.objects.get(name='Autopick End')
+            # f.text_variable = ''
+            # f.save()
+            #
+            ##### CLEAR AUTOPICK (THERE IS NO PLAYER TO PICK)
             # disable autopick
-            found_in_list = False
-            output_string = ''
-            count = 0
-            for x in autopick_list:
-                count += 1
-                auto_pick, delay, skip_pick_flag = x.split(',')
-                if auto_pick == int(pick):
-                    found_in_list = True
-                    if count == 1:
-                        output_string = auto_pick + ',' + '' + ',' + ''
-                    else:
-                        output_string = output_string + ':' + auto_pick + ',' + '' + ',' + ''
-                else:
-                    if count == 1:
-                        output_string = x
-                    else:
-                        output_string = output_string + ':' + x
-            if found_in_list == False:
-                if len(autopick_list) == 0:
-                    output_string = str(pick) + ',' + '' + ',' + ''
-                else:
-                    output_string = output_string + ':' + str(pick) + ',' + '' + ',' + ''
-
-            e.text_variable = output_string
-            e.save()
-
-            create_alerts('Autopick Disabled', user_on_clock, [a.round, a.pick_in_round, 'blank board'])
+            # found_in_list = False
+            # output_string = ''
+            # count = 0
+            # for x in autopick_list:
+            #     count += 1
+            #     auto_pick, delay, skip_pick_flag = x.split(',')
+            #     if auto_pick == int(pick):
+            #         found_in_list = True
+            #         if count == 1:
+            #             output_string = auto_pick + ',' + '' + ',' + ''
+            #         else:
+            #             output_string = output_string + ':' + auto_pick + ',' + '' + ',' + ''
+            #     else:
+            #         if count == 1:
+            #             output_string = x
+            #         else:
+            #             output_string = output_string + ':' + x
+            # if found_in_list == False:
+            #     if len(autopick_list) == 0:
+            #         output_string = str(pick) + ',' + '' + ',' + ''
+            #     else:
+            #         output_string = output_string + ':' + str(pick) + ',' + '' + ',' + ''
+            #
+            # e.text_variable = output_string
+            # e.save()
+            #
+            ##### SEND ALERT THAT AUTOPICK HAS BEEN DISABLED
+            # create_alerts('Autopick Disabled', user_on_clock, [a.round, a.pick_in_round, 'blank board'])
             # var_list = round, pick_in_round, on_autopick
-            create_alerts('Draft - On The Clock', user_on_clock, [a.round, a.pick_in_round, False])
-        else:
-            g = TeamVariable.objects.filter(user=user).get(name='DraftSettings')
-            try:
-                set1, set2, set3 = g.text_variable.split(',')
-            except:
-                set1 = '1'
-                set2 = '1'
-                set3 = '0'
-            if set3 == '1':
-                create_alerts('Draft - On The Clock', user_on_clock, [a.round, a.pick_in_round, True])
+            ##### SEND ALERT TO USER IS ON THE CLOCK
+            # create_alerts('Draft - On The Clock', user_on_clock, [a.round, a.pick_in_round, False])
+        ##### DRAFT BOARD IS NOT BLANK
+        # else:
+            ##### GET DRAFT SETTINGS FOR THIS USER
+            # g = TeamVariable.objects.filter(user=user).get(name='DraftSettings')
+            # try:
+            #     set1, set2, set3 = g.text_variable.split(',')
+            # except:
+            #     set1 = '1'
+            #     set2 = '1'
+            #     set3 = '0'
+            ##### IF USER IS SET TO GET ALERT WHEN ON THE CLOCK EVEN WHEN ON AUTOPICK
+            # if set3 == '1':
+                ##### SEND ALERT TO USER IS ON THE CLOCK
+                # create_alerts('Draft - On The Clock', user_on_clock, [a.round, a.pick_in_round, True])
                 # var_list = round, pick_in_round, on_autopick
-    else:
-        create_alerts('Draft - On The Clock', user_on_clock, [a.round, a.pick_in_round, False])
+    ##### NO ACTIVE AUTOPICK
+    # else:
+        ##### SEND ALERT TO USER IS ON THE CLOCK
+        # create_alerts('Draft - On The Clock', user_on_clock, [a.round, a.pick_in_round, False])
         # var_list = round, pick_in_round, on_autopick
 
 def call_process_draft_pick(user, player_id, d):
+    ##### ACCEPT CURRENT'S USER USERNAME (OWNER SELECTING), PLAYER_ID (PK), AND PLAYER OBJ (OR BLANK LIST IF PASSED)
+    ##### METHOD TO RECONFIGURE DRAFT COSTS WHEN A PICK IS SKIPPED
     def reconfigure_draft_cost(current_pick, total_picks):
         print('reconfiguring draft costs...', current_pick, total_picks)
         for x in range(current_pick+1, total_picks+1):
@@ -189,19 +219,30 @@ def call_process_draft_pick(user, player_id, d):
                     a.yr4_sal = sal_list[x]
             a.save()
 
+    ##### GET CURRENT USER'S TEAM (USER PASSED TO THIS METHOD)
     c = Team.objects.get(user=user)
     team = c.internal_name
+    ##### GET ALL DRAFT PICKS, ORDER BY PICK_OVERALL
     b = Draft_Pick.objects.filter(year=year_list[0]).filter(owner=team).order_by('pick_overall')
+    ##### COUNT NUMBER OF PICKS
     total_picks = Draft_Pick.objects.filter(year=year_list[0]).count()
+    ##### LOOP THROUGH EACH DRAFT PICK->
     for x in b:
+        ##### IF NO PLAYER SELECTED (PICK NOT USED)->
         if x.player_selected == '':
+            ##### IF PICK HAS BEEN PASSED
             if player_id == '_pass_':
+                ##### ENTER PICK PASSED AS PLAYER SELECTED AND RECONFIGURE DRAFT COSTS
                 x.player_selected = 'pick passed'
                 x.save()
                 reconfigure_draft_cost(x.pick_overall, total_picks)
+            ##### PICK HAS NOT BEEN PASSED
             else:
+                ##### SAVE NAME TO PLAYER SELECTED
                 x.player_selected = d.name
                 x.save()
+                ##### SAVE PLAYER OBJ FOR PLAYER PICKS
+                ##### SAVE TEAM, CONTRACT TYPE, SALARY DATA, TOTAL_VALUE, SIGNING_BONUS, SALARY
                 d.team = team
                 d.contract_type = 'Rookie'
                 d.yr1_sb = Decimal(round(x.yr1_sal * Decimal(0.4), 1))
@@ -218,32 +259,39 @@ def call_process_draft_pick(user, player_id, d):
                 d.salary = d.total_value - d.signing_bonus
                 d.save()
 
+            ##### CREATE VERBOSE PICK FOR USE WITH TRANSACTION
             if x.pick_in_round >= 10:
                 verbose_pick = str(x.round) + '.' + str(x.pick_in_round)
             else:
                 verbose_pick = str(x.round) + '.0' + str(x.pick_in_round)
 
+            ##### CREATE TRANSACTION FOR DRAFT PICK
             Transaction.objects.create(player=x.player_selected,
                                        team2=team,
                                        transaction_type='Rookie Draft Pick',
                                        var_d1=Decimal(verbose_pick),
                                        date=timezone.now())
 
+            ##### GET NEXT OWNER (IF ANY)
             try:
                 e = Draft_Pick.objects.filter(year=year_list[0]).get(pick_overall=x.pick_overall + 1)
                 next_owner = e.owner
             except:
                 next_owner = 'none'
 
+            ##### SEND ALERT THAT PICK HAS BEEN MADE
             create_alerts('Draft Pick Made', user,[x.round, x.pick_in_round, x.pick_overall, x.player_selected, x.owner, next_owner])
             # var_list = round, pick_in_round, pick_overall, player_selected, owner, next pick owner
 
             if next_owner == 'none':
                 pass
+            ##### IF DRAFT IS NOT OVER, GET NEW OWNER AND CALL_NEW_DRAFT_PICK
             else:
                 f = Team.objects.get(internal_name=next_owner)
                 call_new_draft_pick(f.user, x.pick_overall+1)
+            ##### RETURN TRUE MEANING A PICK HAS BEEN MADE AND THE ID OF THE PLAYER SELECTED
             return True, x.id
+    ##### RETURN FALSE MEANING PICK HAS NOT BEEN MADE
     return False, 0
 
 def autopick_trade_interrupter(recipient):
@@ -276,6 +324,12 @@ def autopick_trade_interrupter(recipient):
     if interrupt == '0':
         return
 
+    # clear autopick end
+    e = Variable.objects.get(name='Autopick End')
+    e.text_variable = ''
+    e.save()
+
+    '''
     #check to see if autopick is active for this pick
     d = TeamVariable.objects.filter(user=user_on_clock).get(name='AutopickSettings')
     if d.text_variable == '':
@@ -335,7 +389,7 @@ def autopick_trade_interrupter(recipient):
 
         create_alerts('Autopick Disabled', user_on_clock, [f.round, f.pick_in_round, 'trade interrupt'])
         # var_list = round, pick_in_round, on_autopick
-        create_alerts('Draft - On The Clock', user_on_clock, [f.round, f.pick_in_round, False])
+        create_alerts('Draft - On The Clock', user_on_clock, [f.round, f.pick_in_round, False])'''
 
 def check_trade_for_dup_assets(trade, pro_players, pro_picks, pro_assets, opp_players, opp_picks, opp_assets):
         trade_invalid = False
@@ -901,10 +955,15 @@ def create_alerts(alert_type, current_user, var_list):
                                  alert_type=alert_type,
                                  date=date_time,
                                  var_t1=var_list[3],
-                                 var_t2=x.internal_name,
+                                 var_t2=var_list[4],
                                  var_t3=(str(var_list[0])) + ',' + str(var_list[1]))
-            b = TeamVariable.objects.filter(user=x.user).get(name='DraftSettings')
-            set1, send_alert_setting, set3 = b.text_variable.split(',')
+            try:
+                draft_settings = TeamVariable.objects.filter(user=x.user).get(name='DraftSettings')
+                set1, send_alert_setting, set3 = draft_settings.text_variable.split(',')
+            except:
+                set1 = '1'
+                send_alert_setting = '1'
+                set3 = '0'
             if send_alert_setting == '1':
                 send_instant_alert(alert_type, x.user, x.email, var_list)
     elif alert_type == 'Draft - On The Clock':
@@ -1168,68 +1227,70 @@ def check_draft_clocks():
     b = Variable.objects.get(name='Autopick End')
     autopick_end = parse_datetime(b.text_variable)
     time_now = timezone.now()
-    # print(draft_clock_end, autopick_end, time_now)
+    print(draft_clock_end, autopick_end, time_now)
 
     try:
         if time_now > autopick_end:
             print('autopick ended')
-            #make autopick
-            c = Draft_Pick.objects.filter(year=year_list[0]).order_by('pick_overall')
-            on_clock = ''
-            owner = ''
-            current_pick = 0
-            for x in c:
-                if len(x.player_selected) == 0:
-                    owner = x.owner
-                    current_pick = x.pick_overall
-                    break
-            d = Team.objects.get(internal_name=owner)
-            on_clock = d.user
-            e = TeamVariable.objects.filter(user=on_clock).get(name='AutopickSettings')
-            if e.text_variable == '':
-                autopick_list = []
-            else:
-                try:
-                    autopick_list = e.text_variable.strip().split(':')
-                except:
-                    autopick_list = []
-
-            for x in autopick_list:
-                pick, delay, skip_pick_flag = x.split(',')
-                if int(pick) == current_pick:
-                    if skip_pick_flag == 'pick':
-                        #find player at top of board
-                        f = TeamVariable.objects.filter(user=on_clock).get(name='DraftBoard')
-                        player_list = f.text_variable.split(',')
-                        for x in player_list:
-                            g = Player.objects.get(pk=int(x))
-                            if g.team == 'Rookie':
-                                player_model_info = Player.objects.get(pk=int(x))
-                                call_process_draft_pick(on_clock, int(x), player_model_info)
-                                break
-                    else:
-                        #pass pick
-                        call_process_draft_pick(on_clock, '_pass_', [])
+            # make autopick
+            from .classes import Draft
+            draft = Draft()
+            player_selected = draft.team_on_the_clock.draft_board[0].player
+            new_draft = draft.team_on_the_clock.make_draft_selection(player_selected)
+            new_draft.new_draft_pick_loop()
             return
-    except:
-        pass
 
-    #try:
-    #    if time_now > draft_clock_end:
-    #        #pass pick
-    #        c = Draft_Pick.objects.filter(year=year_list[0]).order_by('pick_overall')
-    #        on_clock = ''
-    #        owner = ''
-    #        for x in c:
-    #            if len(x.player_selected) == 0:
-    #                owner = x.owner
-    #                break
-    #        d = Team.objects.get(internal_name=owner)
-    #        on_clock = d.user
-    #        call_process_draft_pick(on_clock, '_pass_', [])
-    #        print('draft_clock ended')
-    #except:
-    #    pass
+
+            # c = Draft_Pick.objects.filter(year=year_list[0]).order_by('pick_overall')
+            # on_clock = ''
+            # owner = ''
+            # current_pick = 0
+            # for x in c:
+            #     if len(x.player_selected) == 0:
+            #         owner = x.owner
+            #         current_pick = x.pick_overall
+            #         break
+            # d = Team.objects.get(internal_name=owner)
+            # on_clock = d.user
+            # e = TeamVariable.objects.filter(user=on_clock).get(name='AutopickSettings')
+            # if e.text_variable == '':
+            #     autopick_list = []
+            # else:
+            #     try:
+            #         autopick_list = e.text_variable.strip().split(':')
+            #     except:
+            #         autopick_list = []
+            #
+            # for x in autopick_list:
+            #     pick, delay, skip_pick_flag = x.split(',')
+            #     if int(pick) == current_pick:
+            #         if skip_pick_flag == 'pick':
+                        #find player at top of board
+                        # f = TeamVariable.objects.filter(user=on_clock).get(name='DraftBoard')
+                        # player_list = f.text_variable.split(',')
+                        # for x in player_list:
+                        #     g = Player.objects.get(pk=int(x))
+                        #     if g.team == 'Rookie':
+                        #         player_model_info = Player.objects.get(pk=int(x))
+                        #         call_process_draft_pick(on_clock, int(x), player_model_info)
+                        #         break
+                    # else:
+                    #     pass pick
+                    #     call_process_draft_pick(on_clock, '_pass_', [])
+            # return
+    except Exception:
+        traceback.print_exc()
+
+    try:
+       if time_now > draft_clock_end:
+           #pass pick
+           from .classes import Draft
+           draft = Draft()
+           new_draft = draft.team_on_the_clock.make_draft_selection('passed')
+           new_draft.new_draft_pick_loop()
+           print('draft_clock ended')
+    except:
+       pass
 
 
 
@@ -5515,40 +5576,68 @@ def draft_data_pull(request):
                          }, safe=False)
 
 def process_draft_pick(request):
+    from .classes import Draft
+    draft = Draft()
+
+    # get player_id
     player_id = request.POST['player_id']
-
-    a = Variable.objects.get(name='Autopick End')
-    a.text_variable = ''
-    a.save()
-
     if player_id == '_pass_':
-        d = []
+        player = 'passed'
     else:
-        d = Player.objects.get(pk=int(player_id))
+        player = Player.objects.get(pk=int(player_id))
 
-    successful_pick, pick_id = call_process_draft_pick(request.user.username, player_id, d)
+    # make selection
+    new_draft = draft.team_on_the_clock.make_draft_selection(player)
 
-    if successful_pick:
+    # if draft isn't over, run new pick loop
+    if new_draft is not None:
+        new_draft.new_draft_pick_loop()
+
+    return JsonResponse('done', safe=False)
+
+
+    ##### GET PLAYER_ID FROM REQUEST (PK OF PLAYER BEING SELECTED)
+    # player_id = request.POST['player_id']
+    #
+    ##### CLEAR AUTOPICK END
+    # a = Variable.objects.get(name='Autopick End')
+    # a.text_variable = ''
+    # a.save()
+    #
+    ##### IF PICK IS PASSED, THERE IS NO PLAYER
+    # if player_id == '_pass_':
+    #     d = []
+    ##### GET PLAYER OBJ OF PLAYER SELECTED
+    # else:
+    #     d = Player.objects.get(pk=int(player_id))
+    #
+    ##### PASS CURRENT USER'S USERNAME (OWNER MAKING SELECTION), PLAYER_ID, AND PLAYER OBJ (OR BLANK LIST IF PASSED)
+    # successful_pick, pick_id = call_process_draft_pick(request.user.username, player_id, d)
+    #
+    ##### IF PICK WAS MADE->
+    # if successful_pick:
+        ##### NEED TO CHECK FOR TRADED PLAYER/ASSETS IN OTHER DEALS AND CANCEL THEM
         # need to check for traded player/assets in other deals and cancel them
-        f = Trade.objects.all().exclude(status3='Closed')
-        for x in f:
-            trade_invalid = check_trade_for_dup_assets(x, [], [str(pick_id)], [], [], [str(pick_id)], [])
+        # f = Trade.objects.all().exclude(status3='Closed')
+        # for x in f:
+        #     trade_invalid = check_trade_for_dup_assets(x, [], [str(pick_id)], [], [], [str(pick_id)], [])
             #trade, pro_players, pro_picks, pro_assets, opp_players, opp_picks, opp_assets
-            if trade_invalid:
-                x.status3 = 'Closed'
-                x.status2 = 'Invalid'
-                x.save()
-                g = Transaction.objects.filter(player='trade').get(var_i1=x.id)
-                g.var_t1 = 'Invalid'
-                g.save()
-        return JsonResponse('done', safe=False)
-    else:
-        return HttpResponse("Error, could not find pick to assign player to...")
+            # if trade_invalid:
+            #     x.status3 = 'Closed'
+            #     x.status2 = 'Invalid'
+            #     x.save()
+            #     g = Transaction.objects.filter(player='trade').get(var_i1=x.id)
+            #     g.var_t1 = 'Invalid'
+            #     g.save()
+        # return JsonResponse('done', safe=False)
+    ##### NO PICK WAS MADE
+    # else:
+    #     return HttpResponse("Error, could not find pick to assign player to...")
 
 def skip_to_pick(request):
     pick = int(request.POST['pick'])
 
-    call_new_draft_pick(request.user.username, pick)
+    call_new_draft_pick()
 
     return JsonResponse('done', safe=False)
 

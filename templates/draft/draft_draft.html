@@ -31,12 +31,21 @@
                     <tbody id="draft_tbody">
                         {% for x in draft_order %}
                             <tr>
-                                {% if x.pick_in_round >= 10 %}
-                                    <td style="text-align: center">{{ x.pick_overall }} - {{ x.round }}.{{ x.pick_in_round }}</td>
+                                {% if x.pick_overall == current_pick %}
+                                    {% if x.pick_in_round >= 10 %}
+                                        <td style="text-align: center; color: #e10006">{{ x.pick_overall }} - {{ x.round }}.{{ x.pick_in_round }}</td>
+                                    {% else %}
+                                        <td style="text-align: center; color: #e10006">{{ x.pick_overall }} - {{ x.round }}.0{{ x.pick_in_round }}</td>
+                                    {% endif %}
+                                    <td style="color: #e10006">{{ x.owner }}</td>
                                 {% else %}
-                                    <td style="text-align: center">{{ x.pick_overall }} - {{ x.round }}.0{{ x.pick_in_round }}</td>
+                                    {% if x.pick_in_round >= 10 %}
+                                        <td style="text-align: center">{{ x.pick_overall }} - {{ x.round }}.{{ x.pick_in_round }}</td>
+                                    {% else %}
+                                        <td style="text-align: center">{{ x.pick_overall }} - {{ x.round }}.0{{ x.pick_in_round }}</td>
+                                    {% endif %}
+                                    <td>{{ x.owner }}</td>
                                 {% endif %}
-                                <td>{{ x.owner }}</td>
                                 <td id="player_selected">{{ x.player_selected }}</td>
                             </tr>
                         {% endfor %}
@@ -67,7 +76,7 @@
                                 <p style="font-size: x-small; color: red">Are you sure you wish to draft this player?</p>
                                 <button style="font-size: x-small" id="confirmation_no">No</button><button style="font-size: x-small; margin-left: 10px" id="confirmation_yes">Yes</button>
                             </div>
-                            <div id="pending_message" style="color: blue; font-size: small" hidden>Pick is processing (could take a couple minutes), please wait...</div>
+                            <div id="pending_message" style="color: blue; font-size: small" hidden>Pick is processing, please wait...</div>
                         </td>
                     </tr>
                 </table>

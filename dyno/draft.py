@@ -1,4 +1,5 @@
 import json
+from decimal import Decimal
 
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.contrib.staticfiles.templatetags.staticfiles import static
@@ -7,7 +8,7 @@ from django.db.models import Q, Sum
 
 from .classes import ImportPlayer, AutopickSettingsObject, DraftBoardObject
 
-from .models import Player, Shortlist, Draft_Pick, TeamVariable, Variable, Team
+from .models import Player, Shortlist, Draft_Pick, TeamVariable, Variable, Team, Transaction, DraftBoard
 from .views import working_local, year_list
 
 
@@ -27,8 +28,13 @@ def get_allpicks_and_current_pick():
     on_clock = -1
     for pick in all_picks:
         if not pick.pick_used:
-            on_clock = pick.pick_overall
+            on_clock = pick.owner
             break
+    try:
+        team = Team.objects.get(internal_name=on_clock)
+        on_clock = team.user
+    except:
+        pass
     return all_picks, on_clock
 
 def create_player_list():
@@ -139,34 +145,50 @@ def get_info_for_draftpage(request):
 
     rookies = Player.objects.filter(team='Rookie').order_by('name')
 
-    draft_board_team_var = TeamVariable.objects.filter(user=request.user).get(name='DraftBoard')
-    draft_board = draft_board_team_var.text_variable
-
-    playername_list = []
-    try:
-        board_list = draft_board.split(',')
-    except:
-        board_list = []
-    # print(board_list)
-    if len(board_list) > 0 and len(board_list[0]) > 0:
-        for x in board_list:
-            d = Player.objects.get(id=int(x))
-            if d.team == 'Rookie':
-                playername_list.append({'name': d.name,
-                                        'pos': d.position,
-                                        'id': d.id})
-        info_list = pull_draft_data_from_file()
-
     draft_board_info = []
-    for x in playername_list:
-        for y in info_list:
-            if y['name'] == x['name']:
-                draft_board_info.append({'pos': x['pos'],
-                                         'player': x['name'],
-                                         'college': y['college'],
-                                         'nfl_team': y['nfl_team'],
-                                         'id': x['id']})
 
+    team = Team.objects.get(user=request.user)
+    draft_board_players = DraftBoard.objects.filter(team=team).order_by('rank')
+    info_list = pull_draft_data_from_file()
+
+    for player in draft_board_players:
+        for draftee in info_list:
+            if player.player.name == draftee['name']:
+                draft_board_info.append({'pos': player.player.position,
+                                         'player': player.player.name,
+                                         'college': draftee['college'],
+                                         'nfl_team': draftee['nfl_team'],
+                                         'id': player.player.id})
+
+    ####################
+    # draft_board_team_var = TeamVariable.objects.filter(user=request.user).get(name='DraftBoard')
+    # draft_board = draft_board_team_var.text_variable
+    #
+    # playername_list = []
+    # try:
+    #     board_list = draft_board.split(',')
+    # except:
+    #     board_list = []
+    # print(board_list)
+    # if len(board_list) > 0 and len(board_list[0]) > 0:
+    #     for x in board_list:
+    #         d = Player.objects.get(id=int(x))
+    #         if d.team == 'Rookie':
+    #             playername_list.append({'name': d.name,
+    #                                     'pos': d.position,
+    #                                     'id': d.id})
+    #     info_list = pull_draft_data_from_file()
+    #
+    # draft_board_info = []
+    # for x in playername_list:
+    #     for y in info_list:
+    #         if y['name'] == x['name']:
+    #             draft_board_info.append({'pos': x['pos'],
+    #                                      'player': x['name'],
+    #                                      'college': y['college'],
+    #                                      'nfl_team': y['nfl_team'],
+    #                                      'id': x['id']})
+    ####################
     return all_picks, on_clock, rookies, draft_board_info
 
 def get_info_for_draftdatapull(request):
@@ -180,8 +202,22 @@ def get_info_for_draftdatapull(request):
     all_picks, on_clock = get_allpicks_and_current_pick()
 
     info_list = pull_draft_data_from_file()
+    player_list = []
+    for pick in all_picks:
+        try:
+            player = Player.objects.get(name=pick.player_selected)
+            for entry in info_list:
+                if player.name == entry['name']:
+                    player_list.append({
+                        'player': player.name,
+                        'pos': player.position,
+                        'college': entry['college'],
+                        'nfl_team': entry['nfl_team']
+                    })
+        except:
+            pass
 
-    return draft_switch, draft_clock_end, on_clock, info_list, on_clock
+    return draft_switch, draft_clock_end, on_clock, player_list, on_clock
 
 def get_info_draft_info_settings_data(request):
     # a = Draft_Pick.objects.filter(
@@ -273,6 +309,9 @@ def get_info_draft_info_settings_data(request):
         if len(x.player_selected) == 0:
             current_pick = x.pick_overall
             break
+    draft_switch = Variable.objects.get(name='Draft Switch')
+    if draft_switch.int_variable == 0:
+        current_pick = 0
 
     return cost_by_year, cap_pen_by_year, draft_board_info, autopick_info, draft_settings, current_pick
 
@@ -330,3 +369,74 @@ def add_draft_year(request):
             )
 
     return HttpResponseRedirect('/batch')
+
+def manual_draft_pick(request):
+    player_id = request.POST['player_id']
+
+    # get player_id
+    player_id = request.POST['player_id']
+    if player_id == '_pass_':
+        player = 'passed'
+    else:
+        player = Player.objects.get(pk=int(player_id))
+
+    from .classes import Draft
+    draft = Draft()
+    new_draft = draft.team_on_the_clock.make_draft_selection(player)
+
+    # if draft isn't over, run new pick loop
+    if new_draft is not None:
+        new_draft.new_draft_pick_loop()
+
+    return JsonResponse('done', safe=False)
+
+def revert_draft_pick(request):
+    pick_id = request.POST['pick_id']
+    
+    # reset Draft_pick
+    draft_pick = Draft_Pick.objects.get(year=year_list[0], pick_overall=int(pick_id))
+    old_pick = draft_pick.player_selected
+    draft_pick.player_selected = ''
+    draft_pick.pick_used = False
+    draft_pick.save()
+    
+    # reset Player
+    if old_pick != 'pick passed':
+        player = Player.objects.get(name=old_pick)
+        old_team = player.team
+        player.team = 'Rookie'
+        player.contract_type = 'none'
+        player.yr1_sb = Decimal(0.00)
+        player.yr1_salary = Decimal(0.00)
+        player.yr2_sb = Decimal(0.00)
+        player.yr2_salary = Decimal(0.00)
+        player.yr3_sb = Decimal(0.00)
+        player.yr3_salary = Decimal(0.00)
+        player.yr4_sb = Decimal(0.00)
+        player.yr4_salary = Decimal(0.00)
+        player.total_value = Decimal(0.00)
+        player.signing_bonus = Decimal(0.00)
+        player.salary = Decimal(0.00)
+        player.save()
+    
+    # delete Transaction
+    try:
+        trans = Transaction.objects.get(player=old_pick,
+                                        team2=old_team,
+                                        transaction_type='Rookie Draft Pick').delete()
+    except:
+        pass
+
+    from .classes import Draft
+    draft = Draft()
+
+    # set clocks
+    draft.save_draft_clock_start_and_end()
+    
+    # if pick was passed, reconfigure pick costs
+    if old_pick == 'pick passed':
+        total_picks = Draft_Pick.objects.filter(year=year_list[0]).count()
+        prev_pick = int(pick_id) - 1
+        draft.team_on_the_clock.reconfigure_draft_cost(int(pick_id), total_picks, increment_direction='up')
+
+    return JsonResponse('', safe=False)
