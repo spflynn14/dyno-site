@@ -56,6 +56,13 @@
                      </div>
                      <br><br>
                      <div style="border: 1px solid #cdcdcd; padding: 15px 15px 15px 15px">
+                         <form method="post" action="/convert_rookies_to_free_agents">
+                             {% csrf_token %}
+                             <input type="submit" value="Convert Rookies to Free Agents">
+                         </form>
+                     </div>
+                     <br><br>
+                     <div style="border: 1px solid #cdcdcd; padding: 15px 15px 15px 15px">
                          <form method="post" action="/add_draft_year">
                              {% csrf_token %}
                              Draft Year: <textarea rows="1" cols="10" name="year"></textarea><br>

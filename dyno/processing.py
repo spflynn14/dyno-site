@@ -5653,3 +5653,10 @@ def check_on_the_clock(request):
 
     return JsonResponse({'pick_on_clock' : pick_on_clock,
                          'clock_end' : draft_clock_end}, safe=False)
+
+def convert_rookies_to_free_agents(request):
+    all_rookies = Player.objects.filter(team='Rookie')
+    for player in all_rookies:
+        player.team = 'Free Agent'
+        player.save()
+    return JsonResponse('', safe=False)
