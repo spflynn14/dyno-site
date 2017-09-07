@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+{% load staticfiles %}
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Dynasty League</title>
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="{% static 'css/dyno.css' %}">
+        <script src="{% static 'js/enter_transaction.js' %}"></script>
+    </head>
+
+    <body>
+        <nav class="nav_bar">
+            {% if user.is_authenticated %}
+                <a href="/logout" class="nav_button" id="logout_link" style="padding-left: 15px">Logout</a>
+                <span style="font-size: 1.2em; float: right; padding-top: 11px; color: white">{{ user.get_username }}</span>
+                <i class="glyphicon glyphicon-user" style="float: right; padding-top: 14px; padding-right: 5px; color: white"></i>
+            {% else %}
+                <a href="/login" class="nav_button" id="login_link">Login</a>
+            {% endif %}
+
+            <div class="dropdown" style="float: right; padding-right: 80px">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="color: white"><i class="glyphicon glyphicon-link" style="padding-right: 8px"></i>Quick Links <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    {% if request.user.is_staff %}
+                        <li><a href="/admin">Admin</a></li>
+                        <li><a href="/batch">Batch</a></li>
+                        <li><a href="/settings">Settings</a></li>
+                    {% else %}
+                    {% endif %}
+                    <li class="divider"></li>
+                    <li><a href="/bug_tracking">Bug Tracking</a></li>
+                    <li><a href="/feature_request">Feature Request</a></li>
+                </ul>
+            </div>
+
+            <a href="/" class="nav_button" id="home_button" style="float: left; padding-left: 20px"><i class="glyphicon glyphicon-home"></i></a>
+        </nav>
+
+        <section id="center_area">
+            {% csrf_token %}
+            <div>
+                 <div id="display_area">
+                     <div style="border: 1px solid #cdcdcd; padding: 15px 15px 15px 15px">
+                         <h4>Enter Transactions</h4>
+                         <table style="table-layout: fixed; width: 100%">
+                            <tr>
+                                <th width="5%">Process</th>
+                                <th width="20%">Date</th>
+                                <th width="20%">Team</th>
+                                <th width="15%">Add or Drop</th>
+                                <th width="40%">Player</th>
+                            </tr>
+                            {% for x in lines %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="process">
+                                </td>
+                                <td><input type="date" id="date" value="{{ today }}"></td>
+                                 <td>
+                                     <select id="team">
+                                         {% for t in teams %}
+                                             <option value="{{ t.internal_name }}">{{ t.internal_name }}</option>
+                                         {% endfor %}
+                                     </select>
+                                 </td>
+                                 <td>
+                                     <select id="adddrop">
+                                         <option value="add">Add</option>
+                                         <option value="drop">Drop</option>
+                                     </select>
+                                 </td>
+                                 <td>
+                                      <select id="player">
+                                         {% for p in players %}
+                                             <option value="{{ p.id }}">{{ p.name }}</option>
+                                         {% endfor %}
+                                     </select>
+                                 </td>
+                             </tr>
+                            {% endfor %}
+                         </table>
+                         <br>
+                         <button id="process_button">Process</button>
+                     </div>
+                 </div>
+            </div>
+        </section>
+    </body>
+</html>

@@ -3285,3 +3285,13 @@ def draftrookiepool(request):
     rookies, shortlists = get_info_for_draft_pool_page(request)
     return render (request, 'draft/draft_rookie_pool.html', {'rookies' : rookies,
                                                              'shortlists' : shortlists})
+
+def enter_transaction_page(request):
+    teams = Team.objects.all()
+    players = Player.objects.all().exclude(team='Deactivated').order_by('name')
+    lines_list = [1,2,3,4,5,6,7,8,9,10]
+    today = timezone.now().date().isoformat()
+    return render (request, 'commish/enter_transaction.html', {'teams': teams,
+                                                               'players': players,
+                                                               'lines': lines_list,
+                                                               'today': today})

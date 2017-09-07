@@ -1,4 +1,4 @@
-import os, platform, traceback
+import os, platform, traceback, json
 import sqlite3 as sql3
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime, parse_time
@@ -5659,4 +5659,34 @@ def convert_rookies_to_free_agents(request):
     for player in all_rookies:
         player.team = 'Free Agent'
         player.save()
+    return JsonResponse('', safe=False)
+
+def process_manual_transactions(request):
+    data = json.loads(request.POST['data1'])
+    for d in data:
+        print(d)
+        if d['adddrop'] == 'add':
+            Transaction.objects.create(
+                player=Player.objects.get(pk=int(d['player'])),
+                team2=d['team'],
+                transaction_type='Contract Set',
+                var_d1=Decimal(1.00),
+                var_d2=Decimal(0.40),
+                var_i1=1,
+                var_t1='Pending',
+                var_t2='Confirmed',
+                var_t3='1',
+                date=d['date']
+            )
+        elif d['adddrop'] == 'drop':
+            Transaction.objects.create(
+                player=Player.objects.get(pk=int(d['player'])),
+                team2=d['team'],
+                transaction_type='Player Cut',
+                var_i1=-1,
+                var_t1='Pending',
+                var_t2='Confirmed',
+                date=d['date']
+            )
+
     return JsonResponse('', safe=False)

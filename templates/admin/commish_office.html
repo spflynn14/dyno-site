@@ -88,6 +88,12 @@
                     {% else %}
                         <a href="/commish/view_model" class="tab_button" id="main_button">View Model</a>
                     {% endif %}
+
+                    {% if request.path == '/commish/enter_transaction' %}
+                        <a href="/commish/enter_transaction" class="tab_button" id="main_button" style="background-color: #2d99d4; color: white">Enter Transaction</a>
+                    {% else %}
+                        <a href="/commish/enter_transaction" class="tab_button" id="main_button">Enter Transaction</a>
+                    {% endif %}
                 </div>
 
                 {% block content %}

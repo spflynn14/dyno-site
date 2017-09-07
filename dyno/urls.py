@@ -167,6 +167,8 @@ urlpatterns = [
     url(r'^skip_to_pick$', processing.skip_to_pick, name='skip to pick - draft'),
     url(r'^check_on_the_clock$', processing.check_on_the_clock, name='check which pick is the current pick'),
     url(r'^convert_rookies_to_free_agents$', processing.convert_rookies_to_free_agents, name='convert rookies'),
+    url(r'^commish/enter_transaction$', views.enter_transaction_page, name='enter transactions'),
+    url(r'^process_manual_transactions$', processing.process_manual_transactions, name='process_manual_transactions'),
 ]
 
 # new draft urls
